@@ -115,12 +115,13 @@ void ff_rel_grant (
 /*------------------------------------------------------------------------*/
 /* If a NULL is returned, the file function fails with FR_NOT_ENOUGH_CORE.
 */
-
+extern tlsf_t UserMem;
 void* ff_memalloc (	/* Returns pointer to the allocated memory block */
 	UINT msize		/* Number of bytes to allocate */
 )
 {
-	return ff_malloc(msize);	/* Allocate a new memory block with POSIX API */
+	//return ff_malloc(msize);	/* Allocate a new memory block with POSIX API */
+	return ff_malloc(UserMem, msize);
 }
 
 
@@ -132,7 +133,9 @@ void ff_memfree (
 	void* mblock	/* Pointer to the memory block to free */
 )
 {
-	ff_free(mblock);	/* Discard the memory block with POSIX API */
+	//ff_free(mblock);	/* Discard the memory block with POSIX API */
+	ff_free(UserMem, mblock);
+	mblock = NULL;
 }
 
 #endif
