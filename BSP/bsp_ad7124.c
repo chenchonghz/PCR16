@@ -14,7 +14,7 @@
 ********************************************************************************
 */
 
-#include "ad7124.h"
+#include "bsp_ad7124.h"
 
 /*
 ********************************************************************************
@@ -22,8 +22,8 @@
 ********************************************************************************
 */
 
-#define AD7124_CS_LOW()          	 HAL_GPIO_WritePin(AD7124_CS_GPIO_Port, AD7124_CS_Pin, GPIO_PIN_RESET)//AD7124_SCLK_GPIO_Port
-#define AD7124_CS_HIGH()            HAL_GPIO_WritePin(AD7124_CS_GPIO_Port, AD7124_CS_Pin, GPIO_PIN_SET)
+#define AD7124_CS_LOW()          	 HAL_GPIO_WritePin(AD_CS_GPIO_Port, AD_CS_Pin, GPIO_PIN_RESET)//AD7124_SCLK_GPIO_Port
+#define AD7124_CS_HIGH()            HAL_GPIO_WritePin(AD_CS_GPIO_Port, AD_CS_Pin, GPIO_PIN_SET)
 
 /*
 ********************************************************************************

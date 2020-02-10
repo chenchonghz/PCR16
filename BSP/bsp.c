@@ -1,6 +1,6 @@
 #include "bsp.h"
 //#include "tim.h"
-//#include "bsp_i2c.h"
+#include "bsp_spi.h"
 #include "bsp_w25qxx.h"
 //#include "bsp_ad7091.h"
 #include "sys_data.h"
@@ -10,9 +10,8 @@
 void	bsp_init(void)
 {
 	SysDataInit();
-//	SysPowerEnable();
 	
-//	bsp_i2c_init();
+	bsp_spi_init();
 	BSP_W25Qx_Init();
 //	BspAD7091Init();
 	//bsp_mlx90614_init();

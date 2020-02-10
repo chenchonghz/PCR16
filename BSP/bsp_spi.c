@@ -21,29 +21,23 @@
 ********************************************************************************
 */
 
-//#define SPI1_RCC_SCK            RCC_APB2Periph_GPIOA
 #define SPI1_PORT_SCK           AD_SCLK_GPIO_Port
 #define SPI1_PIN_SCK            AD_SCLK_Pin
 
-//#define SPI1_RCC_MISO 	        RCC_APB2Periph_GPIOA
 #define SPI1_PORT_MISO	        AD_MISO_GPIO_Port
 #define SPI1_PIN_MISO	       	 AD_MISO_Pin
 
-//#define SPI1_RCC_MOSI 	        RCC_APB2Periph_GPIOA
 #define SPI1_PORT_MOSI	        AD_MOSI_GPIO_Port
 #define SPI1_PIN_MOSI	        	AD_MOSI_Pin
-/*
-#define SPI2_RCC_SCK            RCC_APB2Periph_GPIOB
-#define SPI2_PORT_SCK           GPIOB
-#define SPI2_PIN_SCK            GPIO_Pin_13
 
-#define SPI2_RCC_MISO 	        RCC_APB2Periph_GPIOB
-#define SPI2_PORT_MISO	        GPIOB
-#define SPI2_PIN_MISO	        GPIO_Pin_14
+#define SPI2_PORT_SCK           TMC260_SCK_GPIO_Port
+#define SPI2_PIN_SCK            TMC260_SCK_Pin
 
-#define SPI2_RCC_MOSI 	        RCC_APB2Periph_GPIOB
-#define SPI2_PORT_MOSI	        GPIOB
-#define SPI2_PIN_MOSI	        GPIO_Pin_15*/
+#define SPI2_PORT_MISO	        TMC260_SDO_GPIO_Port
+#define SPI2_PIN_MISO	       	 TMC260_SDO_Pin
+
+#define SPI2_PORT_MOSI	        TMC260_SDI_GPIO_Port
+#define SPI2_PIN_MOSI	        	TMC260_SDI_Pin
 
 
 /*
@@ -109,11 +103,11 @@ static const union _spi_port g_spi_port[SPI_ID_NUMS] = {
         .MISO= {SPI1_PORT_MISO, SPI1_PIN_MISO},
         .MOSI= {SPI1_PORT_MOSI, SPI1_PIN_MOSI}
     },
-    /*[SPI_ID2]._4port = {
+    [SPI_ID2]._4port = {
         .SCK = {SPI2_PORT_SCK,  SPI2_PIN_SCK},
         .MISO= {SPI2_PORT_MISO, SPI2_PIN_MISO},
         .MOSI= {SPI2_PORT_MOSI, SPI2_PIN_MOSI}
-    }*/
+    }
 };
 
 static spi_priv_t   g_spi_priv  [SPI_ID_NUMS] = {
@@ -631,17 +625,17 @@ void bsp_spi_init(void)
 
     pdev->flags &= ~SPI_FLAGS_HARD;
     bsp_spi_open(SPI_ID1);
-#if 0
+#if 1
     pdev = &g_spi[SPI_ID2];
     // 配置SPI引脚SCK 为复用推挽模式 
-    GPIO_InitStructure.GPIO_Pin   = SPI2_PIN_SCK|SPI2_PIN_MOSI;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;	// 推挽输出模式 
-    GPIO_Init(SPI2_PORT_SCK, &GPIO_InitStructure);
+    GPIO_InitStruct.Pin   = SPI2_PIN_SCK|SPI2_PIN_MOSI;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;	// 推挽输出模式 
+    HAL_GPIO_Init(SPI2_PORT_SCK, &GPIO_InitStruct);
 
-    GPIO_InitStructure.GPIO_Pin   = SPI2_PIN_MISO;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;		
-    GPIO_Init(SPI2_PORT_SCK, &GPIO_InitStructure);
+    GPIO_InitStruct.Pin   = SPI2_PIN_MISO;
+    GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;		
+    HAL_GPIO_Init(SPI2_PORT_SCK, &GPIO_InitStruct);
 
     pdev->flags &= ~SPI_FLAGS_HARD;
     bsp_spi_open(SPI_ID2);
