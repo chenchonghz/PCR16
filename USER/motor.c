@@ -56,3 +56,36 @@ void Motor_init(void)
 	TMC260_install(tMotor[MOTOR_ID1].tmc260dev);
 }
 
+
+void enable_motor(TMotor *pdev)
+{
+  struct _io_map const *m_en = &g_motor_port[pdev->id].en;
+  
+  SET_L(m_en);
+}
+
+void disable_motor(TMotor *pdev)
+{
+  struct _io_map const *m_en = &g_motor_port[pdev->id].en;
+  
+  SET_H(m_en);
+}
+
+//void StopMotor(MOTOR_ID id)
+//{
+//    StopPWM(tMotor[id].tmr);
+//    tMotor[id].status.is_run        = MotorState_Stop;
+//}
+
+//static void UpdateMotorTimer(MOTOR_ID id, INT16U val)
+//{
+//    TIM_SetCounter(tMotor[id].tmr, 0);
+//    TIM_SetAutoreload(tMotor[id].tmr, val);
+//    TIM_SetCompare2(tMotor[id].tmr,val/2);
+//}
+
+//static void StartMotorTimer(MOTOR_ID id)
+//{
+//    UpdateMotorTimer(id,(Motor_Timer_CLK/tMotor[id].pCurve->freq_min)-1);    
+//    StartPWM(tMotor[id].tmr);
+//}

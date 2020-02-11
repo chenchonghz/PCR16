@@ -32,7 +32,7 @@
 //#include "misc.h"
 #include "bsp.h"
 //#include "tim.h"
-//#include "bsp_i2c.h"
+#include "task_manage.h"
 //#include "protocol.h"
 //#include "crc.h"
 #include "tlsf.h"

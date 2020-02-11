@@ -63,8 +63,7 @@ void MX_USB_HOST_Process(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 #include "bsp.h"
-#include "Udisk_Program.h"
-#include "Flash_Program.h"
+#include "task_manage.h"
 /* USER CODE END 0 */
 
 /**
@@ -106,7 +105,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   SYS_PRINTF("SYS Startup.");
 bsp_init();
-Flash_DataInit();
+Task_DataInit();
+Task_Init();
 LED_GREEN_ON();
   /* USER CODE END 2 */
 
@@ -118,7 +118,8 @@ LED_GREEN_ON();
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-	Udisk_Program();
+	Udisk_Task();
+	Motor_Task();
   }
   /* USER CODE END 3 */
 }

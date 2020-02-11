@@ -1,9 +1,9 @@
-#include "Flash_Program.h"
+#include "Flash_Task.h"
 #include "rw_spiflash.h"
 
 static void CheckSPIFlash(void);
 
-void Flash_DataInit(void)
+void Flash_TaskInit(void)
 {
 //	DataInit();
 	CheckSPIFlash();

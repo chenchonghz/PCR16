@@ -1,5 +1,5 @@
-#ifndef __TIM_PROGRAM_H__
-#define __TIM_PROGRAM_H__
+#ifndef __TIM_TASK_H__
+#define __TIM_TASK_H__
 
 #include "stm32l4xx_hal.h"
 
@@ -20,6 +20,6 @@ extern volatile uint16_t	_1S_Event;
 extern volatile uint16_t	_2S_Event;
 
 void TIMDataInit(void);
-void TIM_Event(void);
+void TimeEventCallback(void);
 
 #endif

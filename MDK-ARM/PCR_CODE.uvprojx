@@ -488,29 +488,34 @@
           <GroupName>APP</GroupName>
           <Files>
             <File>
-              <FileName>TIM_Program.c</FileName>
+              <FileName>AD_Task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\TIM_Program.c</FilePath>
+              <FilePath>..\APP\AD_Task.c</FilePath>
             </File>
             <File>
-              <FileName>AD_Program.c</FileName>
+              <FileName>Flash_Task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\AD_Program.c</FilePath>
+              <FilePath>..\APP\Flash_Task.c</FilePath>
             </File>
             <File>
-              <FileName>Motor_Program.c</FileName>
+              <FileName>Motor_Task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\Motor_Program.c</FilePath>
+              <FilePath>..\APP\Motor_Task.c</FilePath>
             </File>
             <File>
-              <FileName>Udisk_Program.c</FileName>
+              <FileName>TIM_Task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\Udisk_Program.c</FilePath>
+              <FilePath>..\APP\TIM_Task.c</FilePath>
             </File>
             <File>
-              <FileName>Flash_Program.c</FileName>
+              <FileName>Udisk_Task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\Flash_Program.c</FilePath>
+              <FilePath>..\APP\Udisk_Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>task_manage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\task_manage.c</FilePath>
             </File>
           </Files>
         </Group>

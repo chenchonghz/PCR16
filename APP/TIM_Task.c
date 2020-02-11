@@ -1,4 +1,4 @@
-#include "TIM_Program.h"
+#include "TIM_Task.h"
 //#include "tim.h"
 
 //-------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ void TIMDataInit(void)
 	SysTim.SumNumber = 0;
 }
 
-void TIM_Event(void)
+void TimeEventCallback(void)
 {
 //    if(htim == &htim2)
     {

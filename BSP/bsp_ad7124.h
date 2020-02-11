@@ -430,8 +430,8 @@ CPU_INT32U bsp_ad7124_control_get(ad7124_dev_t *pdev);
 void bsp_ad7124_errorreg_set(ad7124_dev_t *pdev, u8 flag);
 void bsp_ad7124_filterreg_set(ad7124_dev_t *pdev);
 CPU_INT08U bsp_ad7124_conv_ready(ad7124_dev_t *pdev, CPU_INT08U *perr);
-void ad7124_cs_low();
-void ad7124_cs_high();
+void ad7124_cs_low(void);
+void ad7124_cs_high(void);
 #undef EXTERN
 #ifdef __cplusplus
 }
