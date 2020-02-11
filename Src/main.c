@@ -29,7 +29,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "bsp.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,7 +62,9 @@ void MX_USB_HOST_Process(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+#include "bsp.h"
+#include "Udisk_Program.h"
+#include "Flash_Program.h"
 /* USER CODE END 0 */
 
 /**
@@ -104,6 +106,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   SYS_PRINTF("SYS Startup.");
 bsp_init();
+Flash_DataInit();
+LED_GREEN_ON();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,6 +118,7 @@ bsp_init();
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
+	Udisk_Program();
   }
   /* USER CODE END 3 */
 }

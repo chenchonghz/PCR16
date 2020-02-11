@@ -2,19 +2,20 @@
 //#include "tim.h"
 #include "bsp_spi.h"
 #include "bsp_w25qxx.h"
-//#include "bsp_ad7091.h"
+#include "motor.h"
 #include "sys_data.h"
-
+#include "TIM_Program.h"
 ////////////////////////////////////
 //IO≈‰÷√∫Ø ˝
 void	bsp_init(void)
 {
 	SysDataInit();
-	
+	TIMDataInit();
 	bsp_spi_init();
 	BSP_W25Qx_Init();
 //	BspAD7091Init();
 	//bsp_mlx90614_init();
+	Motor_init();
 }
 //io≈‰÷√
 void ioconfig(const struct _io_map *pio, cpu_bool_t sw)

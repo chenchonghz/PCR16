@@ -73,51 +73,34 @@ H*******************************************************************************
 *                                             TYPE DEFINITION
 *********************************************************************************************************
 */
-#define	_SYS_SHUTDOWN_DETECT()			HAL_GPIO_ReadPin(INTR_LT_GPIO_Port, INTR_LT_Pin)
-#define	ReadValveDetectPin()			HAL_GPIO_ReadPin(ValveDet_GPIO_Port,ValveDet_Pin)
-#define	SB_OVC_DETECT()				HAL_GPIO_ReadPin(SB_OVC_GPIO_Port, SB_OVC_Pin)
-#define	USB_OVC_DETECT()			HAL_GPIO_ReadPin(USB_OVC_GPIO_Port, USB_OVC_Pin)
+//#define	_SYS_SHUTDOWN_DETECT()			HAL_GPIO_ReadPin(INTR_LT_GPIO_Port, INTR_LT_Pin)
+//#define	ReadValveDetectPin()			HAL_GPIO_ReadPin(ValveDet_GPIO_Port,ValveDet_Pin)
+//#define	SB_OVC_DETECT()				HAL_GPIO_ReadPin(SB_OVC_GPIO_Port, SB_OVC_Pin)
+//#define	USB_OVC_DETECT()			HAL_GPIO_ReadPin(USB_OVC_GPIO_Port, USB_OVC_Pin)
 
-#define	SysPowerEnable()		HAL_GPIO_WritePin(SysPwrCtrl_GPIO_Port, SysPwrCtrl_Pin,GPIO_PIN_SET)
-#define	SysPowerDisable()		HAL_GPIO_WritePin(SysPwrCtrl_GPIO_Port, SysPwrCtrl_Pin,GPIO_PIN_RESET)
-#define	SlaveboardPowerEnable()			HAL_GPIO_WritePin(SBPwrCtrl_GPIO_Port, SBPwrCtrl_Pin,GPIO_PIN_SET)
-#define	SlaveboardPowerDisable()		HAL_GPIO_WritePin(SBPwrCtrl_GPIO_Port, SBPwrCtrl_Pin,GPIO_PIN_RESET)
-#define	DisplayPowerEnable()		HAL_GPIO_WritePin(DispPwrCtrl_GPIO_Port, DispPwrCtrl_Pin,GPIO_PIN_SET)
-#define	DisplayPowerDisable()		HAL_GPIO_WritePin(DispPwrCtrl_GPIO_Port, DispPwrCtrl_Pin,GPIO_PIN_RESET)
-#define	UsbPowerDisable()		HAL_GPIO_WritePin(USB_PWR_GPIO_Port, USB_PWR_Pin,GPIO_PIN_RESET)
-#define	UsbPowerEnable()		HAL_GPIO_WritePin(USB_PWR_GPIO_Port, USB_PWR_Pin,GPIO_PIN_SET)
-#define	AlarmActive()				HAL_GPIO_WritePin(AlarmActive_GPIO_Port, AlarmActive_Pin,GPIO_PIN_SET)
-#define	AlarmInactive()				HAL_GPIO_WritePin(AlarmActive_GPIO_Port, AlarmActive_Pin,GPIO_PIN_RESET)
+//#define	SysPowerEnable()		HAL_GPIO_WritePin(SysPwrCtrl_GPIO_Port, SysPwrCtrl_Pin,GPIO_PIN_SET)
+//#define	SysPowerDisable()		HAL_GPIO_WritePin(SysPwrCtrl_GPIO_Port, SysPwrCtrl_Pin,GPIO_PIN_RESET)
+//#define	SlaveboardPowerEnable()			HAL_GPIO_WritePin(SBPwrCtrl_GPIO_Port, SBPwrCtrl_Pin,GPIO_PIN_SET)
+//#define	SlaveboardPowerDisable()		HAL_GPIO_WritePin(SBPwrCtrl_GPIO_Port, SBPwrCtrl_Pin,GPIO_PIN_RESET)
+//#define	DisplayPowerEnable()		HAL_GPIO_WritePin(DispPwrCtrl_GPIO_Port, DispPwrCtrl_Pin,GPIO_PIN_SET)
+//#define	DisplayPowerDisable()		HAL_GPIO_WritePin(DispPwrCtrl_GPIO_Port, DispPwrCtrl_Pin,GPIO_PIN_RESET)
 
-#define	PaiqiValvePort		VALVE1_GPIO_Port
-#define	PaiqiValvePin		VALVE1_Pin
-#define	VeinValvePort		VALVE2_GPIO_Port
-#define	VeinValvePin		VALVE2_Pin
-#define	ArteryValvePort		VALVE3_GPIO_Port
-#define	ArteryValvePin		VALVE3_Pin
+#define	Led_Fluo_On()		HAL_GPIO_WritePin(Fluo_OnOff_GPIO_Port, Fluo_OnOff_Pin, GPIO_PIN_RESET)
+#define	Led_Fluo_Off()		HAL_GPIO_WritePin(Fluo_OnOff_GPIO_Port, Fluo_OnOff_Pin, GPIO_PIN_SET)
+#define	Led_FluoBlue_On()		HAL_GPIO_WritePin(Fluo_Blue_GPIO_Port, Fluo_Blue_Pin,GPIO_PIN_RESET)
+#define	Led_FluoBlue_Off()		HAL_GPIO_WritePin(Fluo_Blue_GPIO_Port, Fluo_Blue_Pin,GPIO_PIN_SET)
+#define	Led_FluoGreen_On()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_RESET)
+#define	Led_FluoGreen_Off()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_SET)
 
-#define	PaiqiValveRelease()			HAL_GPIO_WritePin(PaiqiValvePort, PaiqiValvePin, GPIO_PIN_RESET)
-#define	VeinValveRelease()			HAL_GPIO_WritePin(VeinValvePort, VeinValvePin, GPIO_PIN_RESET)
-#define	ArteryValveRelease()		HAL_GPIO_WritePin(ArteryValvePort, ArteryValvePin, GPIO_PIN_RESET)
-#define	AllValveRelease()	\
-do{						\
-	ArteryValveRelease();	\
-	VeinValveRelease();	\
-	PaiqiValveRelease();	\
-}while(0)
+#define	LED_RED_ON()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_SET)
+#define	LED_RED_OFF()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_RESET)
+#define	LED_GREEN_ON()				HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin,GPIO_PIN_SET)
+#define	LED_GREEN_OFF()				HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin,GPIO_PIN_RESET)
+#define	LED_BLUE_ON()				HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin,GPIO_PIN_SET)
+#define	LED_BLUE_OFF()				HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin,GPIO_PIN_RESET)
 
-#define	PaiqiValveActive()			HAL_GPIO_WritePin(PaiqiValvePort, PaiqiValvePin, GPIO_PIN_SET)
-#define	VeinValveActive()			HAL_GPIO_WritePin(VeinValvePort, VeinValvePin, GPIO_PIN_SET)
-#define	ArteryValveActive()			HAL_GPIO_WritePin(ArteryValvePort, ArteryValvePin, GPIO_PIN_SET)
-#define	AllValveActive()	\
-do{						\
-	ArteryValveActive();	\
-	VeinValveActive();	\
-	PaiqiValveActive();	\
-}while(0)
-
-//#define	BEEP_ON()		HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin,GPIO_PIN_SET)
-//#define	BEEP_OFF()		HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin,GPIO_PIN_RESET)
+#define	BEEP_ON()		HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin, GPIO_PIN_SET)
+#define	BEEP_OFF()		HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin, GPIO_PIN_RESET)
 
 struct _io_map {
     GPIO_TypeDef   *port;
