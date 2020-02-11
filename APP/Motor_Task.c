@@ -15,7 +15,7 @@ void Motor_Task(void)
 		return;
 	msg = RecMsgPkt();
 	if(msg->Src == MSG_MOTOR_ACTION)	{
-		
+		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, 100,DEF_False);
 	}
 }
 

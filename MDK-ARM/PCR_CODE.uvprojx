@@ -369,7 +369,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32L476xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32L4xx_HAL_Driver/Inc;../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FatFs/src;../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;../Drivers/CMSIS/Device/ST/STM32L4xx/Include;../Drivers/CMSIS/Include;..\BSP;..\USER;..\APP</IncludePath>
+              <IncludePath>../Inc;  ../Drivers/STM32L4xx_HAL_Driver/Inc;  ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;  ../Middlewares/Third_Party/FatFs/src;  ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;  ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;  ../Drivers/CMSIS/Include;  ..\BSP;  ..\USER;  ..\APP</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -482,11 +482,21 @@
               <FileType>1</FileType>
               <FilePath>..\USER\rw_udisk.c</FilePath>
             </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>APP</GroupName>
           <Files>
+            <File>
+              <FileName>task_manage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\task_manage.c</FilePath>
+            </File>
             <File>
               <FileName>AD_Task.c</FileName>
               <FileType>1</FileType>
@@ -511,11 +521,6 @@
               <FileName>Udisk_Task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\Udisk_Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>task_manage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\task_manage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -569,6 +574,11 @@
               <FileName>sys.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/tim.c</FilePath>
             </File>
             <File>
               <FileName>usart.c</FileName>

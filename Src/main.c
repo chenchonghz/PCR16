@@ -23,6 +23,7 @@
 #include "dma.h"
 #include "fatfs.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
@@ -102,6 +103,7 @@ int main(void)
   MX_UART4_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   SYS_PRINTF("SYS Startup.");
 bsp_init();
