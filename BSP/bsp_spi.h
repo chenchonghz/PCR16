@@ -16,9 +16,7 @@
 * Included Files
 ********************************************************************************
 */
-#include "sys_defs.h"
-#include "sys_types.h"
-#include "sys_data.h"
+#include "includes.h"
 /*
 ********************************************************************************
 * Pre-processor Definitions

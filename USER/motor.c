@@ -69,13 +69,6 @@ void disable_motor(TMotor *pdev)
   SET_H(m_en);
 }
 
-void StopMotor(MOTOR_ID id)
-{
-   	__HAL_TIM_DISABLE_IT(tMotor[id].tmr, TIM_IT_CC3);
-	__HAL_TIM_DISABLE_IT(tMotor[id].tmr,TIM_IT_UPDATE);
-    tMotor[id].status.is_run        = MotorState_Stop;
-}
-
 u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 {
     INT8U err;
@@ -106,6 +99,13 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 //        pMotor->StepsCallback = &MotorSpeedUpDn;
         StartMotorPWM(pMotor->id);
 	}
+}
+
+void StopMotor(MOTOR_ID id)
+{
+   	__HAL_TIM_DISABLE_IT(tMotor[id].tmr, TIM_IT_CC3);
+	__HAL_TIM_DISABLE_IT(tMotor[id].tmr,TIM_IT_UPDATE);
+    tMotor[id].status.is_run        = MotorState_Stop;
 }
 
 static void UpdateMotorTimer(MOTOR_ID id, INT16U val)

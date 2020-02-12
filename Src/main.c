@@ -65,6 +65,11 @@ void MX_USB_HOST_Process(void);
 /* USER CODE BEGIN 0 */
 #include "bsp.h"
 #include "task_manage.h"
+#include "Udisk_Task.h"
+#include "Flash_Task.h"
+#include "Motor_Task.h"
+#include "AD_Task.h"
+#include "TempCtrl_Task.h"
 /* USER CODE END 0 */
 
 /**
@@ -122,6 +127,8 @@ LED_GREEN_ON();
     /* USER CODE BEGIN 3 */
 	Udisk_Task();
 	Motor_Task();
+	AD_Task();
+	TempCtrl_Task();
   }
   /* USER CODE END 3 */
 }
