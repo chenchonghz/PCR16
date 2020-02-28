@@ -1,15 +1,15 @@
-#include "AD_Task.h"
+#include "ad7124.h"
 
 #define AD7124_DATA_READY()		HAL_GPIO_ReadPin(AD_MISO_GPIO_Port, AD_MISO_Pin)
 #define	AD7124_REF_VOLTAGE		(2500) //参考电压 mV
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
 
-static float CalcADCVoltage(u32 adcode);
+//static float CalcADCVoltage(u32 adcode);
 static void AD7124ChannelEnable(void);
-static void StartADDataCollect(void);
+//static void StartADDataCollect(void);
 
-void AD_TaskInit(void)
+void AD7124Init(void)
 {
 	u8 ad7124_id;
 
@@ -67,28 +67,18 @@ static void AD7124ChannelEnable(void)
 	ad7124.status = AD7124_MEASURE_TEMP;		
 }
 
-void AD_Task(void)
-{
-	u8 delaycnt=0;
-	
-	ad7124_cs_low();
-	while(AD7124_DATA_READY())	{//RDY引脚为低时 表示转换完成
-		delaycnt++;
-		if(delaycnt>10)	{
-			ad7124_cs_high();
-			return;
-		}
-	}
-	StartADDataCollect();
-}
-
-static void StartADDataCollect(void)
+void StartADDataCollect(void)
 {
 	u8 r_channel;
 	u8 ad7124_err;
 	u32 ad_code;
 	float temp;
 	
+	ad7124_cs_low();
+	if(AD7124_DATA_READY())	{//RDY引脚为低时 表示转换完成
+		ad7124_cs_high();
+		return;
+	}
 	r_channel = bsp_ad7124_conv_ready(ad7124.pdev, &ad7124_err);//回读当前采样通道
 	if(ad7124_err==AD7124_ERR_NONE)	{
 		if(r_channel == ad7124.channel)	{

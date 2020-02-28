@@ -1,15 +1,13 @@
 /* Includes -----------------------------------------------------------------*/
 #include "task_manage.h"
-//#include "app_udisk.h"
+#include "app_udisk.h"
 #include "app_spiflash.h"
 ////#include "app_display.h"
 //#include "sys_monitor.h"
-//#include "app_perfuseMonitor.h"
 //#include "globalvariable.h"
-//#include "app_motor.h"
-//#include "app_keyscan.h"
+#include "app_motor.h"
 //#include "app_usart.h"
-//#include "sys_alarm.h"
+#include "app_ad.h"
 //////////////////////////////////////////////////////////
 __align(4) OS_STK  TASK_START_STK[STK_SIZE_START]; //任务堆栈声明
 
@@ -54,15 +52,15 @@ static void TaskStart(void * ppdata)
 //创建其他所有任务 在这里我建立了个LED闪烁的任务当例子
 static void TaskCreateOther(void)
 {
-//	AppSafeBoardInit();	
+	AppADInit();	
 //	AppSensorBoardInit();	
 //	AppKeyScanInit();
-//	AppMotorInit();		
+	AppMotorInit();		
 //	AppDisplayInit();
 //	AppPerfusemonitorInit();
 //	AppSysmonitorInit();
-//	AppSpiFlashInit();
-//	AppUSBInit();	
+	AppSpiFlashInit();
+	AppUSBInit();	
 }
 
 

@@ -35,16 +35,13 @@
 #define STK_SIZE_START                 (STK_SIZE_MIN)
 #define STK_SIZE_USART_TX              (STK_SIZE_MIN * 2)
 #define STK_SIZE_USART_RX              (STK_SIZE_MIN * 2)
-//#define STK_SIZE_SAFEBOARD_TX              (STK_SIZE_MIN)
-#define STK_SIZE_SAFEBOARD_RX              (STK_SIZE_MIN)
 #define STK_SIZE_SYSMONITOR            (STK_SIZE_MIN * 2)
 #define STK_SIZE_UDISK								 (STK_SIZE_MIN * 2)
 #define STK_SIZE_SPIFLASH							 (STK_SIZE_MIN * 2)
 #define STK_SIZE_DISPLAY							 (STK_SIZE_MIN * 2)
-#define STK_SIZE_KEYSCAN							 (STK_SIZE_MIN * 1)
 #define STK_SIZE_MOTOR								 (STK_SIZE_MIN * 2)
-#define STK_SIZE_MOTOR_RX							 (STK_SIZE_MIN)
-#define STK_SIZE_PERFUSEMONITOR            (STK_SIZE_MIN * 2)
+#define STK_SIZE_AD								 (STK_SIZE_MIN * 2)
+
 
 /* Task Message Size Configure */
 #define TASK_MSG_SIZE_START             1
@@ -74,16 +71,12 @@
 
 enum _task_prio {
     MUTEX_PRIO_TLSF = TASK_HIGHEST_PRIO,
-    TASK_PRIO_START,   	
+    TASK_PRIO_START,  
+	TASK_PRIO_AD, 	
     TASK_PRIO_USART_TX,
     TASK_PRIO_USART_RX,
-	TASK_PRIO_SAFEBOARD_RX, 
-//	TASK_PRIO_SAFEBOARD_TX, 
-	TASK_PRIO_PERFUSEMONITOR, 	
-//	TASK_PRIO_MOTOR_RX,	
 	TASK_PRIO_MOTOR,	
-	TASK_PRIO_DISPLAY,
-	TASK_PRIO_KEYSCAN,		
+	TASK_PRIO_DISPLAY,	
 	TASK_PRIO_SYSMONITOR,	
 	TASK_PRIO_SPIFLASH,
 	TASK_PRIO_UDISK,

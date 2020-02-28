@@ -28,7 +28,7 @@ void MountUDISK(u8 src)
 //							BSP_PRINTF("udisk filename: %s",fn.fname);
 //						}
 						f_closedir(&dir);
-						udiskfs.udisk_flag |= UDISKFLAG_MOUNTED;
+						udiskfs.flag |= UDISKFLAG_MOUNTED;
 					}
 				}
 				break;
@@ -42,7 +42,7 @@ void MountUDISK(u8 src)
 				}else	{
 					BSP_PRINTF("unmount udisk ok");
 				}
-				udiskfs.udisk_flag &= ~UDISKFLAG_MOUNTED;
+				udiskfs.flag &= ~UDISKFLAG_MOUNTED;
 				break;
 			}
 	}

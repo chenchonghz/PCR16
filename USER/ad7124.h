@@ -1,5 +1,5 @@
-#ifndef __AD_TASK_H__
-#define __AD_TASK_H__
+#ifndef __AD7124_H__
+#define __AD7124_H__
 
 #include "bsp_ad7124.h"
 
@@ -21,7 +21,8 @@ typedef struct  _ad7124
 	u8 busy;
 }_ad7124_t;
 
-void AD_TaskInit(void);
-void AD_Task(void);
+void AD7124Init(void);
+void StartADDataCollect(void);
+float CalcADCVoltage(u32 adcode);
 #endif
 

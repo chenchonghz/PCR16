@@ -20,20 +20,20 @@ void timer_stop(TIM_HandleTypeDef *tmr)
   HAL_TIM_Base_Stop(tmr);
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	if(htim == tMotor[MOTOR_ID1].tmr)	{
-	    __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);  //清除TIMx的中断待处理位:TIM 中断源 
-		if(tMotor[MOTOR_ID1].status.is_run == MotorState_Run)      {
-		  if(tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)
-			tMotor[MOTOR_ID1].CurSteps--;
-		  else
-			tMotor[MOTOR_ID1].CurSteps++;
-//		  tMotor[MOTOR_ID1].StepCnt++;          
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
+//	if(htim == tMotor[MOTOR_ID1].tmr)	{
+//	    __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);  //清除TIMx的中断待处理位:TIM 中断源 
+//		if(tMotor[MOTOR_ID1].status.is_run == MotorState_Run)      {
+//		  if(tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)
+//			tMotor[MOTOR_ID1].CurSteps--;
+//		  else
+//			tMotor[MOTOR_ID1].CurSteps++;
+////		  tMotor[MOTOR_ID1].StepCnt++;          
 
-//		  if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
-//			(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
-//		  }
-		}
-	}
-}
+////		  if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
+////			(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
+////		  }
+//		}
+//	}
+//}

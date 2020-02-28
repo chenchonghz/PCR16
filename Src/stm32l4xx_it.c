@@ -23,11 +23,13 @@
 #include "stm32l4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "includes.h"
+#include "motor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
-#include "TIM_Task.h"
+
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -57,6 +59,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
+extern TIM_HandleTypeDef htim3;
 extern DMA_HandleTypeDef hdma_uart4_tx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart4;
@@ -168,29 +171,17 @@ void DebugMon_Handler(void)
 }
 
 /**
-  * @brief This function handles Pendable request for system service.
-  */
-void PendSV_Handler(void)
-{
-  /* USER CODE BEGIN PendSV_IRQn 0 */
-
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
-
-  /* USER CODE END PendSV_IRQn 1 */
-}
-
-/**
   * @brief This function handles System tick timer.
   */
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-TimeEventCallback();
+	OSIntEnter();		
+  OSTimeTick();      
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+	OSIntExit();       
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -207,12 +198,40 @@ TimeEventCallback();
 void DMA1_Channel7_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
-
+OSIntEnter();
   /* USER CODE END DMA1_Channel7_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_usart2_tx);
   /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
-
+OSIntExit();
   /* USER CODE END DMA1_Channel7_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM3 global interrupt.
+  */
+void TIM3_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+OSIntEnter();
+	if(__HAL_TIM_GET_FLAG(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE)==SET)	{
+		__HAL_TIM_CLEAR_FLAG(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE);  //清除TIMx的中断待处理位:TIM 中断源 
+		if(tMotor[MOTOR_ID1].status.is_run == MotorState_Run)      {
+			if(tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)
+				tMotor[MOTOR_ID1].CurSteps--;
+			else
+				tMotor[MOTOR_ID1].CurSteps++;
+	//		  tMotor[MOTOR_ID1].StepCnt++;          
+
+	//		  if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
+	//			(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
+	//		  }
+		}
+	}
+  /* USER CODE END TIM3_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim3);
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+OSIntExit();
+  /* USER CODE END TIM3_IRQn 1 */
 }
 
 /**
@@ -221,11 +240,11 @@ void DMA1_Channel7_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-
+OSIntEnter();
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
-
+OSIntExit();
   /* USER CODE END USART2_IRQn 1 */
 }
 
@@ -235,11 +254,11 @@ void USART2_IRQHandler(void)
 void UART4_IRQHandler(void)
 {
   /* USER CODE BEGIN UART4_IRQn 0 */
-
+OSIntEnter();
   /* USER CODE END UART4_IRQn 0 */
   HAL_UART_IRQHandler(&huart4);
   /* USER CODE BEGIN UART4_IRQn 1 */
-
+OSIntExit();
   /* USER CODE END UART4_IRQn 1 */
 }
 
@@ -249,11 +268,11 @@ void UART4_IRQHandler(void)
 void DMA2_Channel3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Channel3_IRQn 0 */
-
+OSIntEnter();
   /* USER CODE END DMA2_Channel3_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_uart4_tx);
   /* USER CODE BEGIN DMA2_Channel3_IRQn 1 */
-
+OSIntExit();
   /* USER CODE END DMA2_Channel3_IRQn 1 */
 }
 
@@ -263,11 +282,11 @@ void DMA2_Channel3_IRQHandler(void)
 void OTG_FS_IRQHandler(void)
 {
   /* USER CODE BEGIN OTG_FS_IRQn 0 */
-
+OSIntEnter();
   /* USER CODE END OTG_FS_IRQn 0 */
   HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
   /* USER CODE BEGIN OTG_FS_IRQn 1 */
-
+OSIntExit();
   /* USER CODE END OTG_FS_IRQn 1 */
 }
 

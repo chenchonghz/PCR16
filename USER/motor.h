@@ -64,6 +64,8 @@ typedef struct {
 
 typedef struct Motor_t {
      MOTOR_ID     	id;
+	    OS_EVENT            *Sem;
+    OS_EVENT            *Mbox;
     TIM_HandleTypeDef   *tmr;                        
     motor_state_t       status;       
     INT8U               Dir;                        

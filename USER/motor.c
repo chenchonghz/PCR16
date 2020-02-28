@@ -48,12 +48,6 @@ static motor_priv_t g_motor_priv[MOTOR_ID_NUMS]={
 };
 TMotor tMotor[MOTOR_ID_NUMS];
 
-void Motor_init(void)
-{
-	TMC260_install(tMotor[MOTOR_ID1].tmc260dev);
-	tMotor[MOTOR_ID1].tmr = &htim3;
-}
-
 
 void enable_motor(TMotor *pdev)
 {

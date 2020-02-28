@@ -8,7 +8,7 @@
 typedef struct _udiskfs	{
 	FATFS fs;
 	FIL	fil;
-	u8 udisk_flag;
+	u8 flag;
 } _udiskfs_t;
 
 extern _udiskfs_t udiskfs;

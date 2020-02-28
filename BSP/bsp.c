@@ -4,18 +4,16 @@
 #include "bsp_w25qxx.h"
 #include "motor.h"
 #include "sys_data.h"
-#include "TIM_Task.h"
+
 ////////////////////////////////////
 //IO≈‰÷√∫Ø ˝
 void	bsp_init(void)
 {
 	SysDataInit();
-	TIMDataInit();
+//	TIMDataInit();
 	bsp_spi_init();
 	BSP_W25Qx_Init();
 //	BspAD7091Init();
-	//bsp_mlx90614_init();
-	Motor_init();
 }
 //io≈‰÷√
 void ioconfig(const struct _io_map *pio, cpu_bool_t sw)

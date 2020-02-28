@@ -1,5 +1,6 @@
 #include "sys_data.h"
 
+_sys_t sys;
 _syserror_t SysError;
 _sys_data_t SysData;
 tlsf_t UserMem;
@@ -12,5 +13,6 @@ void SysDataInit(void)
 	SysData.HeatCoverTemp = 0;
 	SysData.PD_1 = 0;
 	SysData.PD_2 = 0;
+	sys.state = SysState_None;
 }
 
