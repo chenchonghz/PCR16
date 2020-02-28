@@ -120,43 +120,43 @@
 */
 
 /************************************** 8-bit DATA TYPE DEFINITION ************************************/
-typedef           unsigned char           INT8U;      /*          Unsigned  8 bit Quantity          */
-typedef             signed char           INT8S;      /*            Signed  8 bit Quantity          */
-typedef             unsigned char   const   INT8UC;     /*          Unsigned  8 bit Constant          */
-typedef               signed char   const   INT8SC;     /*            Signed  8 bit Constant          */
-typedef volatile    unsigned char           VINT8U;     /* Volatile Unsigned  8 bit Quantity          */
-typedef volatile      signed char           VINT8S;     /* Volatile   Signed  8 bit Quantity          */
-typedef volatile    unsigned char   const   VINT8UC;    /* Volatile Unsigned  8 bit Constant          */
-typedef volatile      signed char   const   VINT8SC;    /* Volatile   Signed  8 bit Constant          */
+//typedef           unsigned char           INT8U;      /*          Unsigned  8 bit Quantity          */
+//typedef             signed char           INT8S;      /*            Signed  8 bit Quantity          */
+//typedef             unsigned char   const   INT8UC;     /*          Unsigned  8 bit Constant          */
+//typedef               signed char   const   INT8SC;     /*            Signed  8 bit Constant          */
+//typedef volatile    unsigned char           VINT8U;     /* Volatile Unsigned  8 bit Quantity          */
+//typedef volatile      signed char           VINT8S;     /* Volatile   Signed  8 bit Quantity          */
+//typedef volatile    unsigned char   const   VINT8UC;    /* Volatile Unsigned  8 bit Constant          */
+//typedef volatile      signed char   const   VINT8SC;    /* Volatile   Signed  8 bit Constant          */
 /************************************* 16-bit DATA TYPE DEFINITION ************************************/
-typedef           unsigned short          INT16U;     /*          Unsigned 16 bit Quantity          */
-typedef             signed short          INT16S;     /*            Signed 16 bit Quantity          */
-typedef             unsigned short  const   INT16UC;    /*          Unsigned 16 bit Constant          */
-typedef               signed short  const   INT16SC;    /*            Signed 16 bit Constant          */
-typedef volatile    unsigned short          VINT16U;    /* Volatile Unsigned 16 bit Quantity          */
-typedef volatile      signed short          VINT16S;    /* Volatile   Signed 16 bit Quantity          */
-typedef volatile    unsigned short  const   VINT16UC;   /* Volatile Unsigned 16 bit Constant          */
-typedef volatile      signed short  const   VINT16SC;   /* Volatile   Signed 16 bit Constant          */
+//typedef           unsigned short          INT16U;     /*          Unsigned 16 bit Quantity          */
+//typedef             signed short          INT16S;     /*            Signed 16 bit Quantity          */
+//typedef             unsigned short  const   INT16UC;    /*          Unsigned 16 bit Constant          */
+//typedef               signed short  const   INT16SC;    /*            Signed 16 bit Constant          */
+//typedef volatile    unsigned short          VINT16U;    /* Volatile Unsigned 16 bit Quantity          */
+//typedef volatile      signed short          VINT16S;    /* Volatile   Signed 16 bit Quantity          */
+//typedef volatile    unsigned short  const   VINT16UC;   /* Volatile Unsigned 16 bit Constant          */
+//typedef volatile      signed short  const   VINT16SC;   /* Volatile   Signed 16 bit Constant          */
 /************************************* 32-bit DATA TYPE DEFINITION ************************************/
-typedef           unsigned long           INT32U;     /*          Unsigned 32 bit Quantity          */
-typedef             signed long           INT32S;     /*            Signed 32 bit Quantity          */
-typedef             unsigned long   const   INT32UC;    /*          Unsigned 32 bit Constant          */
-typedef               signed long   const   INT32SC;    /*            Signed 32 bit Constant          */
-typedef volatile    unsigned long           VINT32U;    /* Volatile Unsigned 32 bit Quantity          */
-typedef volatile      signed long           VINT32S;    /* Volatile   Signed 32 bit Quantity          */
-typedef volatile    unsigned long   const   VINT32UC;   /* Volatile Unsigned 32 bit Constant          */
-typedef volatile      signed long   const   VINT32SC;   /* Volatile   Signed 32 bit Constant          */
+//typedef           unsigned long           INT32U;     /*          Unsigned 32 bit Quantity          */
+//typedef             signed long           INT32S;     /*            Signed 32 bit Quantity          */
+//typedef             unsigned long   const   INT32UC;    /*          Unsigned 32 bit Constant          */
+//typedef               signed long   const   INT32SC;    /*            Signed 32 bit Constant          */
+//typedef volatile    unsigned long           VINT32U;    /* Volatile Unsigned 32 bit Quantity          */
+//typedef volatile      signed long           VINT32S;    /* Volatile   Signed 32 bit Quantity          */
+//typedef volatile    unsigned long   const   VINT32UC;   /* Volatile Unsigned 32 bit Constant          */
+//typedef volatile      signed long   const   VINT32SC;   /* Volatile   Signed 32 bit Constant          */
 /************************************* 64-bit DATA TYPE DEFINITION ************************************/
-typedef          unsigned long long         INT64U;     /*          Unsigned 64 bit Quantity          */
-typedef            signed long long         INT64S;     /*            Signed 64 bit Quantity          */
-typedef          unsigned long long const   INT64UC;    /*          Unsigned 64 bit Constant          */
-typedef            signed long long const   INT64SC;    /*            Signed 64 bit Constant          */
-typedef volatile unsigned long long         VINT64U;    /* Volatile Unsigned 64 bit Quantity          */
-typedef volatile   signed long long         VINT64S;    /* Volatile   Signed 64 bit Quantity          */
-typedef volatile unsigned long long const   VINT64UC;   /* Volatile Unsigned 64 bit Constant          */
-typedef volatile   signed long long const   VINT64SC;   /* Volatile   Signed 64 bit Constant          */
+//typedef          unsigned long long         INT64U;     /*          Unsigned 64 bit Quantity          */
+//typedef            signed long long         INT64S;     /*            Signed 64 bit Quantity          */
+//typedef          unsigned long long const   INT64UC;    /*          Unsigned 64 bit Constant          */
+//typedef            signed long long const   INT64SC;    /*            Signed 64 bit Constant          */
+//typedef volatile unsigned long long         VINT64U;    /* Volatile Unsigned 64 bit Quantity          */
+//typedef volatile   signed long long         VINT64S;    /* Volatile   Signed 64 bit Quantity          */
+//typedef volatile unsigned long long const   VINT64UC;   /* Volatile Unsigned 64 bit Constant          */
+//typedef volatile   signed long long const   VINT64SC;   /* Volatile   Signed 64 bit Constant          */
 /************************************* Float DATA TYPE DEFINITION *************************************/
-typedef float                             FP32;       /* Single precision floating point            */
+//typedef float                             FP32;       /* Single precision floating point            */
 //typedef double                            FP64;       /* Double precision floating point            */
 /******************************************************************************************************/
 typedef            void         CPU_VOID;

@@ -17,6 +17,8 @@
 ********************************************************************************
 */
 #include "includes.h"
+
+
 /*
 ********************************************************************************
 * Pre-processor Definitions
@@ -69,7 +71,7 @@ typedef struct _spi_ops {
 typedef struct _spi {
     const CPU_INT08U    id;
     CPU_INT16U          flags;
-   // OS_EVENT           *lock;
+    OS_EVENT           *lock;
   //const spi_ops_t    *ops;
     void               *priv;
 } spi_t;

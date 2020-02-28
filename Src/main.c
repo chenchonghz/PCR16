@@ -63,13 +63,7 @@ void MX_USB_HOST_Process(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#include "bsp.h"
 #include "task_manage.h"
-#include "Udisk_Task.h"
-#include "Flash_Task.h"
-#include "Motor_Task.h"
-#include "AD_Task.h"
-#include "TempCtrl_Task.h"
 /* USER CODE END 0 */
 
 /**
@@ -111,10 +105,8 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   SYS_PRINTF("SYS Startup.");
-bsp_init();
-Task_DataInit();
-Task_Init();
 LED_GREEN_ON();
+CreatMainTask();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,10 +117,6 @@ LED_GREEN_ON();
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-	Udisk_Task();
-	Motor_Task();
-	AD_Task();
-	TempCtrl_Task();
   }
   /* USER CODE END 3 */
 }

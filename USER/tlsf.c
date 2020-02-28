@@ -1093,12 +1093,16 @@ tlsf_t tlsf_create(void* mem)
 
 	return tlsf_cast(tlsf_t, mem);
 }
-
+#include "ucos_ii.h"
+#include "os_cpu.h"
+#include "os_cfg.h"
+#include "msg.h"
+OS_EVENT           *tlsf_lock;
 tlsf_t tlsf_create_with_pool(void* mem, size_t bytes)
 {
 	tlsf_t tlsf = tlsf_create(mem);
 	tlsf_add_pool(tlsf, (char*)mem + tlsf_size(), bytes - tlsf_size());
-//	tlsf_lock         = OSSemCreate(1);
+	tlsf_lock         = OSSemCreate(1);
 	return tlsf;
 }
 
@@ -1116,12 +1120,12 @@ pool_t tlsf_get_pool(tlsf_t tlsf)
 void* tlsf_malloc(tlsf_t tlsf, size_t size)
 {
 	void *ret;
-//	mutex_lock(tlsf_lock);
+	mutex_lock(tlsf_lock);
 	control_t* control = tlsf_cast(control_t*, tlsf);
 	const size_t adjust = adjust_request_size(size, ALIGN_SIZE);
 	block_header_t* block = block_locate_free(control, adjust);
 	ret = block_prepare_used(control, block, adjust);
-//	mutex_unlock(tlsf_lock);
+	mutex_unlock(tlsf_lock);
 	return ret;
 }
 
@@ -1184,7 +1188,7 @@ void* tlsf_memalign(tlsf_t tlsf, size_t align, size_t size)
 
 void tlsf_free(tlsf_t tlsf, void* ptr)
 {
-//	mutex_lock(tlsf_lock);
+	mutex_lock(tlsf_lock);
 	/* Don't attempt to free a NULL pointer. */
 	if (ptr)
 	{
@@ -1196,7 +1200,7 @@ void tlsf_free(tlsf_t tlsf, void* ptr)
 		block = block_merge_next(control, block);
 		block_insert(control, block);
 	}
-//	mutex_unlock(tlsf_lock);
+	mutex_unlock(tlsf_lock);
 }
 
 /*

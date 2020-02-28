@@ -29,6 +29,7 @@ typedef struct _sys_data	{
 
 extern _sys_data_t SysData;
 extern tlsf_t UserMem;
+extern _syserror_t SysError;;
 
 void SysDataInit(void);
 
