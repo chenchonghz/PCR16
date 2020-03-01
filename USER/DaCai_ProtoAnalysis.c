@@ -99,7 +99,7 @@ void DaCai_SendData(u8 *buf, u16 length)
 	OSTimeDly(5);
 }
 
-void UART1_DMA_Callback(DMA_HandleTypeDef *hdma)
+void DaCaiUART_DMA_Callback(DMA_HandleTypeDef *hdma)
 {
 	mutex_unlock(dacai.lock);
 }

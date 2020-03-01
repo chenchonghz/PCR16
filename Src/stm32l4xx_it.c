@@ -65,7 +65,8 @@ extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
-
+#include "app_display.h"
+extern void DaCaiUART_DMA_Callback(DMA_HandleTypeDef *hdma);
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -193,12 +194,40 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles EXTI line2 interrupt.
+  */
+void EXTI2_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI2_IRQn 0 */
+OSIntEnter();
+  /* USER CODE END EXTI2_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+  /* USER CODE BEGIN EXTI2_IRQn 1 */
+OSIntExit();
+  /* USER CODE END EXTI2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line4 interrupt.
+  */
+void EXTI4_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI4_IRQn 0 */
+OSIntEnter();
+  /* USER CODE END EXTI4_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+  /* USER CODE BEGIN EXTI4_IRQn 1 */
+OSIntExit();
+  /* USER CODE END EXTI4_IRQn 1 */
+}
+
+/**
   * @brief This function handles DMA1 channel7 global interrupt.
   */
 void DMA1_Channel7_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
-OSIntEnter();
+OSIntEnter();//上位机通讯串口uart2 dma发送中断
   /* USER CODE END DMA1_Channel7_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_usart2_tx);
   /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
@@ -228,7 +257,6 @@ OSIntEnter();
 		}
 	}
   /* USER CODE END TIM3_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
 OSIntExit();
   /* USER CODE END TIM3_IRQn 1 */
@@ -240,9 +268,8 @@ OSIntExit();
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-OSIntEnter();
+OSIntEnter();//上位机通讯
   /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
 OSIntExit();
   /* USER CODE END USART2_IRQn 1 */
@@ -254,9 +281,23 @@ OSIntExit();
 void UART4_IRQHandler(void)
 {
   /* USER CODE BEGIN UART4_IRQn 0 */
+	u8 rxdat;//串口屏通讯
 OSIntEnter();
+	if(__HAL_UART_GET_IT(appdis.pDaCai->phuart, UART_IT_RXNE)==SET)	{
+		rxdat = (uint8_t)(appdis.pDaCai->phuart->Instance->RDR);
+		if(appdis.pDaCai->puart_t->rx_indicate!=NULL)	{
+				appdis.pDaCai->puart_t->rx_indicate(appdis.pDaCai->puart_t,rxdat);
+		}
+	}
+	if(__HAL_UART_GET_FLAG(appdis.pDaCai->phuart, UART_FLAG_ORE)==SET)	{
+		rxdat = (uint8_t)(appdis.pDaCai->phuart->Instance->RDR);
+		__HAL_UART_CLEAR_OREFLAG(appdis.pDaCai->phuart);
+	}
+	if(__HAL_UART_GET_FLAG(appdis.pDaCai->phuart, UART_CLEAR_TCF)==SET)	{
+		appdis.pDaCai->phuart->gState = HAL_UART_STATE_READY;
+		__HAL_UART_CLEAR_FLAG(appdis.pDaCai->phuart,UART_CLEAR_TCF);
+	}
   /* USER CODE END UART4_IRQn 0 */
-  HAL_UART_IRQHandler(&huart4);
   /* USER CODE BEGIN UART4_IRQn 1 */
 OSIntExit();
   /* USER CODE END UART4_IRQn 1 */
@@ -268,9 +309,12 @@ OSIntExit();
 void DMA2_Channel3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Channel3_IRQn 0 */
-OSIntEnter();
+OSIntEnter();//串口屏uart4 dma发送中断
+	if(__HAL_DMA_GET_FLAG(&hdma_uart4_tx, DMA_FLAG_TC3)==DMA_FLAG_TC3)	{
+		DaCaiUART_DMA_Callback(&hdma_uart4_tx);
+		__HAL_DMA_CLEAR_FLAG(&hdma_uart4_tx,DMA_FLAG_TC3);
+	}
   /* USER CODE END DMA2_Channel3_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_uart4_tx);
   /* USER CODE BEGIN DMA2_Channel3_IRQn 1 */
 OSIntExit();
   /* USER CODE END DMA2_Channel3_IRQn 1 */

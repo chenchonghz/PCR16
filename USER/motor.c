@@ -10,6 +10,8 @@ typedef struct _motor_priv{
 	struct _motor_port *pport;
 }motor_priv_t;
 
+#define	Motor_LeftLimit()				HAL_GPIO_ReadPin(LimitSwitchLeft_GPIO_Port, LimitSwitchLeft_Pin)
+#define	Motor_RigtLimit()				HAL_GPIO_ReadPin(LimitSwitchRgiht_GPIO_Port, LimitSwitchRgiht_Pin)
 /*
 *********************************************************************************************************
 *                                       PRIVATE FUNCTION PROTOTYPES
@@ -19,6 +21,7 @@ static void     UpdateMotorTimer        (MOTOR_ID id, INT16U val);
 static void     CalcSpedingProcedure    (MOTOR_ID id,INT8U if_acc);
 static void UpdateMotorTimer(MOTOR_ID id, INT16U val);
 static void StartMotorPWM(MOTOR_ID id);
+static void StopMotorPWM(MOTOR_ID id);
 /*
 *********************************************************************************************************
 *                                  PRIVATE GLOBAL CONSTANTS & VARIABLES
@@ -63,6 +66,15 @@ void disable_motor(TMotor *pdev)
   SET_H(m_en);
 }
 
+void StopMotor(TMotor *pMotor)
+{
+	StopMotorPWM(pMotor->id);
+	if(pMotor->status.is_run==MotorState_Run)	{
+		OSSemPost(pMotor->Sem);
+		pMotor->status.is_run        = MotorState_Stop;
+	}
+}
+
 u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 {
     INT8U err;
@@ -76,13 +88,13 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
     {
         pMotor->Dir = dir;
         if(pMotor->Dir) {//前进
-//            if(QueryZ1Opt())//在上限开关位置
-//                goto _end;
+            if(Motor_LeftLimit())//在上限开关位置
+                goto _end;
             SET_H(m_dir);
         }
         else    {//后退
-//            if(QueryZ2Opt())//在下限开关位置
-//                goto _end;
+            if(Motor_LeftLimit())//在下限开关位置
+                goto _end;
             SET_L(m_dir);
         }
         enable_motor(pMotor);
@@ -92,13 +104,16 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
         pMotor->TableIndex    = 0;
 //        pMotor->StepsCallback = &MotorSpeedUpDn;
         StartMotorPWM(pMotor->id);
+		OSSemPend(pMotor->Sem, 0, &err);//等待事件触发
 	}
+_end:
+	
+	return 1;
 }
 
-void StopMotor(MOTOR_ID id)
+static void StopMotorPWM(MOTOR_ID id)
 {
-   	__HAL_TIM_DISABLE_IT(tMotor[id].tmr, TIM_IT_CC3);
-	__HAL_TIM_DISABLE_IT(tMotor[id].tmr,TIM_IT_UPDATE);
+	HAL_TIM_PWM_Stop(tMotor[id].tmr, TIM_CHANNEL_3);
     tMotor[id].status.is_run        = MotorState_Stop;
 }
 
@@ -111,8 +126,6 @@ static void UpdateMotorTimer(MOTOR_ID id, INT16U val)
 
 static void StartMotorPWM(MOTOR_ID id)
 {
-//    UpdateMotorTimer(id,(Motor_Timer_CLK/tMotor[id].pCurve->freq_min)-1);    
-	__HAL_TIM_ENABLE_IT(tMotor[id].tmr, TIM_IT_CC3);
 	__HAL_TIM_CLEAR_FLAG(tMotor[id].tmr, TIM_FLAG_UPDATE);
-	__HAL_TIM_ENABLE_IT(tMotor[id].tmr,TIM_IT_UPDATE);
+	HAL_TIM_PWM_Start(tMotor[id].tmr, TIM_CHANNEL_3);	
 }

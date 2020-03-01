@@ -12,7 +12,7 @@ typedef struct _appdisplay	{
 	_UI_t *pUI;
 }_appdisplay_t;
 
-//extern _appdisplay_t appdis;
+extern _appdisplay_t appdis;
 void AppDisplayInit(void);
 void StartAppDisplay(message_pkt_t *msg);
 

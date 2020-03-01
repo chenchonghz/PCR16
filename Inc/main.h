@@ -68,6 +68,7 @@ void Error_Handler(void);
 #define CoolFanCtrl_GPIO_Port GPIOC
 #define LimitSwitchRgiht_Pin GPIO_PIN_2
 #define LimitSwitchRgiht_GPIO_Port GPIOC
+#define LimitSwitchRgiht_EXTI_IRQn EXTI2_IRQn
 #define DoorSwitch_Pin GPIO_PIN_3
 #define DoorSwitch_GPIO_Port GPIOC
 #define TMC260_CS_Pin GPIO_PIN_4
@@ -122,6 +123,7 @@ void Error_Handler(void);
 #define AD_CS_GPIO_Port GPIOB
 #define LimitSwitchLeft_Pin GPIO_PIN_4
 #define LimitSwitchLeft_GPIO_Port GPIOB
+#define LimitSwitchLeft_EXTI_IRQn EXTI4_IRQn
 #define MAX5401_SCLK_Pin GPIO_PIN_8
 #define MAX5401_SCLK_GPIO_Port GPIOB
 #define MAX5401_DIN_Pin GPIO_PIN_9

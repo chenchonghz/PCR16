@@ -56,6 +56,37 @@ enum eMotorState {
     MotorState_Unkown = 0xff
 };
 
+enum eActionState {
+    ActionState_Unknown     = 0,    // Action State:Unknown
+    ActionState_Doing       = 1,    // Action State:Doing
+    ActionState_OK          = 2,    // Action State:OK
+    ActionState_Fail        = 3     // Action State:Fail
+};
+
+enum eMotorAbort {
+	MotorAbort_Normal    = 0,       // Motor Abort:Normal
+	MotorAbort_OverSteps = 1,       // Motor Abort:Over steps
+	MotorAbort_Stuck   = 2,       // Motor Abort:door opened
+	MotorAbort_LimitOpt  = 3,        // Motor Abort:touch limit opt
+	MotorAbort_Min_LimitOpt  = 4,
+	MotorAbort_Max_LimitOpt  = 5,
+	MotorAbort_Reset_err,
+	//MotorAbort_YReset_err,
+	MotorAbort_Zero_err,
+	//MotorAbort_YZero_err,
+	MotorAbort_LostSteps,
+};
+
+enum eMotorAction {
+    MotorAction_Unknown             = 0,    // Motor Action:Unknown
+    MotorAction_Resetting           = 1,          // Motor Action:Reset doing
+    MotorAction_ResetOK             = 2,          // Motor Action:Reset OK
+    MotorAction_ResetFail           = 3,          // Motor Action:Reset Fail
+	MotorAction_Moving              = 4, // Motor Action:Move doing
+    MotorAction_MoveOK              = 5, // Motor Action:Move OK
+    MotorAction_MoveFail            = 6, // Motor Action:Move Fail
+};
+
 typedef struct {
     INT8U   is_run;
     INT8U   action;
@@ -97,6 +128,6 @@ extern TMotor tMotor[MOTOR_ID_NUMS];
 
 void Motor_init(void);
 u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc);
-
+void StopMotor(TMotor *pMotor);
 #endif
 

@@ -163,10 +163,29 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 4, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 4, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
 }
 
 /* USER CODE BEGIN 2 */
-
+#include "motor.h"
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if(GPIO_Pin == LimitSwitchRgiht_Pin) //电机右限位点
+    {
+		StopMotor(&tMotor[MOTOR_ID1]);
+		tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Max_LimitOpt;
+	}
+	else if(GPIO_Pin == LimitSwitchLeft_Pin)//电机左限位点
+	{
+		StopMotor(&tMotor[MOTOR_ID1]);
+		tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Min_LimitOpt;
+	}
+}
 /* USER CODE END 2 */
-
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
