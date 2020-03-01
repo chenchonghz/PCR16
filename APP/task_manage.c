@@ -2,7 +2,7 @@
 #include "task_manage.h"
 #include "app_udisk.h"
 #include "app_spiflash.h"
-////#include "app_display.h"
+#include "app_display.h"
 //#include "sys_monitor.h"
 //#include "globalvariable.h"
 #include "app_motor.h"
@@ -56,7 +56,7 @@ static void TaskCreateOther(void)
 //	AppSensorBoardInit();	
 //	AppKeyScanInit();
 	AppMotorInit();		
-//	AppDisplayInit();
+	AppDisplayInit();
 //	AppPerfusemonitorInit();
 //	AppSysmonitorInit();
 	AppSpiFlashInit();

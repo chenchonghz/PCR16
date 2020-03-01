@@ -39,7 +39,7 @@
 #include "task_config.h"
 #include "task_manage.h"
 #include "timer.h"
-//#include "protocol.h"
+#include "protocol.h"
 #include "msg.h"
 #include "tlsf.h"
 #include "sys_data.h"

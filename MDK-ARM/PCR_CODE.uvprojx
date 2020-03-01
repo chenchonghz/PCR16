@@ -502,6 +502,16 @@
               <FileType>1</FileType>
               <FilePath>..\USER\ad7124.c</FilePath>
             </File>
+            <File>
+              <FileName>DaCai_API.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\DaCai_API.c</FilePath>
+            </File>
+            <File>
+              <FileName>DaCai_ProtoAnalysis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\DaCai_ProtoAnalysis.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
