@@ -5,6 +5,7 @@
 #include "sys_types.h"
 #include "sys_defs.h"
 #include "tlsf.h"
+#include "timestamp.h"
 
 #define	FILE_NAME_LEN		50
 #define	LOG_FILE_NAME		"Pcr16Log.txt"//"PerfusionLog.txt"
@@ -43,6 +44,7 @@ typedef struct _sys_data	{
 
 extern _sys_t sys;
 extern _sys_data_t SysData;
+extern RTC_TIME_ST SysTime;
 extern tlsf_t UserMem;
 extern _syserror_t SysError;;
 

@@ -188,4 +188,5 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 }
 /* USER CODE END 2 */
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

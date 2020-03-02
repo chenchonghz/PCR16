@@ -11,17 +11,6 @@ void AppMotorInit (void)
 	OSTaskCreate(AppMotorTask,  (void * )0, (OS_STK *)&TASK_MOTOR_STK[STK_SIZE_MOTOR-1], TASK_PRIO_MOTOR);
 }
 
-static void MotorReset(void)
-{
-    u8 reset_cnt=0;
-    s32 movelen;
-
-    tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
-    tMotor[MOTOR_ID1].status.action     = MotorAction_Resetting;
-//	tMotor[MOTOR_ID1].Con1Len = Motor_Constant1_LEN;
-	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, MOTOR_LEN_MAX, DEF_False);
-}
-
 static void MotorDatInit (void)
 {
 	tMotor[MOTOR_ID1].id                  = MOTOR_ID1;
@@ -36,12 +25,24 @@ static void MotorDatInit (void)
 //	tMotor[MOTOR_ID1].CurSteps = 0;
 }
 
+static void MotorReset(void)
+{
+    u8 reset_cnt=0;
+    s32 movelen;
+
+    tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
+    tMotor[MOTOR_ID1].status.action     = MotorAction_Resetting;
+//	tMotor[MOTOR_ID1].Con1Len = Motor_Constant1_LEN;
+	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, MOTOR_LEN_MAX, DEF_False);
+}
+
 static void AppMotorTask (void *parg)
 {
     INT8U err;
     message_pkt_t *msg;
 	
 	MotorDatInit();
+	__HAL_TIM_ENABLE_IT(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE);
 	TMC260_install(tMotor[MOTOR_ID1].tmc260dev);
 	MotorReset();
 	tMotor[MOTOR_ID1].CurSteps = 0;

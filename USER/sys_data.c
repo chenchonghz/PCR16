@@ -3,6 +3,7 @@
 _sys_t sys;
 _syserror_t SysError;
 _sys_data_t SysData;
+RTC_TIME_ST SysTime;
 tlsf_t UserMem;
 void SysDataInit(void)
 {
@@ -14,5 +15,13 @@ void SysDataInit(void)
 	SysData.PD_1 = 0;
 	SysData.PD_2 = 0;
 	sys.state = SysState_None;
+	
+	SysTime.tm_year = 2019;
+	SysTime.tm_mon = 7;
+	SysTime.tm_mday = 17;
+	SysTime.tm_hour = 17;
+	SysTime.tm_min = 44;
+	SysTime.tm_sec = 20;
+	SysTime.tm_wday = 3;
 }
 

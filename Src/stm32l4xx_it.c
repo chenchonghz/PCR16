@@ -251,9 +251,9 @@ OSIntEnter();
 				tMotor[MOTOR_ID1].CurSteps++;
 	//		  tMotor[MOTOR_ID1].StepCnt++;          
 
-	//		  if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
-	//			(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
-	//		  }
+//			if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
+//				(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
+//			}
 		}
 	}
   /* USER CODE END TIM3_IRQn 0 */
@@ -270,6 +270,7 @@ void USART2_IRQHandler(void)
   /* USER CODE BEGIN USART2_IRQn 0 */
 OSIntEnter();//上位机通讯
   /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
 OSIntExit();
   /* USER CODE END USART2_IRQn 1 */
@@ -284,6 +285,7 @@ void UART4_IRQHandler(void)
 	u8 rxdat;//串口屏通讯
 OSIntEnter();
 	if(__HAL_UART_GET_IT(appdis.pDaCai->phuart, UART_IT_RXNE)==SET)	{
+		__HAL_UART_CLEAR_IT(appdis.pDaCai->phuart, UART_IT_RXNE);
 		rxdat = (uint8_t)(appdis.pDaCai->phuart->Instance->RDR);
 		if(appdis.pDaCai->puart_t->rx_indicate!=NULL)	{
 				appdis.pDaCai->puart_t->rx_indicate(appdis.pDaCai->puart_t,rxdat);
@@ -298,6 +300,7 @@ OSIntEnter();
 		__HAL_UART_CLEAR_FLAG(appdis.pDaCai->phuart,UART_CLEAR_TCF);
 	}
   /* USER CODE END UART4_IRQn 0 */
+  HAL_UART_IRQHandler(&huart4);
   /* USER CODE BEGIN UART4_IRQn 1 */
 OSIntExit();
   /* USER CODE END UART4_IRQn 1 */
@@ -315,6 +318,7 @@ OSIntEnter();//串口屏uart4 dma发送中断
 		__HAL_DMA_CLEAR_FLAG(&hdma_uart4_tx,DMA_FLAG_TC3);
 	}
   /* USER CODE END DMA2_Channel3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_uart4_tx);
   /* USER CODE BEGIN DMA2_Channel3_IRQn 1 */
 OSIntExit();
   /* USER CODE END DMA2_Channel3_IRQn 1 */

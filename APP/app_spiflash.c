@@ -3,7 +3,7 @@
 
 //堆栈
 __align(4) OS_STK  TASK_SPIFLASH_STK[STK_SIZE_SPIFLASH]; //任务堆栈声?
-#define N_MESSAGES		10
+#define N_MESSAGES		5
 
 _spiflash_t spiflash;
 void    *SpiFlashMSG_Q[N_MESSAGES];//消息队列数组
@@ -35,17 +35,17 @@ void CheckSPIFlash(void)
 	}
 }
 //通过任务写log
-void WriteLogByTask(message_pkt_t *Src)
+void WriteToFlashByTask(message_pkt_t *Src)
 {
 	//msg_pkt_spiflash.Src = Src;
 	OSQPost(spiflash.MSG_Q, Src);
 }
 
-void StartSpiFlashTask(message_pkt_t *Src)
-{
-	//msg_pkt_spiflash.Src = Src;
-	OSQPost(spiflash.MSG_Q, Src);
-}
+//void StartSpiFlashTask(message_pkt_t *Src)
+//{
+//	//msg_pkt_spiflash.Src = Src;
+//	OSQPost(spiflash.MSG_Q, Src);
+//}
 //extern void fs_test();
 static void TaskSPIFLASH(void * ppdata)
 {

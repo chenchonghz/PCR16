@@ -2,7 +2,7 @@
 
 //堆栈
 __align(4) OS_STK  TASK_DISPLAY_STK[STK_SIZE_DISPLAY]; //任务堆栈声?
-#define N_MESSAGES		10
+#define N_MESSAGES		5
 
 _appdisplay_t appdis;
 
@@ -49,6 +49,16 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			}
 			break;
 		}
+		case 0xf7:	{//时间格式是BCD码
+			SysTime.tm_year = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_mon = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_wday = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_mday = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_hour = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_min = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_sec = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			break;
+		}
 	}
 }
 
@@ -82,6 +92,9 @@ static void TaskDisplay(void * ppdata)
 					appdis.pUI->screen_id = Main_UIID;							
 					DaCai_SwitchUI(appdis.pUI);//显示主界面
 //					OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_3, OS_FLAG_SET, &err);
+				}
+				else {
+					DaCai_TimeGet();
 				}
 			}
 		}

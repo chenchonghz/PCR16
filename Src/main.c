@@ -96,7 +96,7 @@ __set_PRIMASK(1);//¹Ø±Õ×ÜÖÐ¶Ï
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FATFS_Init();
-  MX_USB_HOST_Init();
+//  MX_USB_HOST_Init();
   MX_DMA_Init();
   MX_SPI2_Init();
   MX_UART4_Init();

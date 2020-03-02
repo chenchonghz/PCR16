@@ -88,9 +88,9 @@ enum eMotorAction {
 };
 
 typedef struct {
-    INT8U   is_run;
-    INT8U   action;
-    INT8U   abort_type;
+volatile    INT8U   is_run;
+volatile    INT8U   action;
+volatile    INT8U   abort_type;
 } motor_state_t;
 
 typedef struct Motor_t {

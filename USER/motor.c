@@ -74,6 +74,13 @@ void StopMotor(TMotor *pMotor)
 		pMotor->status.is_run        = MotorState_Stop;
 	}
 }
+//位置到达判断
+static void MotorArrivedCheck(TMotor *pMotor)
+{
+	if(pMotor->CurSteps >= pMotor->MoveTotalSteps)	{
+		StopMotor(pMotor);
+	}
+}
 
 u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 {
@@ -102,7 +109,7 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 		pMotor->status.is_run = MotorState_Run;
 //        CalcSpedingProcedure(pMotor->id,if_acc);
         pMotor->TableIndex    = 0;
-//        pMotor->StepsCallback = &MotorSpeedUpDn;
+        pMotor->StepsCallback = &MotorArrivedCheck;
         StartMotorPWM(pMotor->id);
 		OSSemPend(pMotor->Sem, 0, &err);//等待事件触发
 	}
@@ -117,7 +124,7 @@ static void StopMotorPWM(MOTOR_ID id)
     tMotor[id].status.is_run        = MotorState_Stop;
 }
 
-static void UpdateMotorTimer(MOTOR_ID id, INT16U val)
+static void UpdateMotorPWM(MOTOR_ID id, INT16U val)
 {
 	__HAL_TIM_SET_COUNTER(tMotor[id].tmr, 0);
     __HAL_TIM_SET_AUTORELOAD(tMotor[id].tmr, val);

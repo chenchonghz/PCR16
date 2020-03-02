@@ -3,7 +3,7 @@
 #include "bsp.h"
 //堆栈
 __align(4) OS_STK  TASK_UDISK_STK[STK_SIZE_UDISK]; //任务堆栈声?
-#define N_MESSAGES		10
+#define N_MESSAGES		5
 static u8 data_buf[30];
 _appudisk_t appudisk;
 static void    *MyArrayOfMsg[N_MESSAGES];//消息队列数组

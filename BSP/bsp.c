@@ -9,8 +9,6 @@
 //IO≈‰÷√∫Ø ˝
 void	bsp_init(void)
 {
-	SysDataInit();
-//	TIMDataInit();
 	bsp_spi_init();
 	BSP_W25Qx_Init();
 //	BspAD7091Init();
