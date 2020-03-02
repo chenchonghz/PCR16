@@ -104,7 +104,7 @@ void StartADDataCollect(void)
 	}
 }
 //∑µªÿµÁ—π÷µmV
-static float CalcADCVoltage(u32 adcode)
+float CalcADCVoltage(u32 adcode)
 {
 	float adtemp;
 	

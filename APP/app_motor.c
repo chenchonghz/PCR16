@@ -27,8 +27,8 @@ static void MotorDatInit (void)
 
 static void MotorReset(void)
 {
-    u8 reset_cnt=0;
-    s32 movelen;
+//    u8 reset_cnt=0;
+//    s32 movelen;
 
     tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
     tMotor[MOTOR_ID1].status.action     = MotorAction_Resetting;

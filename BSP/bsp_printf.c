@@ -51,7 +51,7 @@ int fputc(int ch, FILE *f)
 {
 	/* 写一个字节到USART1 */
 	while((USART1->ISR &0X40)==0);//循环发送,直到发送完毕   
-	UART5->TDR  = (uint8_t) ch;  
+	USART1->TDR  = (uint8_t) ch;  
 	return ch;
 }
 

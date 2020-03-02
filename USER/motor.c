@@ -19,7 +19,7 @@ typedef struct _motor_priv{
 */
 static void     UpdateMotorTimer        (MOTOR_ID id, INT16U val);
 static void     CalcSpedingProcedure    (MOTOR_ID id,INT8U if_acc);
-static void UpdateMotorTimer(MOTOR_ID id, INT16U val);
+static void UpdateMotorPWM(MOTOR_ID id, INT16U val);
 static void StartMotorPWM(MOTOR_ID id);
 static void StopMotorPWM(MOTOR_ID id);
 /*
@@ -85,7 +85,7 @@ static void MotorArrivedCheck(TMotor *pMotor)
 u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 {
     INT8U err;
-    INT32U len;
+//    INT32U len;
 
    if(pMotor->status.is_run == MotorState_Run)
 	   return 0;

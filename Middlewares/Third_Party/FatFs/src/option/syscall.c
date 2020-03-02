@@ -38,12 +38,15 @@ int ff_cre_syncobj (	/* 1:Function succeeded, 0:Could not create the sync object
 	_SYNC_t *sobj		/* Pointer to return the created sync object */
 )
 {
-
+	unsigned char err;
     int ret;
 
-    osSemaphoreDef(SEM);
-    *sobj = osSemaphoreCreate(osSemaphore(SEM), 1);
-    ret = (*sobj != NULL);
+	*sobj = OSSemCreate(1);
+	if(err==OS_ERR_NONE)	ret = 1;
+	else ret = 0;
+//    osSemaphoreDef(SEM);
+//    *sobj = osSemaphoreCreate(osSemaphore(SEM), 1);
+//    ret = (*sobj != NULL);
 
     return ret;
 }
@@ -62,7 +65,9 @@ int ff_del_syncobj (	/* 1:Function succeeded, 0:Could not delete due to any erro
 	_SYNC_t sobj		/* Sync object tied to the logical drive to be deleted */
 )
 {
-    osSemaphoreDelete (sobj);
+	unsigned char err;
+	sobj = OSSemDel(sobj, OS_DEL_ALWAYS, &err);
+    //osSemaphoreDelete (sobj);
     return 1;
 }
 
@@ -79,12 +84,17 @@ int ff_req_grant (	/* 1:Got a grant to access the volume, 0:Could not get a gran
 	_SYNC_t sobj	/* Sync object to wait */
 )
 {
+	unsigned char err;
   int ret = 0;
 
-  if(osSemaphoreWait(sobj, _FS_TIMEOUT) == osOK)
-  {
-    ret = 1;
-  }
+	OSSemPend(sobj, _FS_TIMEOUT, &err);
+	if(err == OS_ERR_NONE)	{
+		ret = 1;
+	}
+//  if(osSemaphoreWait(sobj, _FS_TIMEOUT) == osOK)
+//  {
+//    ret = 1;
+//  }
 
   return ret;
 }
@@ -101,7 +111,8 @@ void ff_rel_grant (
 	_SYNC_t sobj	/* Sync object to be signaled */
 )
 {
-  osSemaphoreRelease(sobj);
+	OSSemPost(sobj);
+//  osSemaphoreRelease(sobj);
 }
 
 #endif
@@ -115,12 +126,13 @@ void ff_rel_grant (
 /*------------------------------------------------------------------------*/
 /* If a NULL is returned, the file function fails with FR_NOT_ENOUGH_CORE.
 */
-
+extern tlsf_t UserMem;
 void* ff_memalloc (	/* Returns pointer to the allocated memory block */
 	UINT msize		/* Number of bytes to allocate */
 )
 {
-	return ff_malloc(msize);	/* Allocate a new memory block with POSIX API */
+	//return ff_malloc(msize);	/* Allocate a new memory block with POSIX API */
+	return ff_malloc(UserMem, msize);
 }
 
 
@@ -132,7 +144,9 @@ void ff_memfree (
 	void* mblock	/* Pointer to the memory block to free */
 )
 {
-	ff_free(mblock);	/* Discard the memory block with POSIX API */
+	//ff_free(mblock);	/* Discard the memory block with POSIX API */
+	ff_free(UserMem, mblock);
+	mblock = NULL;
 }
 
 #endif

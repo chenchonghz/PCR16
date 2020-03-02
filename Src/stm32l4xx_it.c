@@ -60,6 +60,7 @@
 /* External variables --------------------------------------------------------*/
 extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim6;
 extern DMA_HandleTypeDef hdma_uart4_tx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart4;
@@ -251,9 +252,9 @@ OSIntEnter();
 				tMotor[MOTOR_ID1].CurSteps++;
 	//		  tMotor[MOTOR_ID1].StepCnt++;          
 
-//			if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
-//				(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
-//			}
+			if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
+				(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
+			}
 		}
 	}
   /* USER CODE END TIM3_IRQn 0 */
@@ -304,6 +305,20 @@ OSIntEnter();
   /* USER CODE BEGIN UART4_IRQn 1 */
 OSIntExit();
   /* USER CODE END UART4_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM6 global interrupt, DAC channel1 and channel2 underrun error interrupts.
+  */
+void TIM6_DAC_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+
+  /* USER CODE END TIM6_DAC_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim6);
+  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
+
+  /* USER CODE END TIM6_DAC_IRQn 1 */
 }
 
 /**

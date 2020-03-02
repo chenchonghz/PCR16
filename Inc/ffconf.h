@@ -28,6 +28,8 @@
 #include "stm32l4xx_hal.h"
 #include "usbh_core.h"
 #include "usbh_msc.h"
+#include "ucos_ii.h"
+#include "os_cpu.h"
 /* Handle for USB Host */
 #define hUSB_Host hUsbHostFS
 
@@ -243,9 +245,9 @@
 /      can be opened simultaneously under file lock control. Note that the file
 /      lock control is independent of re-entrancy. */
 
-#define _FS_REENTRANT    0  /* 0:Disable or 1:Enable */
+#define _FS_REENTRANT    1  /* 0:Disable or 1:Enable */
 #define _FS_TIMEOUT      1000 /* Timeout period in unit of time ticks */
-#define _SYNC_t          osSemaphoreId 
+#define _SYNC_t          OS_EVENT* 
 /* The option _FS_REENTRANT switches the re-entrancy (thread safe) of the FatFs
 /  module itself. Note that regardless of this option, file access to different
 /  volume is always re-entrant and volume control functions, f_mount(), f_mkfs()
@@ -266,8 +268,9 @@
 /* define the ff_malloc ff_free macros as standard malloc free */
 #if !defined(ff_malloc) && !defined(ff_free)
 #include <stdlib.h>
-#define ff_malloc  malloc
-#define ff_free  free
+#include "tlsf.h"
+#define ff_malloc  tlsf_malloc//malloc
+#define ff_free  tlsf_free//free
 #endif
 
 #endif /* _FFCONF */
