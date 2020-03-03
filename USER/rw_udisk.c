@@ -9,7 +9,7 @@ void MountUDISK(u8 src)
 	FRESULT res;	
 	
 	switch(src)	{
-		case APPLICATION_READY:
+		case MSG_USB_READY:
 			{
 				BSP_PRINTF("UDISK connected");
 				res = f_mount(&udiskfs.fs,USBHPath,1);
@@ -33,7 +33,7 @@ void MountUDISK(u8 src)
 				}
 				break;
 			}
-		case APPLICATION_DISCONNECT:
+		case MSG_USB_DISCONNECT:
 			{
 				BSP_PRINTF("UDISK disconnect");
 				res=f_mount(NULL,USBHPath,1);//(NULL:unmount)
@@ -72,6 +72,7 @@ u8 CopyFile(char *psrc_path, char *pdest_path)
 		if(res != FR_OK||rsize==0)	break;
 		res =  f_write(&destfile, pbuf, rsize, &wsize);
 		if(res != FR_OK)	break;
+		OSTimeDly(5);
 	}
 	tlsf_free(UserMem,pbuf);
 	pbuf = NULL;

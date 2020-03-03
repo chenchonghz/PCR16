@@ -56,7 +56,7 @@ int FlashFSInit(void)
 		u8 *work;		
 		work = (u8 *)tlsf_malloc(UserMem,_MAX_SS);
 		/* Create FAT volume */
-		BSP_PRINTF("mount flash failed, format flash");
+		BSP_PRINTF("mount flash failed, format flash...");
 		BSP_W25Qx_Erase_Chip();//先格式化
 		//OSTimeDly(5000);
 		res = f_mkfs(USERPath, FM_ANY, 0, work, _MAX_SS);

@@ -20,10 +20,10 @@ static void DataInit(void)
 	//udisk.Mbox         = OSMboxCreate((void *)0);
 	spiflash.MSG_Q 			 = OSQCreate(&SpiFlashMSG_Q[0],N_MESSAGES);//
 }
-//u8 devid[2];
+u8 devid[2];
 void CheckSPIFlash(void)
 {
-	u8 devid[2];
+//	u8 devid[2];
 	
 	BSP_W25Qx_Read_ID(devid);
 	if(devid[0] == W25QXX_MANUFACTURER_ID)	{//devid[1] -- DEVICE_ID; devid[0] -- MANUFACTURER_ID 
