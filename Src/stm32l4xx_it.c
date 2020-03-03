@@ -252,9 +252,9 @@ OSIntEnter();
 				tMotor[MOTOR_ID1].CurSteps++;
 	//		  tMotor[MOTOR_ID1].StepCnt++;          
 
-			if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
-				(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
-			}
+//			if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
+//				(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
+//			}
 		}
 	}
   /* USER CODE END TIM3_IRQn 0 */

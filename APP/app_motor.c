@@ -22,7 +22,9 @@ static void MotorDatInit (void)
     tMotor[MOTOR_ID1].status.abort_type   = MotorAbort_Normal;
     tMotor[MOTOR_ID1].Dir                 = MOTOR_TO_MIN;
 	tMotor[MOTOR_ID1].tmr = &htim3;
-//	tMotor[MOTOR_ID1].CurSteps = 0;
+	tMotor[MOTOR_ID1].tmc260dev = TMC260_get_dev((TMC260_ID)MOTOR_ID1);
+//	tMotor[MOTOR_ID1].StepsCallback = &MotorArrivedCheck;
+	tMotor[MOTOR_ID1].CurSteps = 0;
 }
 
 static void MotorReset(void)
@@ -35,7 +37,7 @@ static void MotorReset(void)
 //	tMotor[MOTOR_ID1].Con1Len = Motor_Constant1_LEN;
 	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, MOTOR_LEN_MAX, DEF_False);
 }
-
+u8 tmc260_status=0;
 static void AppMotorTask (void *parg)
 {
     INT8U err;
@@ -44,6 +46,7 @@ static void AppMotorTask (void *parg)
 	MotorDatInit();
 	__HAL_TIM_ENABLE_IT(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE);
 	TMC260_install(tMotor[MOTOR_ID1].tmc260dev);
+	tmc260_status = TMC260_read_status(tMotor[MOTOR_ID1].tmc260dev);
 	MotorReset();
 	tMotor[MOTOR_ID1].CurSteps = 0;
 	

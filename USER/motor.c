@@ -89,18 +89,18 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 
    if(pMotor->status.is_run == MotorState_Run)
 	   return 0;
-    struct _io_map const *m_dir = &g_motor_port[pMotor->id].dir;
+   struct _io_map const *m_dir = &g_motor_port[pMotor->id].dir;
 //    pMotor->StepCnt       = 0;
 	if (steps)
     {
         pMotor->Dir = dir;
         if(pMotor->Dir) {//前进
-            if(Motor_LeftLimit())//在上限开关位置
+            if(!Motor_LeftLimit())//在上限开关位置
                 goto _end;
             SET_H(m_dir);
         }
         else    {//后退
-            if(Motor_LeftLimit())//在下限开关位置
+            if(!Motor_LeftLimit())//在下限开关位置
                 goto _end;
             SET_L(m_dir);
         }

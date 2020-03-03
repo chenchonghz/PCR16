@@ -50,12 +50,12 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, MAX5401_CS1_Pin|MAX5401_CS2_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOC, MAX5401_CS1_Pin|MAX5401_CS2_Pin|TMC260_EN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, EquipFanCtrl_Pin|CoolFanCtrl_Pin|TMC260_DIR_Pin|TMC260_EN_Pin 
-                          |CoolPWM_Pin|Fluo_Green_Pin|Fluo_Blue_Pin|Fluo_OnOff_Pin 
-                          |AD_SCLK_Pin|AD_MOSI_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, EquipFanCtrl_Pin|CoolFanCtrl_Pin|TMC260_DIR_Pin|CoolPWM_Pin 
+                          |Fluo_Green_Pin|Fluo_Blue_Pin|Fluo_OnOff_Pin|AD_SCLK_Pin 
+                          |AD_MOSI_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(TMC260_CS_GPIO_Port, TMC260_CS_Pin, GPIO_PIN_SET);

@@ -118,7 +118,7 @@ static tmc260_dev_t     g_tmc260_dev    [TMC260_ID_NUMS] = {
         .StepDirConfig = {      // DRVCTRL
             .Intpol = 1,
             .DEdge  = 0,
-            .MRes   = 3// 32Ï¸·Ö
+            .MRes   = 3// 8Ï¸·Ö
         },
         .ChopperConfig = {      // CHOPCONF
             .BlankTime          = 2,
@@ -796,7 +796,7 @@ static INT32U TMC260_spi_rdwr(tmc260_dev_t *pdev, INT32U dat)
     tmc260_priv_t *priv = (tmc260_priv_t*)pdev->priv;
     struct _io_map const *cs = &priv->pport->cs;
 	
-//    bsp_spi_lock(pdev->p_spi);
+    bsp_spi_lock(pdev->p_spi);
 
     /* ÉèÖÃÆ¬Ñ¡ÐÅºÅ */
     SET_L(cs);
@@ -804,7 +804,7 @@ static INT32U TMC260_spi_rdwr(tmc260_dev_t *pdev, INT32U dat)
     rxdat = bsp_spi_rw(pdev->p_spi, MSB_POSEDGE, 20, dat);
 	
     SET_H(cs);
-//    bsp_spi_unlock(pdev->p_spi);
+    bsp_spi_unlock(pdev->p_spi);
 
     return rxdat;
 }
@@ -885,7 +885,6 @@ static INT32U WriteChopperConfig(tmc260_dev_t *pdev)
 
     return TMC260_spi_rdwr(pdev, value);
 }
-
 
 /*F******************************************************************************************************
 *                                               ÅäÖÃSMARTEN¼Ä´æÆ÷
@@ -994,7 +993,7 @@ static INT32U WriteDriverConfig(tmc260_dev_t *pdev)
     return TMC260_spi_rdwr(pdev, value);
 }
 
-
+u32 readreg;
 /*F******************************************************************************************************
 *
 ********************************************************************************************************/
@@ -1008,7 +1007,7 @@ static void TMC260_configs_init(tmc260_dev_t *pdev)
     } while ((TMC260Flags & 0x80) == 0x00);
     #endif
 
-    WriteSmartEnergyControl(pdev); // SMARTEN
+    readreg = WriteSmartEnergyControl(pdev); // SMARTEN
     WriteStallGuardConfig(pdev);   // SGCSCONF
     WriteDriverConfig(pdev);       // DRVCONF
     WriteStepDirConfig(pdev);      // DRVCTRL
