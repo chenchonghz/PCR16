@@ -52,7 +52,7 @@ static void TaskStart(void * ppdata)
 //创建其他所有任务 在这里我建立了个LED闪烁的任务当例子
 static void TaskCreateOther(void)
 {
-//	AppADInit();	
+	AppADInit();	
 //	AppSensorBoardInit();	
 //	AppKeyScanInit();
 //	AppMotorInit();		

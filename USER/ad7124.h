@@ -22,7 +22,7 @@ typedef struct  _ad7124
 }_ad7124_t;
 
 void AD7124Init(void);
-void StartADDataCollect(void);
+u8 StartADDataCollect(void);
 float CalcADCVoltage(u32 adcode);
 #endif
 

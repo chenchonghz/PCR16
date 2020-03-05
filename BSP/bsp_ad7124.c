@@ -123,7 +123,7 @@ static void ad7124_write(ad7124_dev_t *pdev, CPU_INT08U nbits, CPU_INT32U data)
 {
     //spi_t *pspi = bsp_spi_get(pdev->spix);
 
-    //bsp_spi_lock(pdev->p_spi);
+    bsp_spi_lock(pdev->p_spi);
     //bsp_spi_sck_high(pdev->p_spi);
 //    ad7124_cs_low();
 
@@ -132,7 +132,7 @@ static void ad7124_write(ad7124_dev_t *pdev, CPU_INT08U nbits, CPU_INT32U data)
 
 //    ad7124_cs_high();
    // bsp_spi_sck_low(pdev->p_spi);
-    //bsp_spi_unlock(pdev->p_spi);
+    bsp_spi_unlock(pdev->p_spi);
 }
 
 //extern CPU_INT32U ad7124_spi_read(spi_t *pdev, CPU_INT08U nbits);
@@ -141,7 +141,7 @@ static CPU_INT32U ad7124_read(ad7124_dev_t *pdev, CPU_INT08U nbits)
     //spi_t *pspi = bsp_spi_get(pdev->spix);
     CPU_INT32U ret;
 
-    //bsp_spi_lock(pdev->p_spi);
+    bsp_spi_lock(pdev->p_spi);
     //bsp_spi_sck_high(pdev->p_spi);
     //ad7124_cs_low();
 
@@ -150,7 +150,7 @@ static CPU_INT32U ad7124_read(ad7124_dev_t *pdev, CPU_INT08U nbits)
 
     //ad7124_cs_high();
     //bsp_spi_sck_low(pdev->p_spi);
-    //bsp_spi_unlock(pdev->p_spi);
+    bsp_spi_unlock(pdev->p_spi);
 
     return ret;
 }
@@ -320,7 +320,7 @@ void bsp_ad7124_control_set(ad7124_dev_t *pdev)
     r.bits.CONT_READ = 0;
     r.bits.DATA_STATUS = 1;
     r.bits.CS_EN = 1;//1-cs上升沿 DOUT引脚切换为RDY引脚
-    r.bits.REF_EN = 0;
+    r.bits.REF_EN = 1;//此位置1时，内部基准电压源使能
     r.bits.POWER_MODE  = 2;//01 = mid power 02 = full power
 	r.bits.Mode = AD7124_MODE_CONTINUOUS_CNV;//*/AD7124_MODE_SINGLE_CNV; //单次触发模式
 	r.bits.CLK_SEL = 0;//00 = internal 614.4 kHz clock. The internal clock is not available at the CLK pin
@@ -336,9 +336,9 @@ void bsp_ad7124_cfg_set(ad7124_dev_t *pdev, const ad7124_chcfg_t *pcfg)
 	r.bits.BURNOUT = pcfg->burnout;
 	r.bits.AINBUFP    = 1;
 	r.bits.AINBUFM    = 1;
-	r.bits.REFSEL = 0x0;//使用内部参考电压
+	r.bits.REFSEL = 2;//参考电压设置：0--外部;0x2--内部
     r.bits.GAIN   = pcfg->intgain;
-	//cfgwordset = r.uword;
+//	cfgwordset = r.uword;
     ad7124_reg_write(pdev, AD7124_REG_CONFIG + pcfg->config_idx, DEF_INT_16_BITS, r.uword);
 }
 
