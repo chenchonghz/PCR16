@@ -74,10 +74,36 @@ void StopMotor(TMotor *pMotor)
 		pMotor->status.is_run        = MotorState_Stop;
 	}
 }
+
+static INT32S SetMotorDir(TMotor *pMotor,INT32S step)
+{
+    if(step<0){
+        step = -step;
+        pMotor->Dir = MOTOR_TO_MIN;
+    }else{
+    	pMotor->Dir = MOTOR_TO_MAX;
+    }
+    return step;
+}
+
+//以零点为参考点，向前移动len距离
+void CalcAnyPosAtResetSteps(TMotor *pMotor,INT32S step)
+{
+    INT32S tmp,curSteps;
+
+    pMotor->SysAbsoluteOffsetStep = step;
+    if((pMotor->SysAbsoluteOffsetStep>Motor_Move_MAX_STEP))//x y导轨最大行程限制
+		pMotor->SysAbsoluteOffsetStep = Motor_Move_MAX_STEP;
+	
+	curSteps = pMotor->CurSteps;
+    tmp = pMotor->SysAbsoluteOffsetStep - curSteps;//目标位置与当前位置的差 大于0前进
+    pMotor->MoveTotalSteps = SetMotorDir(pMotor,tmp);
+}
+
 //位置到达判断
 static void MotorArrivedCheck(TMotor *pMotor)
 {
-	if(pMotor->CurSteps >= pMotor->MoveTotalSteps)	{
+	if(pMotor->StepCnt >= pMotor->MoveTotalSteps)	{
 		StopMotor(pMotor);
 	}
 }
@@ -90,7 +116,7 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
    if(pMotor->status.is_run == MotorState_Run)
 	   return 0;
    struct _io_map const *m_dir = &g_motor_port[pMotor->id].dir;
-//    pMotor->StepCnt       = 0;
+    pMotor->StepCnt       = 0;
 	if (steps)
     {
         pMotor->Dir = dir;
@@ -112,6 +138,7 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
         pMotor->StepsCallback = &MotorArrivedCheck;
         StartMotorPWM(pMotor->id);
 		OSSemPend(pMotor->Sem, 0, &err);//等待事件触发
+		disable_motor(pMotor);
 	}
 _end:
 	
@@ -121,7 +148,7 @@ _end:
 static void StopMotorPWM(MOTOR_ID id)
 {
 	HAL_TIM_PWM_Stop(tMotor[id].tmr, TIM_CHANNEL_3);
-    tMotor[id].status.is_run        = MotorState_Stop;
+//    tMotor[id].status.is_run        = MotorState_Stop;
 }
 
 static void UpdateMotorPWM(MOTOR_ID id, INT16U val)

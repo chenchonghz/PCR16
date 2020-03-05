@@ -29,14 +29,18 @@ static void MotorDatInit (void)
 
 static void MotorReset(void)
 {
-//    u8 reset_cnt=0;
-//    s32 movelen;
-
     tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
     tMotor[MOTOR_ID1].status.action     = MotorAction_Resetting;
-//	tMotor[MOTOR_ID1].Con1Len = Motor_Constant1_LEN;
-	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, MOTOR_LEN_MAX, DEF_False);
+//	CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], Motor_Move_MAX_STEP);
+	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_False);
+	if(tMotor[MOTOR_ID1].status.abort_type == MotorAbort_Min_LimitOpt)	{//复位过程碰到零点 成功
+		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetOK;
+	}
+	else 	{
+		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetFail;
+	}
 }
+
 u8 tmc260_status=0;
 static void AppMotorTask (void *parg)
 {

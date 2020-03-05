@@ -10,18 +10,18 @@
 *********************************************************************************************************
 */
 #define Motor_DriverRatio             1           // 电机传动比
-#define Motor_MicroSteps              32          // 电机细分数
+#define Motor_MicroSteps              4          // 电机细分数
 #define Motor_StepsPerRound           200         // 电机每圈整步数
-#define Motor_StepsPerRound_With_MicroSteps     (Motor_MicroSteps*Motor_StepsPerRound)//6400
-#define Motor_NumPerRound             1000//250		  // 电机每圈 0.1um*7000
-#define Motor_NumPerStep              ((FP32)Motor_NumPerRound/(FP32)Motor_StepsPerRound_With_MicroSteps)//1步多少um，1000/6400=0.15625
-#define Motor_StepsPerum              ((FP32)Motor_StepsPerRound_With_MicroSteps/(FP32)Motor_NumPerRound)//1um多少步，6400/1000=6.4
+#define Motor_StepsPerRound_With_MicroSteps     (Motor_MicroSteps*Motor_StepsPerRound)//800
+#define Motor_NumPerRound             12		  // 电机每圈 mm
+#define Motor_NumPerStep              ((FP32)Motor_NumPerRound/(FP32)Motor_StepsPerRound_With_MicroSteps)//1步多少mm，12/800=0.015mm
+#define Motor_StepsPerum              ((FP32)Motor_StepsPerRound_With_MicroSteps/(FP32)Motor_NumPerRound)//1um多少步，800/12=66.6
 //#define Motor_InitSpeed                0x57e3
 
-#define Motor_Move_MAX_LEN      19000//13mm
+#define Motor_Move_MAX_LEN      98//mm
 #define Motor_Move_MAX_STEP     Motor_Move_MAX_LEN*Motor_StepsPerum  //    
-#define Motor_Timer_PSC         1
-#define Motor_Timer_CLK         (rcc_clocks.PCLK2_Frequency/Motor_Timer_PSC)
+//#define Motor_Timer_PSC         1
+//#define Motor_Timer_CLK         (rcc_clocks.PCLK2_Frequency/Motor_Timer_PSC)
 //#define DEF_FREQ_MIN            2000
 
 #define Motor_Constant1_Steps          0//启动阶段匀速路程
@@ -36,8 +36,8 @@ typedef enum {
 #define MOTOR_ID_NUMS       	(MOTOR_ID_MAX-MOTOR_ID_MIN+1)
 #define MOTOR_FLAGS_INIT		1
 
-#define MOTOR_TO_MAX         DEF_True        // To Max
-#define MOTOR_TO_MIN         DEF_False       // To Min
+#define MOTOR_TO_MAX         DEF_False        // To Max
+#define MOTOR_TO_MIN         DEF_True       // To Min
 
 #define MOTOR_ID1_EN_PORT	TMC260_EN_GPIO_Port
 #define MOTOR_ID1_EN_PIN	TMC260_EN_Pin
@@ -109,12 +109,13 @@ typedef struct Motor_t {
     INT16U		speed;			//速度
     INT16U		cur_speed;
     INT16U		acceleration;	//加速度
-    INT8U               lock_current;
+//    INT8U               lock_current;
     INT32S		CurSteps;//当前编码器角度值
 
     INT32U              StepCnt;                    
-    INT32U              MoveTotalSteps;          
-    INT32S              SysAbsoluteOffset;
+    INT32U              MoveTotalSteps;      
+	INT32S              SysAbsoluteOffsetStep;//系统绝对偏移量，以0点为基准, 0.1um为单位    
+//    INT32S              SysAbsoluteOffset;
     INT32U              UpSteps;                    
     INT32U              DnSteps;
     INT32U              ConSteps1;//匀速

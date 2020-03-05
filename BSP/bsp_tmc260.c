@@ -118,7 +118,7 @@ static tmc260_dev_t     g_tmc260_dev    [TMC260_ID_NUMS] = {
         .StepDirConfig = {      // DRVCTRL
             .Intpol = 1,
             .DEdge  = 0,
-            .MRes   = 3// 8Ï¸·Ö
+            .MRes   = 6// 4Ï¸·Ö
         },
         .ChopperConfig = {      // CHOPCONF
             .BlankTime          = 2,

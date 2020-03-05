@@ -172,7 +172,7 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>tMotor[0]</ItemText>
+          <ItemText>tMotor[0],0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
@@ -182,45 +182,35 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>udiskfs</ItemText>
+          <ItemText>ad7124_id</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>hUsbHostFS</ItemText>
+          <ItemText>ad_vol,0x10</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ad7124_id</ItemText>
+          <ItemText>r_channel</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ad_vol,0x10</ItemText>
+          <ItemText>calc_time</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>r_channel</ItemText>
+          <ItemText>ad_code,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>calc_time</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>ad_code,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
           <ItemText>cfgwordset</ItemText>
         </Ww>
         <Ww>
-          <count>10</count>
+          <count>8</count>
           <WinNumber>1</WinNumber>
           <ItemText>ad7124reg_r</ItemText>
         </Ww>
