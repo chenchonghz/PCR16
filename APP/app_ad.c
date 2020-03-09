@@ -16,7 +16,9 @@ static void ADDatInit(void)
 {
 	
 }
-
+u16 timecnt=0;
+u32 advol;
+extern float ad_vol;
 static void AppADTask (void *parg)
 {
 	ADDatInit();
@@ -26,5 +28,11 @@ static void AppADTask (void *parg)
     {
 		StartADDataCollect();
 		OSTimeDly(3);
+		timecnt++;
+		if(timecnt>300)	{
+			timecnt = 0;
+			advol = (u32)(ad_vol*100);
+			SYS_PRINTF("vol:%d.%d",advol/100,advol%100);
+		}
 	}
 }
