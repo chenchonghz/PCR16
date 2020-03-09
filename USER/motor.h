@@ -18,7 +18,7 @@
 #define Motor_StepsPerum              ((FP32)Motor_StepsPerRound_With_MicroSteps/(FP32)Motor_NumPerRound)//1um多少步，800/12=66.6
 //#define Motor_InitSpeed                0x57e3
 
-#define Motor_Move_MAX_LEN      98//mm
+#define Motor_Move_MAX_LEN      97//mm
 #define Motor_Move_MAX_STEP     Motor_Move_MAX_LEN*Motor_StepsPerum  //    
 //#define Motor_Timer_PSC         1
 //#define Motor_Timer_CLK         (rcc_clocks.PCLK2_Frequency/Motor_Timer_PSC)
@@ -45,6 +45,9 @@ typedef enum {
 #define MOTOR_ID1_DIR_PIN	TMC260_DIR_Pin
 #define MOTOR_ID1_STEP_PORT	TMC260_STEP_GPIO_Port
 #define MOTOR_ID1_STEP_PIN	TMC260_STEP_Pin
+
+#define	Motor_MaxLimit()				HAL_GPIO_ReadPin(LimitSwitchLeft_GPIO_Port, LimitSwitchLeft_Pin)
+#define	Motor_MinLimit()				HAL_GPIO_ReadPin(LimitSwitchRgiht_GPIO_Port, LimitSwitchRgiht_Pin)
 
 enum eMotorState {
     MotorState_Stop         = 0,    // Motor State:stop
@@ -93,6 +96,15 @@ volatile    INT8U   action;
 volatile    INT8U   abort_type;
 } motor_state_t;
 
+typedef struct _velprofile_t {
+	const u16 *pVelBuf;
+	u8 MaxIdx;
+	u16 SaStep;//加速路程
+	u16 Vo;
+	u16 Vmax;
+	u16 Acc;
+}velprofile_t;
+
 typedef struct Motor_t {
      MOTOR_ID     	id;
 	    OS_EVENT            *Sem;
@@ -116,19 +128,20 @@ typedef struct Motor_t {
     INT32U              MoveTotalSteps;      
 	INT32S              SysAbsoluteOffsetStep;//系统绝对偏移量，以0点为基准, 0.1um为单位    
 //    INT32S              SysAbsoluteOffset;
-    INT32U              UpSteps;                    
-    INT32U              DnSteps;
-    INT32U              ConSteps1;//匀速
-    INT32U              ConSteps2;//匀速
+    INT32S              AccSteps;                    
+    INT32U              DecSteps;
+    INT32U              ConSteps;//匀速
+//    INT32U              ConSteps2;//匀速
     tmc260_dev_t        *tmc260dev;
-	
+	velprofile_t *pCurve;
     void (*StepsCallback)(struct Motor_t *);    
     void (*OptCallback)(struct Motor_t *);      
 } TMotor;
 extern TMotor tMotor[MOTOR_ID_NUMS];
 
-void Motor_init(void);
+void Motor_Init(void);
 u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc);
 void StopMotor(TMotor *pMotor);
+void MotorAccDec(TMotor *pMotor);
 #endif
 

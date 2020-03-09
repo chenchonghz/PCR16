@@ -2,7 +2,6 @@
 
 //堆栈
 __align(4) OS_STK  TASK_MOTOR_STK[STK_SIZE_MOTOR]; //任务堆栈声?
-
 static  message_pkt_t    msg_pkt_motor;
 static void AppMotorTask (void *parg);
 
@@ -24,13 +23,16 @@ static void MotorDatInit (void)
 	tMotor[MOTOR_ID1].tmr = &htim3;
 	tMotor[MOTOR_ID1].tmc260dev = TMC260_get_dev((TMC260_ID)MOTOR_ID1);
 //	tMotor[MOTOR_ID1].StepsCallback = &MotorArrivedCheck;
-	tMotor[MOTOR_ID1].CurSteps = 0;
+	tMotor[MOTOR_ID1].ConSteps = 10;//匀速步数
 }
 
 static void MotorReset(void)
 {
-    tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
     tMotor[MOTOR_ID1].status.action     = MotorAction_Resetting;
+	if(!Motor_MinLimit())	{//已经在下限位 前进
+		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, 10*Motor_StepsPerum, DEF_False);//前进10mm
+	} 
+	tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
 //	CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], Motor_Move_MAX_STEP);
 	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_False);
 	if(tMotor[MOTOR_ID1].status.abort_type == MotorAbort_Min_LimitOpt)	{//复位过程碰到零点 成功
@@ -48,6 +50,7 @@ static void AppMotorTask (void *parg)
     message_pkt_t *msg;
 	
 	MotorDatInit();
+	Motor_Init();
 	__HAL_TIM_ENABLE_IT(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE);
 	TMC260_install(tMotor[MOTOR_ID1].tmc260dev);
 	tmc260_status = TMC260_read_status(tMotor[MOTOR_ID1].tmc260dev);
@@ -56,10 +59,14 @@ static void AppMotorTask (void *parg)
 	
 	for(;;)
     {
-        msg = (message_pkt_t *)OSMboxPend(tMotor[MOTOR_ID1].Mbox, 0, &err);
-		if(err==OS_ERR_NONE)    {
-			
-		}
+		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
+		OSTimeDly(1000);
+		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
+		OSTimeDly(1000);
+//        msg = (message_pkt_t *)OSMboxPend(tMotor[MOTOR_ID1].Mbox, 0, &err);
+//		if(err==OS_ERR_NONE)    {
+//			
+//		}
 	}
 
 }

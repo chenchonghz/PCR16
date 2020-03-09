@@ -313,11 +313,16 @@ OSIntExit();
 void TIM6_DAC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-
+OSIntEnter();
+	if(__HAL_TIM_GET_FLAG(&htim6, TIM_IT_UPDATE)==SET)	{
+		__HAL_TIM_CLEAR_FLAG(&htim6, TIM_IT_UPDATE); 
+		MotorAccDec(&tMotor[MOTOR_ID1]);
+//		HAL_GPIO_TogglePin(GPIOC, Fluo_Green_Pin);
+	}
   /* USER CODE END TIM6_DAC_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim6);
+//  HAL_TIM_IRQHandler(&htim6);
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
-
+OSIntExit();
   /* USER CODE END TIM6_DAC_IRQn 1 */
 }
 
