@@ -56,7 +56,7 @@ static void TaskCreateOther(void)
 //	AppSensorBoardInit();	
 //	AppKeyScanInit();
 	AppMotorInit();		
-//	AppDisplayInit();
+	AppDisplayInit();
 //	AppPerfusemonitorInit();
 //	AppSysmonitorInit();
 	AppSpiFlashInit();

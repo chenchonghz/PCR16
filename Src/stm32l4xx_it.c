@@ -335,7 +335,7 @@ void DMA2_Channel3_IRQHandler(void)
 OSIntEnter();//´®¿ÚÆÁuart4 dma·¢ËÍÖÐ¶Ï
 	if(__HAL_DMA_GET_FLAG(&hdma_uart4_tx, DMA_FLAG_TC3)==DMA_FLAG_TC3)	{
 		DaCaiUART_DMA_Callback(&hdma_uart4_tx);
-		__HAL_DMA_CLEAR_FLAG(&hdma_uart4_tx,DMA_FLAG_TC3);
+//		__HAL_DMA_CLEAR_FLAG(&hdma_uart4_tx,DMA_FLAG_TC3);
 	}
   /* USER CODE END DMA2_Channel3_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_uart4_tx);

@@ -23,7 +23,7 @@ void StartAppDisplay(message_pkt_t *msg)
 
 static void DisDatInit(void)
 {
-	appdis.sem         = OSSemCreate(0);
+//	appdis.sem         = OSSemCreate(0);
 	appdis.MSG_Q 			 = OSQCreate(&AppDisMSG_Q[0],N_MESSAGES);//
 
 	appdis.pDaCai = &dacai;
