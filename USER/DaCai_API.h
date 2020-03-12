@@ -3,12 +3,24 @@
 
 #include "DaCai_ProtoAnalysis.h"
 
-typedef struct _UI	{
-	s16 screen_id;//当前画面id
-	s16 sub_screen_id;
+#define	SCREEN_BUFSIZE	4
+
+typedef struct _UI_EDIT	{
+	s8 screen_id;
 	u8 ctrl_id;
+}_UI_EDIT_T;
+
+typedef struct _UI	{
+	s8 screen_id;//当前画面id
+	s8 screen_idbk;
+//	s8 screen_idlifo[SCREEN_BUFSIZE];
+	s8 sub_screen_id;
+	u8 ctrl_id;
+	u8 ctrl_idbk;
 	s8 button_id;
+//	s8 ButtonState;
 	s8 index;
+	_UI_EDIT_T editinfo;
 	char *pdata;
 	u16 datlen;
 }_UI_t;

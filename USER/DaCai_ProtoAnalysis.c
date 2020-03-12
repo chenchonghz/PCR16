@@ -4,7 +4,7 @@
 static _dacai_usart_t dacai_uart;//串口结构体
 _DACAI_t  dacai;
 
-static u8 usart_rx_buf[DACAIUSART_RXSIZE];
+u8 usart_rx_buf[DACAIUSART_RXSIZE];
 //static u8 usart_tx_buf[DACAIUSART_TXSIZE];
 static  message_pkt_t    msg_pkt_dacaiuart;
 //extern DMA_HandleTypeDef hdma_uart4_tx;

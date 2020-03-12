@@ -53,7 +53,7 @@ static void TaskUDISK(void * ppdata)
 				if(msg->Src == MSG_USB_READY||msg->Src == MSG_USB_DISCONNECT)	{
 					MountUDISK(msg->Src);
 					if(udiskfs.flag & UDISKFLAG_MOUNTED && \
-						(sys.devstate == DevState_IDLE||sys.devstate == DevState_Error))	{//设备空闲或故障情况下 检查是否有升级固件
+						(Sys.devstate == DevState_IDLE||Sys.devstate == DevState_Error))	{//设备空闲或故障情况下 检查是否有升级固件
 //						CheckUpdateFWName();
 					}
 				}

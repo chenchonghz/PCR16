@@ -517,6 +517,21 @@
               <FileType>1</FileType>
               <FilePath>..\USER\timestamp.c</FilePath>
             </File>
+            <File>
+              <FileName>display_code.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\display_code.c</FilePath>
+            </File>
+            <File>
+              <FileName>ring_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\ring_buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>LIFO_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\LIFO_buffer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

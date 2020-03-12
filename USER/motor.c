@@ -61,10 +61,10 @@ static void VelProfile_Init(void)
 	
 	VelProfile.Vo = 1000;
 	VelProfile.Vmax = 3000;
-	VelProfile.Acc = 100;
+	VelProfile.AccStep = 100;//加速步进
 	VelProfile.SaStep = 40;
 	for(t=0;;t++)	{
-		vel_profile[t] = VelProfile.Acc*t + VelProfile.Vo;
+		vel_profile[t] = VelProfile.AccStep*t + VelProfile.Vo;
 		if(vel_profile[t]>=VelProfile.Vmax)	{
 			VelProfile.MaxIdx = t;//加速次数
 			break;

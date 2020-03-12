@@ -123,6 +123,12 @@
 #define DEF_OUT         1u
 #endif
 
+#ifndef DEF_Press
+#define DEF_Press         1u
+#endif
+#ifndef DEF_Releass
+#define DEF_Releass        0u
+#endif
 /*
 ********************************************************************************
 * Pre-processor Definitions

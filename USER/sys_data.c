@@ -1,6 +1,6 @@
 #include "sys_data.h"
 
-_sys_t sys;
+_sys_t Sys;
 _syserror_t SysError;
 _sys_data_t SysData;
 RTC_TIME_ST SysTime;
@@ -14,7 +14,9 @@ void SysDataInit(void)
 	SysData.HeatCoverTemp = 0;
 	SysData.PD_1 = 0;
 	SysData.PD_2 = 0;
-	sys.state = SysState_None;
+	
+	Sys.state = SysState_None;
+	Sys.devstate = DevState_IDLE;
 	
 	SysTime.tm_year = 2019;
 	SysTime.tm_mon = 7;

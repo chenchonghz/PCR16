@@ -11,11 +11,14 @@
 #define	LOG_FILE_NAME		"Pcr16Log.txt"//"PerfusionLog.txt"
 
 #define SysState_None							0
-#define SysState_Standby					DEF_BIT02_MASK
-#define SysState_UdiskConnect				DEF_BIT04_MASK
+#define SysState_Standby					DEF_BIT00_MASK
+#define SysState_DeleteLabTB			DEF_BIT01_MASK
+#define SysState_RunningTB				DEF_BIT04_MASK
 
+//设备运行模式
 enum	{
 	DevState_IDLE,//待机模式
+	DevState_Running,
 	DevState_Error,//设备有故障
 	DevState_Test,
 };
@@ -42,7 +45,7 @@ typedef struct _sys_data	{
 	s16 PD_2;//PD传感器2
 }_sys_data_t;
 
-extern _sys_t sys;
+extern _sys_t Sys;
 extern _sys_data_t SysData;
 extern RTC_TIME_ST SysTime;
 extern tlsf_t UserMem;

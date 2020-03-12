@@ -17,16 +17,27 @@
 #define Invalid_UIID						(-1)
 #define Welcome_UIID						0//欢迎使用界面id
 #define Main_UIID							1//主界面
-#define Menu_UIID						2//菜单界面
-#define SysSetting_UIID						3//系统设置界面
-#define PerfuseSetting_UIID					4//灌注参数 设置界面
-#define LOG_UIID							5//LOG界面
-#define INFOR_UIID							6//
-#define HELP_UIID							7//HELP
-#define ERROR_UIID							14
-#define WARNING_UIID						12
-#define MESSAGE_UIID						13
-#define PerfuseData_UIID						16//显示灌注数据界面
+#define Lab_UIID							2//实验界面
+#define Menu_UIID							3//菜单界面
+#define Keyboard_UIID						4//全键盘界面
+#define SampleInfor_UIID							5//样本信息界面
+#define Temp_UIID							6//温度程序
+#define LabAttr_UIID							7//实验属性
+#define	System_UIID							8//系统
+#define	Data_UIID							9//数据
+#define	Step_UIID							10//
+#define	Stage_UIID							11
+#define	SampleList_UIID						12//样本列表
+#define	Confirm_UIID						13//确认
+#define	AboutDev_UIID						14//关于仪器
+#define	Setting_UIID						15//设置
+#define	Log_UIID							16//日志
+#define	Message_UIID							17//提示
+#define	MenuFlue_UIID						18
+#define	MenuResultDat_UIID						19
+#define	Flue_UIID							20
+#define	ResultDat_UIID							21
+
 
 #define BUTTON_RELEASE	DEF_False
 #define BUTTON_PRESS		DEF_True

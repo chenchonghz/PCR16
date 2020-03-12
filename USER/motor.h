@@ -102,7 +102,7 @@ typedef struct _velprofile_t {
 	u16 SaStep;//加速路程
 	u16 Vo;
 	u16 Vmax;
-	u16 Acc;
+	u16 AccStep;
 }velprofile_t;
 
 typedef struct Motor_t {

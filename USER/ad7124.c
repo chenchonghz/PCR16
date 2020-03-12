@@ -36,36 +36,36 @@ static void AD7124ChannelEnable(void)
 	{uCH_0, DEF_Enable, CONFIG_0,  UNIPOLAR, 0, AIN0, AIN_AVSS, 1, AD7124_GAIN_1_MUL};//channel_0 配置寄存器0 单极性 内部增益64
 	
 	bsp_ad7124_cfg_set(ad7124.pdev, &g_chcfg_tbl1);//初始化配置寄存器0 使用内部参考电压 内部增益64 用于压力采集
-//	ad7124reg_r = bsp_ad7124_cfg_get(ad7124.pdev,CONFIG_0);
+
 	g_chcfg_tbl1.channel = uCH_0;
 	g_chcfg_tbl1.config_idx = CONFIG_0;
 	g_chcfg_tbl1.AINP = AIN0;
 	g_chcfg_tbl1.AINM = AIN_AVSS;
 	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_0使用配置寄存器0 配置
-//	ad7124reg_r = bsp_ad7124_channel_get(ad7124.pdev,uCH_0);
-//	g_chcfg_tbl1.channel = uCH_1;
-//	g_chcfg_tbl1.AINP = AIN1;
-//	g_chcfg_tbl1.AINM = AIN_AVSS;
-//	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_1使用配置寄存器0 配置
-//	g_chcfg_tbl1.channel = uCH_2;
-//	g_chcfg_tbl1.AINP = AIN2;
-//	g_chcfg_tbl1.AINM = AIN_AVSS;
-//	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_2使用配置寄存器0 配置
-//	g_chcfg_tbl1.channel = uCH_3;
-//	g_chcfg_tbl1.AINP = AIN3;
-//	g_chcfg_tbl1.AINM = AIN_AVSS;
-//	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
-//	g_chcfg_tbl1.channel = uCH_4;
-//	g_chcfg_tbl1.AINP = AIN4;
-//	g_chcfg_tbl1.AINM = AIN_AVSS;
-//	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
-//	g_chcfg_tbl1.channel = uCH_5;
-//	g_chcfg_tbl1.AINP = AIN5;
-//	g_chcfg_tbl1.AINM = AIN_AVSS;
-//	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
+
+	g_chcfg_tbl1.channel = uCH_1;
+	g_chcfg_tbl1.AINP = AIN1;
+	g_chcfg_tbl1.AINM = AIN_AVSS;
+	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_1使用配置寄存器0 配置
+	g_chcfg_tbl1.channel = uCH_2;
+	g_chcfg_tbl1.AINP = AIN2;
+	g_chcfg_tbl1.AINM = AIN_AVSS;
+	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_2使用配置寄存器0 配置
+	g_chcfg_tbl1.channel = uCH_3;
+	g_chcfg_tbl1.AINP = AIN3;
+	g_chcfg_tbl1.AINM = AIN_AVSS;
+	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
+	g_chcfg_tbl1.channel = uCH_4;
+	g_chcfg_tbl1.AINP = AIN4;
+	g_chcfg_tbl1.AINM = AIN_AVSS;
+	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
+	g_chcfg_tbl1.channel = uCH_5;
+	g_chcfg_tbl1.AINP = AIN5;
+	g_chcfg_tbl1.AINM = AIN_AVSS;
+	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
 	
 	ad7124.channel = uCH_0;//起始通道
-	ad7124.channel_last = uCH_0;//最后一个通道		
+	ad7124.channel_last = uCH_5;//最后一个通道		
 	ad7124.status = AD7124_MEASURE_TEMP;		
 }
 u8 r_channel;
@@ -110,6 +110,15 @@ u8 StartADDataCollect(void)
 				case uCH_5:	
 					break;
 			}
+			ad7124.channel ++;
+			if(ad7124.channel > ad7124.channel_last)	{
+				ad7124.channel = uCH_0;
+				ad7124.busy = DEF_Idle;
+			}
+		}
+		else if(r_channel > ad7124.channel_last)	{
+			ad7124.channel = uCH_0;
+			ad7124.busy = DEF_Idle;
 		}
 	}
 	return 1;
