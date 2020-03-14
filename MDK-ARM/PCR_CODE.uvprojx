@@ -532,6 +532,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\LIFO_buffer.c</FilePath>
             </File>
+            <File>
+              <FileName>TempCtrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TempCtrl.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -558,11 +563,6 @@
               <FilePath>..\APP\app_udisk.c</FilePath>
             </File>
             <File>
-              <FileName>app_tempctrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\app_tempctrl.c</FilePath>
-            </File>
-            <File>
               <FileName>app_motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_motor.c</FilePath>
@@ -576,6 +576,11 @@
               <FileName>app_display.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_temp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\app_temp.c</FilePath>
             </File>
           </Files>
         </Group>

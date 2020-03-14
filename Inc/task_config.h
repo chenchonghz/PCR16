@@ -41,6 +41,7 @@
 #define STK_SIZE_DISPLAY							 (STK_SIZE_MIN * 2)
 #define STK_SIZE_MOTOR								 (STK_SIZE_MIN * 2)
 #define STK_SIZE_AD								 (STK_SIZE_MIN * 2)
+#define STK_SIZE_TEMP								 (STK_SIZE_MIN * 2)
 
 
 /* Task Message Size Configure */
@@ -73,6 +74,7 @@ enum _task_prio {
     MUTEX_PRIO_TLSF = TASK_HIGHEST_PRIO,
     TASK_PRIO_START,  
 	TASK_PRIO_AD, 	
+	TASK_PRIO_TEMP,
     TASK_PRIO_USART_TX,
     TASK_PRIO_USART_RX,
 	TASK_PRIO_MOTOR,	

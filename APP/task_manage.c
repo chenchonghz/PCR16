@@ -6,7 +6,7 @@
 //#include "sys_monitor.h"
 //#include "globalvariable.h"
 #include "app_motor.h"
-//#include "app_usart.h"
+#include "app_temp.h"
 #include "app_ad.h"
 //////////////////////////////////////////////////////////
 __align(4) OS_STK  TASK_START_STK[STK_SIZE_START]; //ÈÎÎñ¶ÑÕ»ÉùÃ÷
@@ -53,7 +53,7 @@ static void TaskStart(void * ppdata)
 static void TaskCreateOther(void)
 {
 	AppADInit();	
-//	AppSensorBoardInit();	
+	AppTempInit();	
 //	AppKeyScanInit();
 	AppMotorInit();		
 	AppDisplayInit();
