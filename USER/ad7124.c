@@ -1,7 +1,7 @@
 #include "ad7124.h"
 //#include "TempCtrl.h"
 
-#define AD7124_DATA_READY()		HAL_GPIO_ReadPin(AD_MISO_GPIO_Port, AD_MISO_Pin)
+#define AD7124_DATA_READY()		HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11)
 #define	AD7124_REF_VOLTAGE		(2500) //参考电压 mV 3304
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
@@ -52,7 +52,7 @@ static void AD7124ChannelEnable(void)
 	{uCH_0, DEF_Enable, CONFIG_0,  UNIPOLAR, 0, AIN0, AIN_AVSS, 1, AD7124_GAIN_1_MUL};//channel_0 配置寄存器0 单极性 内部增益64
 	
 	bsp_ad7124_cfg_set(ad7124.pdev, &g_chcfg_tbl1);//初始化配置寄存器0 使用内部参考电压 内部增益64 用于压力采集
-
+	ad7124reg_r = bsp_ad7124_cfg_get(ad7124.pdev, CONFIG_0);
 	g_chcfg_tbl1.channel = uCH_0;
 	g_chcfg_tbl1.config_idx = CONFIG_0;
 	g_chcfg_tbl1.AINP = AIN0;

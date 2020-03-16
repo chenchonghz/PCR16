@@ -368,7 +368,8 @@ typedef struct _ad7124_dev {
     const CPU_FP32   vref;
     CPU_INT32U cs_mask;
     CPU_INT32U flags;
-    spi_t 				*p_spi;
+//    spi_t 				*p_spi;
+	SPI_HandleTypeDef	*p_spi;
     void *priv;
 } ad7124_dev_t;
 
