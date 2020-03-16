@@ -320,7 +320,6 @@ OSIntEnter();
 //		HAL_GPIO_TogglePin(GPIOC, Fluo_Green_Pin);
 	}
   /* USER CODE END TIM6_DAC_IRQn 0 */
-//  HAL_TIM_IRQHandler(&htim6);
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 OSIntExit();
   /* USER CODE END TIM6_DAC_IRQn 1 */

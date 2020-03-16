@@ -95,8 +95,8 @@ void Error_Handler(void);
 #define HeatCoverCtrl_GPIO_Port GPIOB
 #define SPI2_CS_Pin GPIO_PIN_12
 #define SPI2_CS_GPIO_Port GPIOB
-#define CoolPWM_Pin GPIO_PIN_6
-#define CoolPWM_GPIO_Port GPIOC
+#define TEC_PWM_Pin GPIO_PIN_6
+#define TEC_PWM_GPIO_Port GPIOC
 #define Fluo_Green_Pin GPIO_PIN_7
 #define Fluo_Green_GPIO_Port GPIOC
 #define Fluo_Blue_Pin GPIO_PIN_8
@@ -109,8 +109,8 @@ void Error_Handler(void);
 #define DEBUG_UART1_TX_GPIO_Port GPIOA
 #define DEBUG_UART1_RX_Pin GPIO_PIN_10
 #define DEBUG_UART1_RX_GPIO_Port GPIOA
-#define Bridge_DIR_Pin GPIO_PIN_15
-#define Bridge_DIR_GPIO_Port GPIOA
+#define TEC_DIR_Pin GPIO_PIN_15
+#define TEC_DIR_GPIO_Port GPIOA
 #define AD_SCLK_Pin GPIO_PIN_10
 #define AD_SCLK_GPIO_Port GPIOC
 #define AD_MISO_Pin GPIO_PIN_11
