@@ -86,14 +86,14 @@ static void AD7124ChannelEnable(void)
 }
 u8 r_channel;
 u8 ad7124_err;
-//float ad_vol;
+float ad_temp;
 u32 ad_code;
 u32 calc_start=0,calc_time;
 u8 StartADDataCollect(void)
 {
 //	u8 r_channel;
 //	u8 ad7124_err;
-	float ad_temp;
+//	float ad_temp;
 //	u32 ad_code;
 	u8 delaycnt=0;
 	
@@ -126,10 +126,10 @@ u8 StartADDataCollect(void)
 					CalcADCVolAverage(uCH_3, ad_temp);
 					break;
 				case uCH_4:	
-					ad7124.vol[uCH_4] = (u16)(ad_temp*1000);
+					ad7124.vol[uCH_4] = (u16)ad_temp;
 					break;
 				case uCH_5:	
-					ad7124.vol[uCH_5] = (u16)(ad_temp*1000);
+					ad7124.vol[uCH_5] = (u16)ad_temp;
 					break;
 			}
 			ad7124.channel ++;
@@ -168,7 +168,7 @@ static void CalcADCVolAverage(u8 ch, float vol)
 	u16 advol;
 	u8 idx;
 	
-	advol = (u16)(vol*1000);
+	advol = (u16)vol;
 	idx = AdcVolAver[ch].idx;
 	AdcVolAver[ch].buf[idx] = advol;
 	AdcVolAver[ch].idx ++;

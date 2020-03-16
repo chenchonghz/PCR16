@@ -19,7 +19,7 @@
 //	u16 cur_temp;
 //}_tempctrl_t;
 
-void CalcTemperature(u32 Rx, s32 *ptemp);
+u8 CalcTemperature(u32 Rx, s32 *ptemp);
 
 #endif
 

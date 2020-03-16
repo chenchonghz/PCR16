@@ -21,13 +21,33 @@ static void TempDatInit(void)
 
 static void AppTempTask (void *parg)
 {
+	s16 temp;
 	TempDatInit();
 	
 	for(;;)
     {
 //		if(Sys.devstate == DevState_Running)	
 		{
-			CalcTemperature(GetADCVol(TEMP_ID1), (s32 *)&app_temp.current_t[TEMP_ID1]);
+			if(CalcTemperature(GetADCVol(TEMP_ID1), (s32 *)&temp)==0)	{
+				app_temp.current_t[TEMP_ID1] = temp;
+			}else	{//ÎÂ¶È´«¸ÐÆ÷ÍÑÂä
+			
+			}
+			if(CalcTemperature(GetADCVol(TEMP_ID2), (s32 *)&temp)==0)	{
+				app_temp.current_t[TEMP_ID2] = temp;
+			}else	{
+			
+			}
+			if(CalcTemperature(GetADCVol(TEMP_ID3), (s32 *)&temp)==0)	{
+				app_temp.current_t[TEMP_ID3] = temp;
+			}else	{
+			
+			}
+			if(CalcTemperature(GetADCVol(TEMP_ID4), (s32 *)&temp)==0)	{
+				app_temp.current_t[TEMP_ID4] = temp;
+			}else	{
+			
+			}
 		}
 		OSTimeDly(100);
 	}

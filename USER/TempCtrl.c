@@ -134,6 +134,7 @@ const static  TEMP_TABLE_T temp_table[TEMP_TABLE_LIST_SIZE] =
 {11800,	143},
 {11900,	131},
 {12000,	120},
+
 };
 
 static u32 config_temp_calculate_decimal(uint32_t max, uint32_t mix, uint32_t resistance)
@@ -179,8 +180,8 @@ static u8 config_lookup_temp_tables(uint32_t resistance, s32 *outTemp)
 }
 
 //º∆À„Œ¬∂»
-void CalcTemperature(u32 Rx, s32 *ptemp)
+u8 CalcTemperature(u32 Rx, s32 *ptemp)
 {
-	config_lookup_temp_tables(Rx, ptemp);
+	return config_lookup_temp_tables(Rx, ptemp);
 }
 

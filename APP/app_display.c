@@ -4,7 +4,7 @@
 //堆栈
 __align(4) OS_STK  TASK_DISPLAY_STK[STK_SIZE_DISPLAY]; //任务堆栈声?
 #define N_MESSAGES		5
-LIFOBUFF_T ScreenIDLIFO;
+//LIFOBUFF_T ScreenIDLIFO;
 _appdisplay_t appdis;
 
 void    *AppDisMSG_Q[N_MESSAGES];//消息队列数组
