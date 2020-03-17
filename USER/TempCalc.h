@@ -1,5 +1,5 @@
-#ifndef __TEMPCTRL_H__
-#define __TEMPCTRL_H__
+#ifndef __TEMPCALC_H__
+#define __TEMPCALC_H__
 
 #include "includes.h"
 #include "ad7124.h"

@@ -6,11 +6,11 @@
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
 
-#define	AVER_MAX		3
+#define	AVER_MAX		4
 #define	DISCARD_NUM		1
 #define	CH_AVERNUMS			4//需要算平均的通道个数
 struct _AdcVolAver_t {
-	u16 buf[AVER_MAX];
+	u32 buf[AVER_MAX];
 	u8 idx;
 //	u16 aver;
 }AdcVolAver[CH_AVERNUMS];
@@ -146,7 +146,7 @@ u8 StartADDataCollect(void)
 	return 1;
 }
 
-u16 GetADCVol(u8 ch)
+u32 GetADCVol(u8 ch)
 {
 	return ad7124.vol[ch];
 }
@@ -165,10 +165,10 @@ static float CalcADCVoltage(u32 adcode)
 //计算每个通道电压均值 去掉1个最大值 1个最小值 取平均
 static void CalcADCVolAverage(u8 ch, float vol)
 {	
-	u16 advol;
+	u32 advol;
 	u8 idx;
 	
-	advol = (u16)vol;
+	advol = (u32)(vol*100);
 	idx = AdcVolAver[ch].idx;
 	AdcVolAver[ch].buf[idx] = advol;
 	AdcVolAver[ch].idx ++;
@@ -177,6 +177,7 @@ static void CalcADCVolAverage(u8 ch, float vol)
 		 /*---------------- 冒泡排序,由小到大排序 -----------------*/
     	u8 i,j,flag;
 		i=0;
+		idx = AdcVolAver[ch].idx;
 
 		do{
 			flag=0;
@@ -198,22 +199,19 @@ static void CalcADCVolAverage(u8 ch, float vol)
 				}
 			}
 			i++;
-		}while ((i<AdcVolAver[ch].idx) && flag);
+		}while ((i<idx) && flag);
 		/*---------------- end -----------------*/
 		/*----------- 去掉1个最大值和最小值,记录最大偏差，数据进行平均 --------------*/
 		temp = 0;
-		j = AdcVolAver[ch].idx - DISCARD_NUM;
+		j = idx - DISCARD_NUM;
 		for (i=DISCARD_NUM;i<j;i++)
 		{
 			temp += AdcVolAver[ch].buf[i];
 		}
-		j = AdcVolAver[ch].idx - DISCARD_NUM*2;
+		j = idx - DISCARD_NUM*2;
 		ad7124.vol[ch] = temp/j;
-//		*paver = temp/j;
 		/*---------------- end -----------------*/
 		AdcVolAver[ch].idx = 0;
-//		return 1;
 	}
-//	return 0;
 }
 

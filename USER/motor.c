@@ -232,21 +232,22 @@ static void StopMotorAccDec(MOTOR_ID id)
 	__HAL_TIM_DISABLE(&htim6);
 }
 
+#define	MOTORPWM_CH		TIM_CHANNEL_3
 static void StopMotorPWM(MOTOR_ID id)
 {
-	HAL_TIM_PWM_Stop(tMotor[id].tmr, TIM_CHANNEL_3);
+	HAL_TIM_PWM_Stop(tMotor[id].tmr, MOTORPWM_CH);
 }
 
 static void UpdateMotorPWM(MOTOR_ID id, INT16U val)
 {
 //	__HAL_TIM_SET_COUNTER(tMotor[id].tmr, 0);
     __HAL_TIM_SET_AUTORELOAD(tMotor[id].tmr, val);
-    __HAL_TIM_SET_COMPARE(tMotor[id].tmr, TIM_CHANNEL_3, val/2);
+    __HAL_TIM_SET_COMPARE(tMotor[id].tmr, MOTORPWM_CH, val/2);
 }
 
 static void StartMotorPWM(MOTOR_ID id)
 {
 	__HAL_TIM_CLEAR_FLAG(tMotor[id].tmr, TIM_FLAG_UPDATE);
 	UpdateMotorPWM(id, tMotor[id].pCurve->pVelBuf[tMotor[id].TableIndex]);
-	HAL_TIM_PWM_Start(tMotor[id].tmr, TIM_CHANNEL_3);	
+	HAL_TIM_PWM_Start(tMotor[id].tmr, MOTORPWM_CH);	
 }

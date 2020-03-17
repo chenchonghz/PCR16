@@ -20,12 +20,12 @@ typedef struct  _ad7124
 	u8 channel;
 	u8 status;
 	u8 busy;
-	u16 vol[AVALID_CH];
+	u32 vol[AVALID_CH];
 }_ad7124_t;
 
 extern _ad7124_t ad7124;
 void AD7124Init(void);
 u8 StartADDataCollect(void);
-u16 GetADCVol(u8 ch);
+u32 GetADCVol(u8 ch);
 #endif
 

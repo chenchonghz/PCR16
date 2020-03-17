@@ -92,6 +92,11 @@ H*******************************************************************************
 #define	Led_FluoGreen_On()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_RESET)
 #define	Led_FluoGreen_Off()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_SET)
 
+#define	TEC_DIR_COLD()				HAL_GPIO_WritePin(TEC_DIR_GPIO_Port, TEC_DIR_Pin,GPIO_PIN_SET)
+#define	TEC_DIR_HOT()				HAL_GPIO_WritePin(TEC_DIR_GPIO_Port, TEC_DIR_Pin,GPIO_PIN_RESET)
+#define	TEC_ON()				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET)
+#define	TEC_OFF()				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET)
+
 #define	LED_RED_ON()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_SET)
 #define	LED_RED_OFF()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_RESET)
 #define	LED_GREEN_ON()				HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin,GPIO_PIN_SET)
