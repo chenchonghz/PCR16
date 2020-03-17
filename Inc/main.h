@@ -111,12 +111,6 @@ void Error_Handler(void);
 #define DEBUG_UART1_RX_GPIO_Port GPIOA
 #define TEC_DIR_Pin GPIO_PIN_15
 #define TEC_DIR_GPIO_Port GPIOA
-#define AD_SCLK_Pin GPIO_PIN_10
-#define AD_SCLK_GPIO_Port GPIOC
-#define AD_MISO_Pin GPIO_PIN_11
-#define AD_MISO_GPIO_Port GPIOC
-#define AD_MOSI_Pin GPIO_PIN_12
-#define AD_MOSI_GPIO_Port GPIOC
 #define AD_SYNC_Pin GPIO_PIN_2
 #define AD_SYNC_GPIO_Port GPIOD
 #define AD_CS_Pin GPIO_PIN_3
