@@ -27,7 +27,7 @@ static void AppADTask (void *parg)
 	for(;;)
     {
 		StartADDataCollect();
-		OSTimeDly(3);
+		OSTimeDly(2);
 //		timecnt++;
 //		if(timecnt>300)	{
 //			timecnt = 0;

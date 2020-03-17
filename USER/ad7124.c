@@ -6,14 +6,14 @@
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
 
-#define	AVER_MAX		4
+#define	AVER_MAX		3
 #define	DISCARD_NUM		1
-#define	CH_NUMS			4
+#define	CH_AVERNUMS			4//需要算平均的通道个数
 struct _AdcVolAver_t {
 	u16 buf[AVER_MAX];
 	u8 idx;
 //	u16 aver;
-}AdcVolAver[CH_NUMS];
+}AdcVolAver[CH_AVERNUMS];
 
 static float CalcADCVoltage(u32 adcode);
 static void AD7124ChannelEnable(void);
@@ -45,14 +45,14 @@ void AD7124Init(void)
 	bsp_ad7124_control_set(ad7124.pdev);//连续采样模式
 	AD7124ChannelEnable();//通道配置
 }
-u32 ad7124reg_r;
+//u32 ad7124reg_r;
 static void AD7124ChannelEnable(void)
 {
 	ad7124_chcfg_t g_chcfg_tbl1=\
 	{uCH_0, DEF_Enable, CONFIG_0,  UNIPOLAR, 0, AIN0, AIN_AVSS, 1, AD7124_GAIN_1_MUL};//channel_0 配置寄存器0 单极性 内部增益64
 	
 	bsp_ad7124_cfg_set(ad7124.pdev, &g_chcfg_tbl1);//初始化配置寄存器0 使用内部参考电压 内部增益64 用于压力采集
-	ad7124reg_r = bsp_ad7124_cfg_get(ad7124.pdev, CONFIG_0);
+//	ad7124reg_r = bsp_ad7124_cfg_get(ad7124.pdev, CONFIG_0);
 	g_chcfg_tbl1.channel = uCH_0;
 	g_chcfg_tbl1.config_idx = CONFIG_0;
 	g_chcfg_tbl1.AINP = AIN0;

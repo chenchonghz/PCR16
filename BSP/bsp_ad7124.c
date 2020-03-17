@@ -120,71 +120,49 @@ void ad7124_cs_high()
 	AD7124_CS_HIGH();
 }
 
-u8 SPI_SendByte(SPI_HandleTypeDef *pSpi, u8 dat)
-{
-	u8 timeout=0;
-	
-	for(;;)	{
-		if (__HAL_SPI_GET_FLAG(pSpi, SPI_FLAG_TXE))	{
-			*((__IO uint8_t *)&pSpi->Instance->DR) = dat;
-		}	
-			OSTimeDly(1);
-		timeout++;
-		if(timeout>AD7124_TIMEOUT_VALUE)	{
-			return 0;
-		}
-	}
-	return 1;
-}
-
-u8 SPI_ReceiveByte(SPI_HandleTypeDef *pSpi, u8 *pdata)
-{
-	u8 timeout=0;
-	
-	for(;;)	{
-		if (__HAL_SPI_GET_FLAG(pSpi, SPI_FLAG_RXNE))	{
-			*pdata = *(__IO uint8_t *)&pSpi->Instance->DR;
-		}
-		OSTimeDly(1);
-		timeout++;
-		if(timeout>AD7124_TIMEOUT_VALUE)	{
-			return 0;
-		}
-	}
-	return 1;
-}
-BIT32 adwtemp;
 //extern void ad7124_spi_write(spi_t *pdev, CPU_INT08U nbits, CPU_INT32U txdat);
 static void ad7124_write(ad7124_dev_t *pdev, CPU_INT08U len, CPU_INT32U data)
 {
+#if OS_CRITICAL_METHOD == 3
+	OS_CPU_SR   cpu_sr = 0;
+#endif
 	s8 i;
-//	BIT32 adwtemp;
+	BIT32 temp;
+	
 	if(len==0)
 		return ;
-	adwtemp.uword = data;
+	OS_ENTER_CRITICAL();
+	temp.uword = data;
 	for(i=len-1;i>=0;i--)	{
-		SPI_SendByte(pdev->p_spi, adwtemp.ubyte[i]);
+		HAL_SPI_Transmit(pdev->p_spi, &temp.ubyte[i], 1, AD7124_TIMEOUT_VALUE);
 	}
+	OS_EXIT_CRITICAL();
 //    bsp_spi_lock(pdev->p_spi);
 //    ad7124_spi_write(pdev->p_spi, nbits, data);
 //    bsp_spi_unlock(pdev->p_spi);
 }
-BIT32 adrtemp;
+
 //extern CPU_INT32U ad7124_spi_read(spi_t *pdev, CPU_INT08U nbits);
 static CPU_INT32U ad7124_read(ad7124_dev_t *pdev, CPU_INT08U len)
 {
+#if OS_CRITICAL_METHOD == 3
+	OS_CPU_SR   cpu_sr = 0;
+#endif
 	s8 i;
-//    BIT32 temp;
+    BIT32 temp;
+	
 	if(len==0)
 		return 0;
-	adrtemp.uword = 0;
+	OS_ENTER_CRITICAL();
+	temp.uword = 0;
 //    bsp_spi_lock(pdev->p_spi);
 //    ret = ad7124_spi_read(pdev->p_spi, nbits);
 //    bsp_spi_unlock(pdev->p_spi);
 	for(i=len-1;i>=0;i--)	{
-		SPI_ReceiveByte(pdev->p_spi, &adrtemp.ubyte[i]);
+		HAL_SPI_Receive(pdev->p_spi, &temp.ubyte[i], 1, AD7124_TIMEOUT_VALUE);
 	}
-    return adrtemp.uword;
+	OS_EXIT_CRITICAL();
+    return temp.uword;
 }
 
 static void ad7124_reg_write(ad7124_dev_t *pdev, CPU_INT08U reg, CPU_INT08U len, CPU_INT32U data)
@@ -388,7 +366,7 @@ void bsp_ad7124_filterreg_set(ad7124_dev_t *pdev)
 	ad7124_reg_filter_t r;
 	
 	r.uword = 0;
-	r.bits.FS = 30;
+	r.bits.FS = 15;
 	ad7124_reg_write(pdev, 0x21, 3, r.uword);
 }
 ad7124_dev_t* bsp_ad7124_find(CPU_INT08U id)
