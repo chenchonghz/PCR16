@@ -234,6 +234,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>PID[0]</ItemText>
         </Ww>
+        <Ww>
+          <count>13</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>AdcVolAver[2],0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>

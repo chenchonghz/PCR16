@@ -27,5 +27,6 @@ extern _ad7124_t ad7124;
 void AD7124Init(void);
 u8 StartADDataCollect(void);
 u32 GetADCVol(u8 ch);
+void AD7124_PDChannelONOFF(u8 ch, u8 flag);
 #endif
 

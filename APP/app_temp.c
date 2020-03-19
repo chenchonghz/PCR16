@@ -43,38 +43,44 @@ static void UpdateTECPWM(INT16U duty)
 
 static void StartTECPWM(u16 duty)
 {
+	static u16 dutybk;
+	
+	if(dutybk==duty)
+		return;
 	if(duty==100)	{
 		duty++;
 	}
 	__HAL_TIM_CLEAR_FLAG(app_temp.pTECPWM, TIM_FLAG_UPDATE);
 	UpdateTECPWM(duty);
 	HAL_TIM_PWM_Start(app_temp.pTECPWM, TECPWM_CH);	
+	dutybk = duty;
 }
 //pid调节半导体片温度 采样增量法计算 pwm占空比不能超过50%
-static u16 TempCtrl(u8 id, u16 pwmduty, u16 cur_t)
+static u16 TempCtrl(u8 id, s16 *pwmduty, u16 cur_t)
 {
-	s16 ret;
+	s16 dat;
 	u16 setval;
 	
-	ret = (s16)PID_control(id, pwmduty, cur_t);
-	if(ret<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
+	dat = *pwmduty;
+	dat += (s16)PID_control(id, dat, cur_t);
+	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
 		TEC_DIR_COLD();
-		setval = -ret;
+		setval = -dat;
 	}
 	else {//当前温度低于目标温度 将TEC切换到制热模式 快速升温
 		TEC_DIR_HOT();
-		setval = ret;
+		setval = dat;
 	}
 	if(setval>TECPWMDUTY_MAX)	{
 		setval = TECPWMDUTY_MAX;
 	}
 	StartTECPWM(setval);
-	return ret;
+	*pwmduty = dat;
 }
 
 static void AppTempTask (void *parg)
 {
-	s16 cur_temp;
+	s32 cur_temp;
 	u16 diff;
 	
 	TempDatInit();
@@ -83,10 +89,10 @@ static void AppTempTask (void *parg)
 	
 	for(;;)
     {
-		if(Sys.devstate == DevState_Running)	
+//		if(Sys.devstate == DevState_Running)	
 		{
-			if(CalcTemperature(GetADCVol(TEMP_ID1), (s32 *)&cur_temp)==0)	{
-				app_temp.current_t[TEMP_ID1] = cur_temp/10;//0.1
+			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{
+				app_temp.current_t[TEMP_ID1] = cur_temp;//0.1
 				SetPIDTarget(PID_ID1, app_temp.target_t[HOLE_TEMP]);//设置控制目标
 				diff = abs(app_temp.current_t[TEMP_ID1] - app_temp.target_t[HOLE_TEMP]);
 //				if(diff > 200)	{//根据温度差 设置pid参数
@@ -94,8 +100,10 @@ static void AppTempTask (void *parg)
 //				}
 //				else 
 //					SetPIDVal(PID_ID1, 1, 0, 0);
-				if(diff > 3)	{//小于0.3度 不调节
-					app_temp.duty[HOLE_TEMP] += TempCtrl(PID_ID1, app_temp.duty[HOLE_TEMP], cur_temp);//pid调节 增量法计算
+				if(diff > 3)	{//大于0.3度 
+					TempCtrl(PID_ID1, &app_temp.duty[HOLE_TEMP], cur_temp);//pid调节 增量法计算
+				}else	{//小于0.3度 不调节 TEC停止工作
+					StopTECPWM();
 				}
 			}else	{//温度传感器脱落
 			
@@ -116,6 +124,6 @@ static void AppTempTask (void *parg)
 			
 			}
 		}
-		OSTimeDly(50);
+		OSTimeDly(80);
 	}
 }

@@ -6,8 +6,8 @@
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
 
-#define	AVER_MAX		4
-#define	DISCARD_NUM		1
+#define	AVER_MAX		8
+#define	DISCARD_NUM		2
 #define	CH_AVERNUMS			4//需要算平均的通道个数
 struct _AdcVolAver_t {
 	u32 buf[AVER_MAX];
@@ -71,18 +71,31 @@ static void AD7124ChannelEnable(void)
 	g_chcfg_tbl1.AINP = AIN3;
 	g_chcfg_tbl1.AINM = AIN_AVSS;
 	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
-	g_chcfg_tbl1.channel = uCH_4;
-	g_chcfg_tbl1.AINP = AIN4;
-	g_chcfg_tbl1.AINM = AIN_AVSS;
-	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
-	g_chcfg_tbl1.channel = uCH_5;
-	g_chcfg_tbl1.AINP = AIN5;
-	g_chcfg_tbl1.AINM = AIN_AVSS;
-	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
+//	g_chcfg_tbl1.channel = uCH_4;
+//	g_chcfg_tbl1.AINP = AIN4;
+//	g_chcfg_tbl1.AINM = AIN_AVSS;
+//	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
+//	g_chcfg_tbl1.channel = uCH_5;
+//	g_chcfg_tbl1.AINP = AIN5;
+//	g_chcfg_tbl1.AINM = AIN_AVSS;
+//	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
 	
 	ad7124.channel = uCH_0;//起始通道
 	ad7124.channel_last = uCH_5;//最后一个通道		
 	ad7124.status = AD7124_MEASURE_TEMP;		
+}
+//打开/关闭测量PD的AD通道
+void AD7124_PDChannelONOFF(u8 ch, u8 flag)
+{
+	ad7124_chcfg_t g_chcfg_tbl1=\
+	{uCH_0, DEF_Enable, CONFIG_0,  UNIPOLAR, 0, AIN0, AIN_AVSS, 1, AD7124_GAIN_1_MUL};//channel_0 配置寄存器0 单极性 内部增益64
+	
+	g_chcfg_tbl1.enable = flag;
+	g_chcfg_tbl1.channel = ch;
+	g_chcfg_tbl1.config_idx = CONFIG_0;
+	g_chcfg_tbl1.AINP = ch;
+	g_chcfg_tbl1.AINM = AIN_AVSS;
+	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_0使用配置寄存器0 配置
 }
 u8 r_channel;
 u8 ad7124_err;
@@ -107,7 +120,8 @@ u8 StartADDataCollect(void)
 	}
 	r_channel = bsp_ad7124_conv_ready(ad7124.pdev, &ad7124_err);//回读当前采样通道
 	if(ad7124_err==AD7124_ERR_NONE)	{
-		if(r_channel == ad7124.channel)	{
+		if(r_channel <= ad7124.channel_last)	
+		{
 			ad_code = bsp_ad7124_value_get(ad7124.pdev); //读取ADC转换结果				
 			ad_temp = CalcADCVoltage(ad_code); //计算电压			
 //			calc_time = HAL_GetTick() - calc_start;
@@ -131,17 +145,19 @@ u8 StartADDataCollect(void)
 				case uCH_5:	
 					ad7124.vol[uCH_5] = (u16)ad_temp;
 					break;
+				default:
+					break;
 			}
-			ad7124.channel ++;
-			if(ad7124.channel > ad7124.channel_last)	{
-				ad7124.channel = uCH_0;
-				ad7124.busy = DEF_Idle;
-			}
+//			ad7124.channel ++;
+//			if(ad7124.channel > ad7124.channel_last)	{
+//				ad7124.channel = uCH_0;
+//				ad7124.busy = DEF_Idle;
+//			}
 		}
-		else if(r_channel > ad7124.channel_last)	{
-			ad7124.channel = uCH_0;
-			ad7124.busy = DEF_Idle;
-		}
+//		else if(r_channel > ad7124.channel_last)	{
+//			ad7124.channel = uCH_0;
+//			ad7124.busy = DEF_Idle;
+//		}
 	}
 	return 1;
 }
@@ -170,9 +186,14 @@ static void CalcADCVolAverage(u8 ch, float vol)
 	
 	advol = (u32)(vol*100);
 	idx = AdcVolAver[ch].idx;
+//	if(ch==2&&idx==0)	{			
+//		calc_start = HAL_GetTick();
+//	}
 	AdcVolAver[ch].buf[idx] = advol;
 	AdcVolAver[ch].idx ++;
 	if(AdcVolAver[ch].idx >= AVER_MAX)	{
+//		if(ch==2)
+//			calc_time = HAL_GetTick() - calc_start;
 		u32 temp;
 		 /*---------------- 冒泡排序,由小到大排序 -----------------*/
     	u8 i,j,flag;
