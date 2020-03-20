@@ -18,7 +18,7 @@ void AppTempInit (void)
 static void TempDatInit(void)
 {
 //	app_temp.pTemp = &tempctrl;
-	app_temp.target_t[HOLE_TEMP] = 900;//0.1
+	app_temp.target_t[HOLE_TEMP] = 5000;//0.01
 	app_temp.target_t[COVER_TEMP] = 0;
 	app_temp.duty[HOLE_TEMP] = 0;
 	app_temp.duty[COVER_TEMP] = 0;
@@ -55,6 +55,13 @@ static void StartTECPWM(u16 duty)
 	HAL_TIM_PWM_Start(app_temp.pTECPWM, TECPWM_CH);	
 	dutybk = duty;
 }
+//停止温度控制
+static void StopTempCtrl(s16 *pwmduty)
+{
+	StopTECPWM();
+	*pwmduty = 0;
+}
+
 //pid调节半导体片温度 采样增量法计算 pwm占空比不能超过50%
 static u16 TempCtrl(u8 id, s16 *pwmduty, u16 cur_t)
 {
@@ -64,20 +71,21 @@ static u16 TempCtrl(u8 id, s16 *pwmduty, u16 cur_t)
 	dat = *pwmduty;
 	dat += (s16)PID_control(id, dat, cur_t);
 	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
+		if(dat<-TECPWMDUTY_MAX)
+			dat = -TECPWMDUTY_MAX;
 		TEC_DIR_COLD();
 		setval = -dat;
 	}
 	else {//当前温度低于目标温度 将TEC切换到制热模式 快速升温
+		if(dat>TECPWMDUTY_MAX)
+			dat = TECPWMDUTY_MAX;
 		TEC_DIR_HOT();
 		setval = dat;
-	}
-	if(setval>TECPWMDUTY_MAX)	{
-		setval = TECPWMDUTY_MAX;
 	}
 	StartTECPWM(setval);
 	*pwmduty = dat;
 }
-
+#define	TEMPCTRL_ACCURACY		20//0.2
 static void AppTempTask (void *parg)
 {
 	s32 cur_temp;
@@ -85,25 +93,25 @@ static void AppTempTask (void *parg)
 	
 	TempDatInit();
 	PIDParamInit();
-	TEC_OFF();
+	StopTempCtrl(&app_temp.duty[HOLE_TEMP]);
 	
 	for(;;)
     {
 //		if(Sys.devstate == DevState_Running)	
 		{
 			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{
-				app_temp.current_t[TEMP_ID1] = cur_temp;//0.1
+				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
 				SetPIDTarget(PID_ID1, app_temp.target_t[HOLE_TEMP]);//设置控制目标
-				diff = abs(app_temp.current_t[TEMP_ID1] - app_temp.target_t[HOLE_TEMP]);
+				diff = abs(GetPIDDiff(PID_ID1));//获取PID当前误差
 //				if(diff > 200)	{//根据温度差 设置pid参数
 //					SetPIDVal(PID_ID1, 1, 0, 0);
 //				}
 //				else 
 //					SetPIDVal(PID_ID1, 1, 0, 0);
-				if(diff > 3)	{//大于0.3度 
+				if(diff > TEMPCTRL_ACCURACY)	{//大于0.1度 
 					TempCtrl(PID_ID1, &app_temp.duty[HOLE_TEMP], cur_temp);//pid调节 增量法计算
-				}else	{//小于0.3度 不调节 TEC停止工作
-					StopTECPWM();
+				}else	{//小<=0.1度 不调节 TEC停止工作
+					StopTempCtrl(&app_temp.duty[HOLE_TEMP]);
 				}
 			}else	{//温度传感器脱落
 			

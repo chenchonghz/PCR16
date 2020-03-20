@@ -74,4 +74,10 @@ s32 PID_control(u8 id, s32 set_dat,s32 actual_dat)
               + pPid->Kd * (pPid->diff - 2*pPid->diff_last + pPid->diff_llast);
 	return (s32)(increment);
 }
-
+//获取pid本次误差
+s32 GetPIDDiff(u8 id)
+{
+	_PID_t *pPid = &PID[id];
+	
+	return pPid->diff;
+}

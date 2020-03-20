@@ -161,12 +161,12 @@ void MX_GPIO_Init(void)
 #include "motor.h"
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if(GPIO_Pin == LimitSwitchRgiht_Pin) //电机右限位点
+    if(GPIO_Pin == LimitSwitchRgiht_Pin && tMotor[MOTOR_ID1].Dir == MOTOR_TO_MAX) //电机右限位点
     {
 		StopMotor(&tMotor[MOTOR_ID1]);
 		tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Max_LimitOpt;
 	}
-	else if(GPIO_Pin == LimitSwitchLeft_Pin)//电机左限位点
+	else if(GPIO_Pin == LimitSwitchLeft_Pin && tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)//电机左限位点
 	{
 		StopMotor(&tMotor[MOTOR_ID1]);
 		tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Min_LimitOpt;

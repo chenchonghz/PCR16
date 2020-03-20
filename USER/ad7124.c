@@ -7,8 +7,11 @@
 _ad7124_t ad7124;
 
 #define	AVER_MAX		8
-#define	DISCARD_NUM		2
-#define	CH_AVERNUMS			4//需要算平均的通道个数
+#define	TEC_AVER_MAX		AVER_MAX
+#define	PD_AVER_MAX		4
+#define	TEC_DISCARD_NUM		2
+#define	PD_DISCARD_NUM		1
+#define	CH_AVERNUMS			6//需要算平均的通道个数
 struct _AdcVolAver_t {
 	u32 buf[AVER_MAX];
 	u8 idx;
@@ -17,7 +20,7 @@ struct _AdcVolAver_t {
 
 static float CalcADCVoltage(u32 adcode);
 static void AD7124ChannelEnable(void);
-static void CalcADCVolAverage(u8 ch, float vol);
+static void CalcADCVolAverage(u8 ch, u32 advol, u8 aver_max, u8 discard);
 
 u8 ad7124_id;
 void AD7124Init(void)
@@ -67,14 +70,14 @@ static void AD7124ChannelEnable(void)
 	g_chcfg_tbl1.AINP = AIN2;
 	g_chcfg_tbl1.AINM = AIN_AVSS;
 	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_2使用配置寄存器0 配置
-	g_chcfg_tbl1.channel = uCH_3;
-	g_chcfg_tbl1.AINP = AIN3;
-	g_chcfg_tbl1.AINM = AIN_AVSS;
-	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
-//	g_chcfg_tbl1.channel = uCH_4;
-//	g_chcfg_tbl1.AINP = AIN4;
+//	g_chcfg_tbl1.channel = uCH_3;
+//	g_chcfg_tbl1.AINP = AIN3;
 //	g_chcfg_tbl1.AINM = AIN_AVSS;
 //	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
+	g_chcfg_tbl1.channel = uCH_4;
+	g_chcfg_tbl1.AINP = AIN4;
+	g_chcfg_tbl1.AINM = AIN_AVSS;
+	bsp_ad7124_channel_set(ad7124.pdev, &g_chcfg_tbl1);//channel_3使用配置寄存器0 配置	
 //	g_chcfg_tbl1.channel = uCH_5;
 //	g_chcfg_tbl1.AINP = AIN5;
 //	g_chcfg_tbl1.AINM = AIN_AVSS;
@@ -128,22 +131,22 @@ u8 StartADDataCollect(void)
 //			calc_start = HAL_GetTick();
 			switch(r_channel)	{
 				case uCH_0:	//测温通道 精确到mv
-					CalcADCVolAverage(uCH_0, ad_temp);
+					CalcADCVolAverage(uCH_0, (u32)(ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);
 					break;
 				case uCH_1:	//测温通道 精确到mv
-					CalcADCVolAverage(uCH_1, ad_temp);
+					CalcADCVolAverage(uCH_1, (u32)(ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);
 					break;
 				case uCH_2://测温通道 精确到mv	 
-					CalcADCVolAverage(uCH_2, ad_temp);				
+					CalcADCVolAverage(uCH_2,(u32) (ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);				
 					break;
 				case uCH_3:	//测温通道 精确到mv
-					CalcADCVolAverage(uCH_3, ad_temp);
+					CalcADCVolAverage(uCH_3, (u32)(ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);
 					break;
 				case uCH_4:	
-					ad7124.vol[uCH_4] = (u16)ad_temp;
+					CalcADCVolAverage(uCH_4, (u32)ad_temp, PD_AVER_MAX, PD_DISCARD_NUM);
 					break;
 				case uCH_5:	
-					ad7124.vol[uCH_5] = (u16)ad_temp;
+					CalcADCVolAverage(uCH_5, (u32)ad_temp, PD_AVER_MAX, PD_DISCARD_NUM);
 					break;
 				default:
 					break;
@@ -179,19 +182,19 @@ static float CalcADCVoltage(u32 adcode)
 }
 
 //计算每个通道电压均值 去掉1个最大值 1个最小值 取平均
-static void CalcADCVolAverage(u8 ch, float vol)
+static void CalcADCVolAverage(u8 ch, u32 advol, u8 aver_max, u8 discard)
 {	
-	u32 advol;
+//	u32 advol;
 	u8 idx;
 	
-	advol = (u32)(vol*100);
+//	advol = (u32)(vol*100);
 	idx = AdcVolAver[ch].idx;
 //	if(ch==2&&idx==0)	{			
 //		calc_start = HAL_GetTick();
 //	}
 	AdcVolAver[ch].buf[idx] = advol;
 	AdcVolAver[ch].idx ++;
-	if(AdcVolAver[ch].idx >= AVER_MAX)	{
+	if(AdcVolAver[ch].idx >= aver_max)	{
 //		if(ch==2)
 //			calc_time = HAL_GetTick() - calc_start;
 		u32 temp;
@@ -224,12 +227,12 @@ static void CalcADCVolAverage(u8 ch, float vol)
 		/*---------------- end -----------------*/
 		/*----------- 去掉1个最大值和最小值,记录最大偏差，数据进行平均 --------------*/
 		temp = 0;
-		j = idx - DISCARD_NUM;
-		for (i=DISCARD_NUM;i<j;i++)
+		j = idx - discard;
+		for (i=discard;i<j;i++)
 		{
 			temp += AdcVolAver[ch].buf[i];
 		}
-		j = idx - DISCARD_NUM*2;
+		j = idx - discard*2;
 		ad7124.vol[ch] = temp/j;
 		/*---------------- end -----------------*/
 		AdcVolAver[ch].idx = 0;
