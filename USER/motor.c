@@ -97,9 +97,9 @@ void disable_motor(TMotor *pdev)
 }
 //停止电机
 void StopMotor(TMotor *pMotor)
-{
-	StopMotorPWM(pMotor->id);
+{	
 	if(pMotor->status.is_run==MotorState_Run)	{
+		StopMotorPWM(pMotor->id);
 		OSSemPost(pMotor->Sem);
 		pMotor->status.is_run        = MotorState_Stop;
 		StopMotorAccDec(MOTOR_ID1);//停止加减速
@@ -193,13 +193,13 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 	if (steps)
     {
         pMotor->Dir = dir;
-        if(pMotor->Dir) {//前进
-            if(!Motor_MaxLimit())//在上限开关位置
+        if(pMotor->Dir==MOTOR_TO_MIN) {//后退
+            if(!Motor_MinLimit())//在上限开关位置
                 goto _end;
             SET_H(m_dir);
         }
-        else    {//后退
-            if(!Motor_MinLimit())//在下限开关位置
+        else    {//前进
+            if(!Motor_MaxLimit())//在下限开关位置
                 goto _end;
             SET_L(m_dir);
         }

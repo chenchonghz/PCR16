@@ -161,15 +161,19 @@ void MX_GPIO_Init(void)
 #include "motor.h"
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if(GPIO_Pin == LimitSwitchRgiht_Pin && tMotor[MOTOR_ID1].Dir == MOTOR_TO_MAX) //电机右限位点
-    {
-		StopMotor(&tMotor[MOTOR_ID1]);
-		tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Max_LimitOpt;
+	if(tMotor[MOTOR_ID1].status.is_run!=MotorState_Run)
+		return;
+    if(GPIO_Pin == LimitSwitchRgiht_Pin)	{
+		if(tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)	{ //电机右限位点
+			StopMotor(&tMotor[MOTOR_ID1]);
+			tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Min_LimitOpt;
+		}
 	}
-	else if(GPIO_Pin == LimitSwitchLeft_Pin && tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)//电机左限位点
-	{
-		StopMotor(&tMotor[MOTOR_ID1]);
-		tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Min_LimitOpt;
+	else if(GPIO_Pin == LimitSwitchLeft_Pin) { 
+		if(tMotor[MOTOR_ID1].Dir == MOTOR_TO_MAX)	{//电机左限位点	
+			StopMotor(&tMotor[MOTOR_ID1]);
+			tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Max_LimitOpt;
+		}
 	}
 }
 /* USER CODE END 2 */
