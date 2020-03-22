@@ -23,7 +23,7 @@ void PIDParamInit(void)
 void SetPIDVal(u8 id, float P,float I,float D)
 {
 	_PID_t *pPid = &PID[id];
-	
+
 	pPid->Kp = P;
 	pPid->Ki = I;
 	pPid->Kd = D;
@@ -58,10 +58,11 @@ s32 PID_control(u8 id, s32 set_dat,s32 actual_dat)
 	return (s32)(increment);
 }
 #endif
+float increment;
 //增量法计算公式：Pdlt=Kp*(e(t)-e(t-1))+Ki*e(t)+Kd*(e(t)-2*e(t-1)+e(t-2));
-s32 PID_control(u8 id, s32 set_dat,s32 actual_dat)
+float PID_control(u8 id, s32 set_dat,s32 actual_dat)
 {	
-	float increment;
+//	float increment;
 //	s32 ret;
 	_PID_t *pPid = &PID[id];
 	
@@ -72,8 +73,19 @@ s32 PID_control(u8 id, s32 set_dat,s32 actual_dat)
 	increment = pPid->Kp * (pPid->diff - pPid->diff_last)   \
               + pPid->Ki *  pPid->diff         \
               + pPid->Kd * (pPid->diff - 2*pPid->diff_last + pPid->diff_llast);
-	return (s32)(increment);
+	return increment;
 }
+
+void ClearPIDDiff(u8 id)
+{
+	_PID_t *pPid = &PID[id];
+	
+	pPid->diff = 0;
+	pPid->diff_last = 0;
+	pPid->diff_llast = 0;
+	pPid->integral = 0;
+}
+
 //获取pid本次误差
 s32 GetPIDDiff(u8 id)
 {

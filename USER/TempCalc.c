@@ -1235,7 +1235,7 @@ static u32 config_temp_calculate_decimal(uint32_t max, uint32_t mix, uint32_t re
 
 static u8 config_lookup_temp_tables(uint32_t resistance, s32 *outTemp)
 {
-    uint8_t i = 0;
+    uint16_t i = 0;
     u32 difference;
     int table_size = sizeof(temp_table) / sizeof( TEMP_TABLE_T);
 	

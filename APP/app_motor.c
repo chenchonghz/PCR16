@@ -31,6 +31,7 @@ static void MotorReset(void)
     tMotor[MOTOR_ID1].status.action     = MotorAction_Resetting;
 	if(!Motor_MinLimit())	{//已经在下限位 前进
 		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, 10*Motor_StepsPerum, DEF_False);//前进10mm
+		OSTimeDly(1000);
 	} 
 	tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
 //	CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], Motor_Move_MAX_STEP);
@@ -41,6 +42,7 @@ static void MotorReset(void)
 	else 	{
 		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetFail;
 	}
+	OSTimeDly(1000);
 }
 
 u8 tmc260_status=0;

@@ -85,17 +85,20 @@ H*******************************************************************************
 //#define	DisplayPowerEnable()		HAL_GPIO_WritePin(DispPwrCtrl_GPIO_Port, DispPwrCtrl_Pin,GPIO_PIN_SET)
 //#define	DisplayPowerDisable()		HAL_GPIO_WritePin(DispPwrCtrl_GPIO_Port, DispPwrCtrl_Pin,GPIO_PIN_RESET)
 
-#define	Led_Fluo_On()		HAL_GPIO_WritePin(Fluo_OnOff_GPIO_Port, Fluo_OnOff_Pin, GPIO_PIN_RESET)
-#define	Led_Fluo_Off()		HAL_GPIO_WritePin(Fluo_OnOff_GPIO_Port, Fluo_OnOff_Pin, GPIO_PIN_SET)
-#define	Led_FluoBlue_On()		HAL_GPIO_WritePin(Fluo_Blue_GPIO_Port, Fluo_Blue_Pin,GPIO_PIN_RESET)
-#define	Led_FluoBlue_Off()		HAL_GPIO_WritePin(Fluo_Blue_GPIO_Port, Fluo_Blue_Pin,GPIO_PIN_SET)
-#define	Led_FluoGreen_On()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_RESET)
-#define	Led_FluoGreen_Off()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_SET)
+#define	Led_Fluo_On()		HAL_GPIO_WritePin(Fluo_OnOff_GPIO_Port, Fluo_OnOff_Pin, GPIO_PIN_SET)
+#define	Led_Fluo_Off()		HAL_GPIO_WritePin(Fluo_OnOff_GPIO_Port, Fluo_OnOff_Pin, GPIO_PIN_RESET)
+#define	Led_FluoBlue_On()		HAL_GPIO_WritePin(Fluo_Blue_GPIO_Port, Fluo_Blue_Pin,GPIO_PIN_SET)
+#define	Led_FluoBlue_Off()		HAL_GPIO_WritePin(Fluo_Blue_GPIO_Port, Fluo_Blue_Pin,GPIO_PIN_RESET)
+#define	Led_FluoGreen_On()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_SET)
+#define	Led_FluoGreen_Off()		HAL_GPIO_WritePin(Fluo_Green_GPIO_Port, Fluo_Green_Pin,GPIO_PIN_RESET)
 
-#define	TEC_DIR_COLD()				HAL_GPIO_WritePin(TEC_DIR_GPIO_Port, TEC_DIR_Pin,GPIO_PIN_SET)
-#define	TEC_DIR_HOT()				HAL_GPIO_WritePin(TEC_DIR_GPIO_Port, TEC_DIR_Pin,GPIO_PIN_RESET)
+#define	TEC_DIR_COLD()				HAL_GPIO_WritePin(TEC_DIR_GPIO_Port, TEC_DIR_Pin,GPIO_PIN_RESET)
+#define	TEC_DIR_HOT()				HAL_GPIO_WritePin(TEC_DIR_GPIO_Port, TEC_DIR_Pin,GPIO_PIN_SET)
 #define	TEC_ON()				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET)
 #define	TEC_OFF()				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET)
+
+#define	COOLFAN_ON()				HAL_GPIO_WritePin(CoolFanCtrl_GPIO_Port, CoolFanCtrl_Pin, GPIO_PIN_SET)
+#define	COOLFAN_OFF()				HAL_GPIO_WritePin(CoolFanCtrl_GPIO_Port, CoolFanCtrl_Pin, GPIO_PIN_RESET)
 
 #define	LED_RED_ON()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_SET)
 #define	LED_RED_OFF()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_RESET)

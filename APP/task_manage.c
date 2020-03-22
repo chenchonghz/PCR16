@@ -4,7 +4,7 @@
 #include "app_spiflash.h"
 #include "app_display.h"
 //#include "sys_monitor.h"
-//#include "globalvariable.h"
+#include "app_fluo.h"
 #include "app_motor.h"
 #include "app_temp.h"
 #include "app_ad.h"
@@ -54,7 +54,7 @@ static void TaskCreateOther(void)
 {
 	AppADInit();	
 	AppTempInit();	
-//	AppKeyScanInit();
+	AppFluoInit();
 	AppMotorInit();		
 	AppDisplayInit();
 //	AppPerfusemonitorInit();

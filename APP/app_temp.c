@@ -18,7 +18,7 @@ void AppTempInit (void)
 static void TempDatInit(void)
 {
 //	app_temp.pTemp = &tempctrl;
-	app_temp.target_t[HOLE_TEMP] = 5000;//0.01
+	app_temp.target_t[HOLE_TEMP] = 3700;//0.01
 	app_temp.target_t[COVER_TEMP] = 0;
 	app_temp.duty[HOLE_TEMP] = 0;
 	app_temp.duty[COVER_TEMP] = 0;
@@ -59,33 +59,41 @@ static void StartTECPWM(u16 duty)
 static void StopTempCtrl(s16 *pwmduty)
 {
 	StopTECPWM();
+	ClearPIDDiff(PID_ID1);
 	*pwmduty = 0;
 }
-
+u16 setval;
 //pid调节半导体片温度 采样增量法计算 pwm占空比不能超过50%
-static u16 TempCtrl(u8 id, s16 *pwmduty, u16 cur_t)
+static u16 TempCtrl(u8 id, s16 pwmduty, u16 cur_t)
 {
 	s16 dat;
-	u16 setval;
+	float temp;
+//	u16 setval;
 	
-	dat = *pwmduty;
-	dat += (s16)PID_control(id, dat, cur_t);
+	temp = pwmduty;
+	temp += PID_control(id, dat, cur_t);
+	dat = (s16)temp;
 	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
 		if(dat<-TECPWMDUTY_MAX)
-			dat = -TECPWMDUTY_MAX;
+			setval = TECPWMDUTY_MAX;
+		else
+			setval = -dat;
 		TEC_DIR_COLD();
-		setval = -dat;
 	}
 	else {//当前温度低于目标温度 将TEC切换到制热模式 快速升温
 		if(dat>TECPWMDUTY_MAX)
-			dat = TECPWMDUTY_MAX;
+			setval = TECPWMDUTY_MAX;
+		else
+			setval = dat;
 		TEC_DIR_HOT();
-		setval = dat;
 	}
 	StartTECPWM(setval);
-	*pwmduty = dat;
+	SYS_PRINTF("D:%d,T:%d ",dat,cur_t);
+	return dat;
 }
-#define	TEMPCTRL_ACCURACY		20//0.2
+float Kpbk;
+#define	TEMPCTRL_ACCURACY		20//温控精度0.2
+#define	TEMPCOLLECT_ACCURACY		5//温度采集精度 0.05
 static void AppTempTask (void *parg)
 {
 	s32 cur_temp;
@@ -94,24 +102,37 @@ static void AppTempTask (void *parg)
 	TempDatInit();
 	PIDParamInit();
 	StopTempCtrl(&app_temp.duty[HOLE_TEMP]);
-	
+	COOLFAN_ON();
+//	SetPIDVal(PID_ID1, 1, 0, 0);
 	for(;;)
     {
-//		if(Sys.devstate == DevState_Running)	
+		if(Sys.devstate == DevState_Running)	
 		{
 			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{
-				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
-				SetPIDTarget(PID_ID1, app_temp.target_t[HOLE_TEMP]);//设置控制目标
-				diff = abs(GetPIDDiff(PID_ID1));//获取PID当前误差
-//				if(diff > 200)	{//根据温度差 设置pid参数
-//					SetPIDVal(PID_ID1, 1, 0, 0);
-//				}
-//				else 
-//					SetPIDVal(PID_ID1, 1, 0, 0);
-				if(diff > TEMPCTRL_ACCURACY)	{//大于0.1度 
-					TempCtrl(PID_ID1, &app_temp.duty[HOLE_TEMP], cur_temp);//pid调节 增量法计算
-				}else	{//小<=0.1度 不调节 TEC停止工作
-					StopTempCtrl(&app_temp.duty[HOLE_TEMP]);
+//				diff = abs(app_temp.current_t[TEMP_ID1] - cur_temp);
+//				if(diff>TEMPCOLLECT_ACCURACY)	
+				{
+					app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
+					SetPIDTarget(PID_ID1, app_temp.target_t[HOLE_TEMP]);//设置控制目标
+					diff = abs(app_temp.target_t[HOLE_TEMP] - cur_temp);//获取PID当前误差
+//					if(diff > 200)	{//根据温度差 设置pid参数
+//						SetPIDVal(PID_ID1, 1, 0, 0);
+//					}
+//					else 
+//						SetPIDVal(PID_ID1, 1, 0, 0);
+					if(cur_temp > (app_temp.target_t[HOLE_TEMP]+1000))	{
+						StopTempCtrl(&app_temp.duty[HOLE_TEMP]);
+						return;
+					}
+					if(diff > TEMPCTRL_ACCURACY)	{//大于0.1度 
+						if(PID[PID_ID1].Kp != Kpbk)		{
+							Kpbk = PID[PID_ID1].Kp;
+							SetPIDVal(PID_ID1, PID[PID_ID1].Kp,PID[PID_ID1].Ki,PID[PID_ID1].Kd);
+						}
+						app_temp.duty[HOLE_TEMP] = TempCtrl(PID_ID1, app_temp.duty[HOLE_TEMP], cur_temp);//pid调节 增量法计算
+					}else	{//小<=0.1度 不调节 TEC停止工作
+//						StopTempCtrl(&app_temp.duty[HOLE_TEMP]);						
+					}
 				}
 			}else	{//温度传感器脱落
 			
