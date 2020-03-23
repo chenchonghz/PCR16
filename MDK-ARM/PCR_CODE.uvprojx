@@ -542,6 +542,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\TempCalc.c</FilePath>
             </File>
+            <File>
+              <FileName>misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\misc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -586,6 +591,11 @@
               <FileName>app_temp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_temp.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_fluo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\app_fluo.c</FilePath>
             </File>
           </Files>
         </Group>

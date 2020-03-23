@@ -16,7 +16,7 @@ typedef struct _app_temp	{
 	TIM_HandleTypeDef *pTECPWM;
 	s32 target_t[PIDCTRL_NUM];//目标温度 0.1
 	s32 current_t[TEMP_ID_NUMS];//当前温度 0.1
-	s16 duty[PIDCTRL_NUM];//tec pwm占空比
+	float PIDParam[PIDCTRL_NUM];//tec pwm占空比
 }_app_temp_t;
 
 void AppTempInit (void);

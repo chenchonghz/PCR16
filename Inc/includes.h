@@ -33,7 +33,7 @@
 #include "spi.h"
 #include "fatfs.h"
 #include "usb_host.h"
-//#include "misc.h"
+#include "misc.h"
 #include "bsp.h"
 #include "tim.h"
 #include "task_config.h"

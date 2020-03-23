@@ -20,8 +20,8 @@ static void TempDatInit(void)
 //	app_temp.pTemp = &tempctrl;
 	app_temp.target_t[HOLE_TEMP] = 3700;//0.01
 	app_temp.target_t[COVER_TEMP] = 0;
-	app_temp.duty[HOLE_TEMP] = 0;
-	app_temp.duty[COVER_TEMP] = 0;
+	app_temp.PIDParam[HOLE_TEMP] = 0.0;
+	app_temp.PIDParam[COVER_TEMP] = 0.0;
 	app_temp.pTECPWM = &htim8;
 }
 
@@ -56,23 +56,22 @@ static void StartTECPWM(u16 duty)
 	dutybk = duty;
 }
 //停止温度控制
-static void StopTempCtrl(s16 *pwmduty)
+static u32 StopTempCtrl(void)
 {
 	StopTECPWM();
-	ClearPIDDiff(PID_ID1);
-	*pwmduty = 0;
+	return 0;
 }
 u16 setval;
 //pid调节半导体片温度 采样增量法计算 pwm占空比不能超过50%
-static u16 TempCtrl(u8 id, s16 pwmduty, u16 cur_t)
+static float TempCtrl(u8 id, float pid_param, u16 cur_t)
 {
 	s16 dat;
 	float temp;
 //	u16 setval;
 	
-	temp = pwmduty;
+	temp = pid_param;
 	temp += PID_control(id, dat, cur_t);
-	dat = (s16)temp;
+	dat = (s16)floatToInt(temp);
 	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
 		if(dat<-TECPWMDUTY_MAX)
 			setval = TECPWMDUTY_MAX;
@@ -88,11 +87,11 @@ static u16 TempCtrl(u8 id, s16 pwmduty, u16 cur_t)
 		TEC_DIR_HOT();
 	}
 	StartTECPWM(setval);
-	SYS_PRINTF("D:%d,T:%d ",dat,cur_t);
-	return dat;
+//	SYS_PRINTF("D:%d,T:%d ",dat,cur_t);
+	return temp;
 }
 float Kpbk;
-#define	TEMPCTRL_ACCURACY		20//温控精度0.2
+#define	TEMPCTRL_ACCURACY		10//温控精度0.2
 #define	TEMPCOLLECT_ACCURACY		5//温度采集精度 0.05
 static void AppTempTask (void *parg)
 {
@@ -101,7 +100,7 @@ static void AppTempTask (void *parg)
 	
 	TempDatInit();
 	PIDParamInit();
-	StopTempCtrl(&app_temp.duty[HOLE_TEMP]);
+	app_temp.PIDParam[HOLE_TEMP] = StopTempCtrl();
 	COOLFAN_ON();
 //	SetPIDVal(PID_ID1, 1, 0, 0);
 	for(;;)
@@ -121,17 +120,21 @@ static void AppTempTask (void *parg)
 //					else 
 //						SetPIDVal(PID_ID1, 1, 0, 0);
 					if(cur_temp > (app_temp.target_t[HOLE_TEMP]+1000))	{
-						StopTempCtrl(&app_temp.duty[HOLE_TEMP]);
+						app_temp.PIDParam[HOLE_TEMP] = StopTempCtrl();
 						return;
 					}
-					if(diff > TEMPCTRL_ACCURACY)	{//大于0.1度 
+					if(diff > TEMPCOLLECT_ACCURACY)	
+					{//大于0.1度 
 						if(PID[PID_ID1].Kp != Kpbk)		{
 							Kpbk = PID[PID_ID1].Kp;
 							SetPIDVal(PID_ID1, PID[PID_ID1].Kp,PID[PID_ID1].Ki,PID[PID_ID1].Kd);
 						}
-						app_temp.duty[HOLE_TEMP] = TempCtrl(PID_ID1, app_temp.duty[HOLE_TEMP], cur_temp);//pid调节 增量法计算
-					}else	{//小<=0.1度 不调节 TEC停止工作
-//						StopTempCtrl(&app_temp.duty[HOLE_TEMP]);						
+						app_temp.PIDParam[HOLE_TEMP] = TempCtrl(PID_ID1, app_temp.PIDParam[HOLE_TEMP], cur_temp);//pid调节 增量法计算
+					}
+					else	{//小<=0.1度 不调节 TEC停止工作
+//						StartTECPWM(1);
+						ClearPIDDiff(PID_ID1);
+						app_temp.PIDParam[HOLE_TEMP] = StopTempCtrl();				
 					}
 				}
 			}else	{//温度传感器脱落
@@ -152,6 +155,10 @@ static void AppTempTask (void *parg)
 			}else	{
 			
 			}
+		}
+		else	{
+			ClearPIDDiff(PID_ID1);
+			app_temp.PIDParam[HOLE_TEMP] = StopTempCtrl();
 		}
 		OSTimeDly(80);
 	}
