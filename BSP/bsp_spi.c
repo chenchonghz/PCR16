@@ -30,14 +30,14 @@
 //#define SPI1_PORT_MOSI	        AD_MOSI_GPIO_Port
 //#define SPI1_PIN_MOSI	        	AD_MOSI_Pin
 
-#define SPI1_PORT_SCK           TMC260_SCK_GPIO_Port
-#define SPI1_PIN_SCK            TMC260_SCK_Pin
+#define SPI1_PORT_SCK           MAX5401_SCLK_GPIO_Port
+#define SPI1_PIN_SCK            MAX5401_SCLK_Pin
 
-#define SPI1_PORT_MISO	        TMC260_SDO_GPIO_Port
-#define SPI1_PIN_MISO	       	 TMC260_SDO_Pin
+#define SPI1_PORT_DIO	        MAX5401_DIN_GPIO_Port
+#define SPI1_PIN_DIO	       	MAX5401_DIN_Pin
 
-#define SPI1_PORT_MOSI	        TMC260_SDI_GPIO_Port
-#define SPI1_PIN_MOSI	        	TMC260_SDI_Pin
+//#define SPI1_PORT_MOSI	        TMC260_SDI_GPIO_Port
+//#define SPI1_PIN_MOSI	        	TMC260_SDI_Pin
 
 #define SPI2_PORT_SCK           TMC260_SCK_GPIO_Port
 #define SPI2_PIN_SCK            TMC260_SCK_Pin
@@ -107,10 +107,10 @@ static void       spi_ln3wires_write(spi_t *pdev, CPU_INT08U nbits, CPU_INT32U t
 */
 
 static const union _spi_port g_spi_port[SPI_ID_NUMS] = {
-    [SPI_ID1]._4port = {
+    [SPI_ID1]._3port = {
         .SCK = {SPI1_PORT_SCK,  SPI1_PIN_SCK},
-        .MISO= {SPI1_PORT_MISO, SPI1_PIN_MISO},
-        .MOSI= {SPI1_PORT_MOSI, SPI1_PIN_MOSI}
+        .DIO= {SPI1_PORT_DIO, SPI1_PIN_DIO},
+//        .MOSI= {SPI1_PORT_MOSI, SPI1_PIN_MOSI}
     },
     [SPI_ID2]._4port = {
         .SCK = {SPI2_PORT_SCK,  SPI2_PIN_SCK},
@@ -121,7 +121,7 @@ static const union _spi_port g_spi_port[SPI_ID_NUMS] = {
 
 static spi_priv_t   g_spi_priv  [SPI_ID_NUMS] = {
     [SPI_ID1] = {
-        .nwire = SPI_4Wires,
+        .nwire = SPI_3Wires,
         .pport = &g_spi_port[SPI_ID1]
     },
     [SPI_ID2] = {
@@ -637,20 +637,20 @@ void bsp_spi_init(void)
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     spi_t *pdev;
 
-//	pdev = &g_spi[SPI_ID1];
-//    /* 配置SPI引脚SCK、MISO 和 MOSI为复用推挽模式 */
-//    GPIO_InitStruct.Pin   = SPI1_PIN_SCK|SPI1_PIN_MOSI;
-//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-//    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;	/* 推挽输出模式 */
-//    HAL_GPIO_Init(SPI1_PORT_SCK, &GPIO_InitStruct);
+	pdev = &g_spi[SPI_ID1];
+    /* 配置SPI引脚SCK、MISO 和 MOSI为复用推挽模式 */
+    GPIO_InitStruct.Pin   = SPI1_PIN_SCK|SPI1_PIN_DIO;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;	/* 推挽输出模式 */
+    HAL_GPIO_Init(SPI1_PORT_SCK, &GPIO_InitStruct);
 
-//    GPIO_InitStruct.Pin   = SPI1_PIN_MISO;
+//    GPIO_InitStruct.Pin   = SPI1_PIN_DIO;
 //    GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;		/* MISO 设置为输入上拉 */
 //		GPIO_InitStruct.Pull = GPIO_PULLUP;
 //    HAL_GPIO_Init(SPI1_PORT_SCK, &GPIO_InitStruct);
 
-//    pdev->flags &= ~SPI_FLAGS_HARD;
-//    bsp_spi_open(SPI_ID1);
+    pdev->flags &= ~SPI_FLAGS_HARD;
+    bsp_spi_open(SPI_ID1);
 
     pdev = &g_spi[SPI_ID2];
     /* 配置SPI引脚SCK 为复用推挽模式 */

@@ -1,5 +1,5 @@
 #include "app_fluo.h"
-//#include "ad7124.h"
+#include "bsp_max5401.h"
 
 //¶ÑÕ»
 __align(4) OS_STK  TASK_FLUO_STK[STK_SIZE_FLUO]; //ÈÎÎñ¶ÑÕ»Éù?
@@ -25,6 +25,7 @@ static void AppFLUOTask (void *parg)
 	FLUODatInit();
 //	Led_FluoGreen_On();
 //	Led_Fluo_On();
+//	MAX5401WriteResistor();
 	
 	for(;;)
     {
