@@ -24,7 +24,7 @@ static void TempDatInit(void)
 	TempPid[HOLE_TEMP].PIDParam = 0.0;
 	
 	TempPid[COVER_TEMP].PIDid = PID_ID2;
-//	TempPid[COVER_TEMP].pTECPWM = &htim8;
+	TempPid[COVER_TEMP].pTECPWM = &htim2;
 	TempPid[COVER_TEMP].target_t = 0;	
 	TempPid[COVER_TEMP].PIDParam = 0.0;
 }
@@ -109,7 +109,6 @@ void StartTempCtrl(u16 target)
 static void AppTempTask (void *parg)
 {
 	s32 cur_temp;
-	u16 diff;
 	
 	TempDatInit();
 	PIDParamInit();
@@ -123,14 +122,9 @@ static void AppTempTask (void *parg)
 		{
 			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{
 				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
-//				if(cur_temp > (TempPid[HOLE_TEMP].target_t+TEMPCTRL_MAX))	{
-//					StopTempCtrl(&TempPid[HOLE_TEMP]);
-//					return;
-//				}
-//				else
 				{
 					SetPIDTarget(TempPid[HOLE_TEMP].PIDid, TempPid[HOLE_TEMP].target_t);//设置控制目标
-					diff = abs(TempPid[HOLE_TEMP].target_t - cur_temp);//获取PID当前误差
+//					diff = abs(TempPid[HOLE_TEMP].target_t - cur_temp);//获取PID当前误差
 //					if(diff > 200)	{//根据温度差 设置pid参数
 //						SetPIDVal(PID_ID1, 1, 0, 0);
 //					}
@@ -138,10 +132,6 @@ static void AppTempTask (void *parg)
 //						SetPIDVal(PID_ID1, 1, 0, 0);
 //					if(diff > TEMPCOLLECT_ACCURACY)	
 					{//大于0.1度 
-//						if(PID[PID_ID1].Kp != Kpbk)		{
-//							Kpbk = PID[PID_ID1].Kp;
-//							SetPIDVal(PID_ID1, PID[PID_ID1].Kp,PID[PID_ID1].Ki,PID[PID_ID1].Kd);
-//						}
 						TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
 					}
 //					else	{//小<=0.1度 不调节 TEC停止工作
@@ -153,7 +143,7 @@ static void AppTempTask (void *parg)
 			
 			}
 			if(CalcTemperature(GetADCVol(TEMP_ID2), (s32 *)&cur_temp)==0)	{
-				app_temp.current_t[TEMP_ID2] = cur_temp;
+				app_temp.current_t[TEMP_ID2] = cur_temp;				
 			}else	{
 			
 			}
@@ -164,6 +154,7 @@ static void AppTempTask (void *parg)
 //			}
 			if(CalcTemperature(GetADCVol(TEMP_ID4), (s32 *)&cur_temp)==0)	{
 				app_temp.current_t[TEMP_ID4] = cur_temp;
+				TempCtrl(&TempPid[COVER_TEMP], cur_temp);//热盖pid调节 增量法计算
 			}else	{
 			
 			}

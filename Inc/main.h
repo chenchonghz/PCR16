@@ -91,8 +91,6 @@ void Error_Handler(void);
 #define LED_GREEN_GPIO_Port GPIOB
 #define LED_BLUE_Pin GPIO_PIN_10
 #define LED_BLUE_GPIO_Port GPIOB
-#define HeatCoverCtrl_Pin GPIO_PIN_11
-#define HeatCoverCtrl_GPIO_Port GPIOB
 #define SPI2_CS_Pin GPIO_PIN_12
 #define SPI2_CS_GPIO_Port GPIOB
 #define TEC_PWM_Pin GPIO_PIN_6

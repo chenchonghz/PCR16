@@ -105,6 +105,7 @@ __set_PRIMASK(1);//¹Ø±Õ×ÜÖÐ¶Ï
   MX_TIM3_Init();
   MX_TIM6_Init();
   MX_SPI3_Init();
+  MX_TIM2_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
   SYS_PRINTF("SYS Startup.");
