@@ -37,3 +37,24 @@ void timer_stop(TIM_HandleTypeDef *tmr)
 //		}
 //	}
 //}
+
+void StopPWM(TIM_HandleTypeDef *pPWM, u8 ch)
+{
+	HAL_TIM_PWM_Stop(pPWM, ch);
+}
+//ÐÞ¸ÄTEC pwmÕ¼¿Õ±È
+void UpdatePWM(TIM_HandleTypeDef *pPWM, u8 ch, INT16U val)
+{
+//	u16 temp;
+	
+//	temp = (HOLE_TECPWM_PLUSE/100)*duty;
+//    __HAL_TIM_SET_AUTORELOAD(pPWM, HOLE_TECPWM_PLUSE);
+    __HAL_TIM_SET_COMPARE(pPWM, ch, val);
+}
+
+void StartPWM(TIM_HandleTypeDef *pPWM, u8 ch, u16 val)
+{
+	__HAL_TIM_CLEAR_FLAG(pPWM, TIM_FLAG_UPDATE);
+	UpdatePWM(pPWM, ch, val);
+	HAL_TIM_PWM_Start(pPWM, ch);	
+}

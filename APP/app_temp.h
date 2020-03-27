@@ -8,11 +8,14 @@
 #define	COVER_TEMP		1
 
 #define	PIDCTRL_NUM		2//需要pid控制数量
-#define	TECPWMDUTY_MAX		62//TEC pwm占空比最大值
+
 
 typedef struct _pid_ctrl	{
 	u8 PIDid;
 	TIM_HandleTypeDef *pTECPWM;	
+	u8 TimCH;
+	u16 TimPluse;
+	u8 DutyMax;
 	s16 target_t;//目标温度 0.1
 	float PIDParam;//tec pwm占空比
 }pid_ctrl_t;

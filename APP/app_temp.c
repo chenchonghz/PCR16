@@ -7,7 +7,10 @@ __align(4) OS_STK  TASK_TEMP_STK[STK_SIZE_TEMP]; //任务堆栈声?
 
 _app_temp_t app_temp;
 pid_ctrl_t TempPid[PIDCTRL_NUM];
-
+#define	HOLE_TECPWM_PLUSE		400
+#define	COVER_TECPWM_PLUSE		80
+#define	HOLE_TECPWM_MAX		62//TEC pwm占空比最大值
+#define	COVER_TECPWM_MAX		62//TEC pwm占空比最大值
 static  message_pkt_t    msg_pkt_temp;
 static void AppTempTask (void *parg);
 
@@ -20,52 +23,43 @@ static void TempDatInit(void)
 {
 	TempPid[HOLE_TEMP].PIDid = PID_ID1;
 	TempPid[HOLE_TEMP].pTECPWM = &htim8;
+	TempPid[HOLE_TEMP].TimCH = TIM_CHANNEL_1;
+	TempPid[HOLE_TEMP].TimPluse = HOLE_TECPWM_PLUSE;
+	TempPid[HOLE_TEMP].DutyMax = HOLE_TECPWM_MAX;
 	TempPid[HOLE_TEMP].target_t = 3700;//0.01
 	TempPid[HOLE_TEMP].PIDParam = 0.0;
 	
 	TempPid[COVER_TEMP].PIDid = PID_ID2;
 	TempPid[COVER_TEMP].pTECPWM = &htim2;
+	TempPid[COVER_TEMP].TimCH = TIM_CHANNEL_4;
+	TempPid[COVER_TEMP].TimPluse = COVER_TECPWM_PLUSE;
+	TempPid[HOLE_TEMP].DutyMax = COVER_TECPWM_MAX;
 	TempPid[COVER_TEMP].target_t = 0;	
 	TempPid[COVER_TEMP].PIDParam = 0.0;
 }
-
-#define	TECPWM_CH		TIM_CHANNEL_1
-#define	TECPWM_PLUSE		400
-static void StopTECPWM(TIM_HandleTypeDef *pPWM)
+//TEC pwm控制
+void StartTECPWM(pid_ctrl_t *pTempPid, u8 duty)
 {
-	HAL_TIM_PWM_Stop(pPWM, TECPWM_CH);
-}
-//修改TEC pwm占空比
-static void UpdateTECPWM(TIM_HandleTypeDef *pPWM, INT16U duty)
-{
+	static u8 dutybk;
 	u16 temp;
-	
-	temp = (TECPWM_PLUSE/100)*duty;
-    __HAL_TIM_SET_AUTORELOAD(pPWM, TECPWM_PLUSE);
-    __HAL_TIM_SET_COMPARE(pPWM, TECPWM_CH, temp);
-}
-
-static void StartTECPWM(TIM_HandleTypeDef *pPWM, u16 duty)
-{
-	static u16 dutybk;
 	
 	if(dutybk==duty)
 		return;
 	if(duty==100)	{
 		duty++;
 	}
-	__HAL_TIM_CLEAR_FLAG(pPWM, TIM_FLAG_UPDATE);
-	UpdateTECPWM(pPWM, duty);
-	HAL_TIM_PWM_Start(pPWM, TECPWM_CH);	
+	temp = (pTempPid->TimPluse/100)*duty;
+	StartPWM(pTempPid->pTECPWM, pTempPid->TimCH, temp);
 	dutybk = duty;
 }
+
 //停止温度控制
 static u32 StopTempCtrl(pid_ctrl_t *pTempPid)
 {
-	StopTECPWM(pTempPid->pTECPWM);
+	StopPWM(pTempPid->pTECPWM, pTempPid->TimCH);
 	pTempPid->PIDParam = 0.0;
 }
-u16 setval;
+u8 setval;
 //pid调节半导体片温度 采样增量法计算 pwm占空比不能超过50%
 static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
 {
@@ -78,20 +72,20 @@ static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
 	pTempPid->PIDParam = temp;
 	dat = (s16)floatToInt(temp);
 	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
-		if(dat<-TECPWMDUTY_MAX)
-			setval = TECPWMDUTY_MAX;
+		if(dat < -pTempPid->DutyMax)
+			setval = pTempPid->DutyMax;
 		else
 			setval = -dat;
 		TEC_DIR_COLD();
 	}
 	else {//当前温度低于目标温度 将TEC切换到制热模式 快速升温
-		if(dat>TECPWMDUTY_MAX)
-			setval = TECPWMDUTY_MAX;
+		if(dat > pTempPid->DutyMax)
+			setval = pTempPid->DutyMax;
 		else
 			setval = dat;
 		TEC_DIR_HOT();
 	}
-	StartTECPWM(pTempPid->pTECPWM, setval);
+	StartTECPWM(pTempPid, setval);
 //	SYS_PRINTF("D:%d,T:%d ",dat,cur_t);
 }
 //
@@ -102,8 +96,6 @@ void StartTempCtrl(u16 target)
 	Sys.devstate = DevState_Running;
 }
 
-//float Kpbk;
-#define	TEMPCTRL_MAX		1000//
 #define	TEMPCTRL_ACCURACY		10//温控精度0.1
 #define	TEMPCOLLECT_ACCURACY		5//温度采集精度 0.05
 static void AppTempTask (void *parg)
@@ -147,21 +139,23 @@ static void AppTempTask (void *parg)
 			}else	{
 			
 			}
-//			if(CalcTemperature(GetADCVol(TEMP_ID3), (s32 *)&cur_temp)==0)	{
-//				app_temp.current_t[TEMP_ID3] = cur_temp;
-//			}else	{
-//			
-//			}
-			if(CalcTemperature(GetADCVol(TEMP_ID4), (s32 *)&cur_temp)==0)	{
-				app_temp.current_t[TEMP_ID4] = cur_temp;
+			if(CalcTemperature(GetADCVol(TEMP_ID3), (s32 *)&cur_temp)==0)	{
+				app_temp.current_t[TEMP_ID3] = cur_temp;
 				TempCtrl(&TempPid[COVER_TEMP], cur_temp);//热盖pid调节 增量法计算
 			}else	{
 			
 			}
+//			if(CalcTemperature(GetADCVol(TEMP_ID4), (s32 *)&cur_temp)==0)	{//散热器 预留
+//				app_temp.current_t[TEMP_ID4] = cur_temp;				
+//			}else	{
+//			
+//			}
 		}
 		else	{
 			ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
 			StopTempCtrl(&TempPid[HOLE_TEMP]);
+			ClearPIDDiff(TempPid[COVER_TEMP].PIDid);
+			StopTempCtrl(&TempPid[COVER_TEMP]);
 		}
 		OSTimeDly(80);
 	}
