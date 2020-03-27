@@ -1,5 +1,6 @@
 #include "rw_spiflash.h"
 #include "tlsf.h"
+#include "app_spiflash.h"
 
 #define FORMAT_DISK			0
 
@@ -8,6 +9,8 @@ struct _flashfs	{
 	FATFS fs;
 	FIL	fil;
 } flashfs;
+
+_loginfor_t LogInfor;
 
 u8 GetFlashSpace(u32 *ptotal, u32 *pfree)
 {
@@ -84,13 +87,14 @@ int FlashFSInit(void)
 	return res;
 }
 
-//创建系统所需文件
+//创建系统所需文件 若文件已存在，检测大小，超过指定大小，删除旧数据
 void CreateLogFile(void)
 {
 	FILINFO fn;
 	FRESULT res;     /* FatFs return code */
-	//char datbuf[20] = "Create file.\r\n";
+	u32 fil_size,rsize;
 	char filename[FILE_NAME_LEN];
+	char *pLogBufer;
 	
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);
 	res = f_stat(filename, &fn);
@@ -98,74 +102,66 @@ void CreateLogFile(void)
 		BSP_PRINTF("Time: %u/%02u/%02u, %02u:%02u\n",
                (fn.fdate >> 9)+1980, (fn.fdate >> 5) & 0x0f, fn.fdate & 0x1f,
                fn.ftime >> 11, (fn.ftime >> 5) & 0x3f);
-		return;
-	}	
-	if(res == FR_NO_FILE)	
+		res = f_open(&flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);
+		fil_size = f_size(&flashfs.fil);//获取log文件大小
+		if(fil_size>LOG_FILE_MAXSIZE)	{//文件大于10k 删除旧数据
+			char data;
+			fil_size -= LOG_FILE_TRUNCATION_SIZE;
+			f_lseek(&flashfs.fil, fil_size);//将文件指针指向文件末尾1k的位置
+			for(;;)		{//找到换行位置 目的是在截取文件时 保留完整的行
+				f_read(&flashfs.fil, &data, 1, &rsize);
+				if(rsize==0)	goto _exit;
+				if(data == '\n')	{
+					break;
+				}
+			}
+			pLogBufer = (char *)tlsf_malloc(UserMem, RLOG_BUFSIZE);
+			f_read(&flashfs.fil, pLogBufer, LOG_FILE_TRUNCATION_SIZE, &rsize);//读出需要保留的内容
+			f_close(&flashfs.fil);
+			f_open(&flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//重新创建文件
+			f_write(&flashfs.fil, pLogBufer, rsize, NULL);//重新写入保留的内容
+			tlsf_free(UserMem, pLogBufer);
+		}
+	}
+	else if(res == FR_NO_FILE)	
 	{//文件不存在 or 强制创建标志有效 创建文件
 		res = f_open(&flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and w mode
 		if(res != FR_OK)	{
 			return;
 		}
 		f_close(&flashfs.fil);
-		write_log("Create file.");
+//		write_log("Create file.");
 	}
-	//BSP_PRINTF("Create logfile ok");
+_exit:
+	f_close(&flashfs.fil);
+	pLogBufer = NULL;
+//	return 1;
 }
 
-//u32 fil_size,rsize,f_tell_pos;
-//写日志
-u8 write_log(char *str)
+//将日志从缓存写入flash
+u8 write_log(void)
 {
 	FRESULT res;     /* FatFs return code */
-	u8 len, log_len;
+	u32 len;
 	char filename[FILE_NAME_LEN];
-	char *pLogBufer;
-	u32 fil_size,rsize;
-//	RTC_TimeTypeDef sTime = {0};
-//	RTC_DateTypeDef sDate = {0};
 	
-	pLogBufer = (char *)tlsf_malloc(UserMem, RLOG_BUFSIZE);//写入单条log不能大于WLOG_BUFSIZE
-	//memset(pLogBufer,0,WLOG_BUFSIZE);
+	if(LogInfor.len == 0)	{
+		return 0;
+	}
+	mutex_lock(spiflash.lock);
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);//log文件名
 	res = f_open(&flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);//create new file and rw mode
 	if(res != FR_OK)
 		goto _exit;
-	fil_size = f_size(&flashfs.fil);//获取log文件大小
-	if(fil_size>LOG_FILE_MAXSIZE)	{//文件大于10k 删除旧数据
-		char data;
-		fil_size = LOG_FILE_MAXSIZE - LOG_FILE_TRUNCATION_SIZE;
-		f_lseek(&flashfs.fil, fil_size);//将文件指针指向文件末尾1k的位置
-		for(;;)		{//找到换行位置 目的是在截取文件时 保留完整的行
-			f_read(&flashfs.fil, &data, 1, &rsize);
-			if(rsize==0)	goto _exit;
-			if(data == '\n')	{
-				break;
-			}
-		}
-		//f_tell_pos = f_tell(&flashfs.fil);
-		f_read(&flashfs.fil, pLogBufer, LOG_FILE_TRUNCATION_SIZE, &rsize);//读出需要保留的内容
-		f_close(&flashfs.fil);
-		f_open(&flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//重新创建文件
-		f_write(&flashfs.fil, pLogBufer, rsize, NULL);//重新写入保留的内容
-		//f_sync(&flashfs.fil);//强制刷新文件
-		f_lseek(&flashfs.fil, f_size(&flashfs.fil));//将文件指针移到文件尾部
-	}
-//	bsp_rtc_get_time(&sTime, &sDate);
-//	len = sprintf(pLogBufer,"*%02u/%02u/%02u %02u:%02u:%02u  ",sDate.Year,sDate.Month, sDate.Date, sTime.Hours,sTime.Minutes,sTime.Seconds);
-	log_len = len + strlen(str)+2;
-	if(log_len > WLOG_BUFSIZE)//单条日志长度太大 退出
-		goto _exit;
-	sprintf(pLogBufer + len, "%s\r\n", str);//加换行
-	f_write(&flashfs.fil, pLogBufer, log_len, NULL);	//写入log文件
-	BSP_PRINTF("Write Log OK");
+	f_write(&flashfs.fil, LogInfor.pbuf, LogInfor.len, &len);	//写入log文件
+	LogInfor.len -= len;	
+//	BSP_PRINTF("Write Log OK");
 _exit:
 	f_close(&flashfs.fil);
-	tlsf_free(UserMem, pLogBufer);
-	pLogBufer = NULL;
+	mutex_unlock(spiflash.lock);
 	return 1;
 }
 
-//u32 logPosition,dissize;
 //读日志 读取log最后一段LOG_DISPLAY_SIZE
 u32 read_log(char *pbuf)
 {
@@ -180,11 +176,6 @@ u32 read_log(char *pbuf)
 	res = f_open(&flashfs.fil, filename, FA_READ);
 	if(res != FR_OK)
 		return 0;
-	/*logPosition = f_size(&flashfs.fil);
-	if(logPosition >= LOG_DISPLAY_SIZE)	{
-		logPosition -= LOG_DISPLAY_SIZE;
-	}
-	f_lseek(&flashfs.fil, f_size(&flashfs.fil));//将文件指针指向指定位置*/
 	logPosition = 0;
 	dissize = f_size(&flashfs.fil);
 	if(dissize>=25)
@@ -215,7 +206,6 @@ _exit:
 	f_close(&flashfs.fil);
 	return rsize;
 }
-
 
 
 

@@ -4,10 +4,10 @@
 //堆栈
 __align(4) OS_STK  TASK_SPIFLASH_STK[STK_SIZE_SPIFLASH]; //任务堆栈声?
 #define N_MESSAGES		5
-
+#define LOG_BUF		512
 _spiflash_t spiflash;
 void    *SpiFlashMSG_Q[N_MESSAGES];//消息队列数组
-//static  message_pkt_t    msg_pkt_spiflash;
+static  message_pkt_t    msg_pkt_spiflash;
 static void TaskSPIFLASH(void * ppdata);
 
 void AppSpiFlashInit(void)
@@ -17,13 +17,14 @@ void AppSpiFlashInit(void)
 
 static void DataInit(void)
 {
-	//udisk.Mbox         = OSMboxCreate((void *)0);
+	spiflash.lock         =  OSSemCreate(1);
 	spiflash.MSG_Q 			 = OSQCreate(&SpiFlashMSG_Q[0],N_MESSAGES);//
+	LogInfor.pbuf = (char *)tlsf_malloc(UserMem, LOG_BUF);//日志缓存
 }
-u8 devid[2];
+//u8 devid[2];
 void CheckSPIFlash(void)
 {
-//	u8 devid[2];
+	u8 devid[2];
 	
 	BSP_W25Qx_Read_ID(devid);
 	if(devid[0] == W25QXX_MANUFACTURER_ID)	{//devid[1] -- DEVICE_ID; devid[0] -- MANUFACTURER_ID 
@@ -35,18 +36,32 @@ void CheckSPIFlash(void)
 	}
 }
 //通过任务写log
-void WriteToFlashByTask(message_pkt_t *Src)
+u8 WriteLogToBuff(char *str)
 {
-	//msg_pkt_spiflash.Src = Src;
-	OSQPost(spiflash.MSG_Q, Src);
+	char *pbuf;
+	u8 len, log_len;
+//	RTC_TimeTypeDef sTime = {0};
+//	RTC_DateTypeDef sDate = {0};
+	
+	if(LogInfor.len>=LOG_BUF)
+		return 0;
+	mutex_lock(spiflash.lock);
+	pbuf = LogInfor.pbuf + LogInfor.len;
+//	bsp_rtc_get_time(&sTime, &sDate);
+	len = sprintf(pbuf,"*%02u/%02u/%02u %02u:%02u:%02u  ",SysTime.tm_year,SysTime.tm_mon, SysTime.tm_mday, SysTime.tm_hour,SysTime.tm_min,SysTime.tm_sec);
+	log_len = len + strlen(str)+2;
+	if(log_len > ONELOG_SIZE)	{//单条日志长度太大 退出
+		mutex_unlock(spiflash.lock);
+		return 0;
+	}
+	sprintf(pbuf+ len, "%s\r\n", str);//加换行
+	LogInfor.len += log_len;
+	mutex_unlock(spiflash.lock);
+	msg_pkt_spiflash.Src = MSG_WRITELOG;
+	OSQPost(spiflash.MSG_Q, &msg_pkt_spiflash);
+	return 1;
 }
 
-//void StartSpiFlashTask(message_pkt_t *Src)
-//{
-//	//msg_pkt_spiflash.Src = Src;
-//	OSQPost(spiflash.MSG_Q, Src);
-//}
-//extern void fs_test();
 static void TaskSPIFLASH(void * ppdata)
 {
 	u8 err;
@@ -69,7 +84,7 @@ static void TaskSPIFLASH(void * ppdata)
 		if(err==OS_ERR_NONE)    {
 			if(SysError.Y2.bits.b7 == DEF_Active)	{
 				if(msg->Src == MSG_WRITELOG)	{//写日志
-					write_log((char *)msg->Data);
+					write_log();
 				}
 				else if(msg->Src == MSG_SAVE_PERFUSE_DATA)	{//保存灌注数据
 //					WritePerfuseData(PerfuseData.pdata);

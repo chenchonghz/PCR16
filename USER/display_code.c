@@ -65,3 +65,16 @@ void DisplayMessageUI(char *pbuf)
 	DaCai_UpdateTXT(appdis.pUI);
 }
 
+void DisplayLogUI(void)
+{
+	u32 ret;
+
+	appdis.pUI->screen_id = Log_UIID;//LOG界面					
+	DaCai_SwitchUI(appdis.pUI);
+	ret = read_log(appdis.pUI->pdata);
+	if(ret)	{//读取log长度不为0
+		appdis.pUI->ctrl_id = 3;
+		appdis.pUI->datlen = ret;
+		DaCai_UpdateTXT(appdis.pUI);
+	}
+}

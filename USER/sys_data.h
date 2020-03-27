@@ -37,16 +37,35 @@ typedef struct _sys	{
 	u8 StandbyFlag;
 }_sys_t;
 
-typedef struct _sys_data	{
-	s8 HeatCoverTemp;//热盖温度
-	s8 Temp1;//
-	s8 Temp2;//
-	s16 PD_1;//PD传感器1
-	s16 PD_2;//PD传感器2
-}_sys_data_t;
+//typedef struct _sys_data	{
+//	s8 HeatCoverTemp;//热盖温度
+//	s8 Temp1;//
+//	s8 Temp2;//
+//	s16 PD_1;//PD传感器1
+//	s16 PD_2;//PD传感器2
+//}_sys_data_t;
+#define	STAGE_MAX		10
+#define	STEP_MAX		3
+typedef struct _lab_step	{
+	s16 temp;
+	u16 tim;
+}_lab_step_t;
+
+typedef struct _lab_stage	{
+	u8 id;
+	u8 repeat;
+	_lab_step_t step[STEP_MAX];
+}_lab_stage_t;
+
+typedef struct _lab_data	{
+	u8 StageNum;
+	u8 HeatCoverEnable;
+	s16 HeatCoverTemp;
+	_lab_stage_t stage[STAGE_MAX];
+}_lab_data_t;
 
 extern _sys_t Sys;
-extern _sys_data_t SysData;
+//extern _sys_data_t SysData;
 extern RTC_TIME_ST SysTime;
 extern tlsf_t UserMem;
 extern _syserror_t SysError;;

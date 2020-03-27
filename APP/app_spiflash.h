@@ -4,6 +4,7 @@
 #include "includes.h"
 
 typedef struct _spiflash	{
+	OS_EVENT           *lock;
 	OS_EVENT           *MSG_Q;
 	//FATFS fatfs;
 }_spiflash_t;

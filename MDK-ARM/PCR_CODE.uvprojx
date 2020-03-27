@@ -457,6 +457,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\bsp_max5401.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\bsp_rtc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

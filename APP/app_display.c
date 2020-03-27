@@ -62,13 +62,13 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			break;
 		}
 		case 0xf7:	{//时间格式是BCD码
-			SysTime.tm_year = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_mon = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_wday = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_mday = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_hour = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_min = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_sec = (UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_year = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)) + 2000;
+			SysTime.tm_mon = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_wday = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_mday = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_hour = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_min = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_sec = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
 			break;
 		}
 	}
@@ -208,7 +208,7 @@ static void TaskDisplay(void * ppdata)
 //					OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_3, OS_FLAG_SET, &err);
 				}
 				else {
-//					DaCai_TimeGet();
+					DaCai_TimeGet();
 				}
 			}
 		}

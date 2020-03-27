@@ -4,7 +4,7 @@
 #include "includes.h"
 //#include "bsp_w25qxx.h"
 
-#define WLOG_BUFSIZE		80
+#define ONELOG_SIZE		80
 #define RLOG_BUFSIZE		1024
 #define LOG_FILE_MAXSIZE		(10*1024)//log最大长度10k
 #define LOG_FILE_TRUNCATION_SIZE		1024//log文件截断长度
@@ -13,11 +13,16 @@
 
 #define	FLASH_FREE_MIN		100//flash剩余空间小于100k 不允许灌注 需要删除数据
 
+typedef struct _loginfor	{
+	char *pbuf;
+	u32 len;
+}_loginfor_t;
+
 extern struct _flashfs flashfs;
-extern struct _logbuf logBufer;
+extern _loginfor_t LogInfor;
 //void fs_test();
 int FlashFSInit(void);
-u8 write_log(char *str);
+u8 write_log(void);
 u32 read_log(char *pbuf);
 void CreateLogFile(void);
 //u8 WritePerfuseData(char *data);
