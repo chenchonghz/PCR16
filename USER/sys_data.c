@@ -11,7 +11,7 @@ void SysDataInit(void)
 	
 	SysError.Y1.ubyte = 0x0;//来自传感器板的故障 
 	SysError.Y2.ubyte = 0;//主板故障
-	SysData.HeatCoverTemp = 0;
+//	SysData.HeatCoverTemp = 0;
 //	SysData.PD_1 = 0;
 //	SysData.PD_2 = 0;
 	

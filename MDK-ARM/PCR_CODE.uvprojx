@@ -369,7 +369,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32L476xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                ../Drivers/STM32L4xx_HAL_Driver/Inc;                ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                ../Middlewares/Third_Party/FatFs/src;                ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;                ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;                ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                ../Drivers/CMSIS/Include;                ..\BSP;                ..\USER;                ..\APP;                ..\UCOSII\CONFIG;                ..\UCOSII\PORT;                ..\UCOSII\CORE</IncludePath>
+              <IncludePath>../Inc;                  ../Drivers/STM32L4xx_HAL_Driver/Inc;                  ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                  ../Middlewares/Third_Party/FatFs/src;                  ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;                  ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;                  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                  ../Drivers/CMSIS/Include;                  ..\BSP;                  ..\USER;                  ..\APP;                  ..\UCOSII\CONFIG;                  ..\UCOSII\PORT;                  ..\UCOSII\CORE</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -646,11 +646,6 @@
               <FileName>spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/sys.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>
@@ -972,6 +967,9 @@
         <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
+        <Group>
+          <GroupName>::Data Exchange</GroupName>
+        </Group>
       </Groups>
     </Target>
   </Targets>
@@ -985,8 +983,23 @@
           <targetInfo name="PCR_CODE"/>
         </targetInfos>
       </component>
+      <component Cclass="Data Exchange" Cgroup="JSON" Csub="Jansson" Cvendor="Keil" Cversion="2.7.0" condition="ARMCC">
+        <package license="doc\license.txt" name="Jansson" schemaVersion="1.0" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="PCR_CODE"/>
+        </targetInfos>
+      </component>
     </components>
-    <files/>
+    <files>
+      <file attr="config" category="source" name="src\jansson_config.c" version="2.7.0">
+        <instance index="0">RTE\Data_Exchange\jansson_config.c</instance>
+        <component Cclass="Data Exchange" Cgroup="JSON" Csub="Jansson" Cvendor="Keil" Cversion="2.7.0" condition="ARMCC"/>
+        <package license="doc\license.txt" name="Jansson" schemaVersion="1.0" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="PCR_CODE"/>
+        </targetInfos>
+      </file>
+    </files>
   </RTE>
 
 </Project>
