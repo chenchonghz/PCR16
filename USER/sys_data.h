@@ -10,6 +10,9 @@
 #define	FILE_NAME_LEN		50
 #define	LOG_FILE_NAME		"Pcr16Log.txt"//"PerfusionLog.txt"
 
+#define	HEATCOVER_TEMPMAX		110
+#define	HEATCOVER_TEMPMIN		30
+
 #define SysState_None							0
 #define SysState_Standby					DEF_BIT00_MASK
 #define SysState_DeleteLabTB			DEF_BIT01_MASK
@@ -44,31 +47,60 @@ typedef struct _sys	{
 //	s16 PD_1;//PD传感器1
 //	s16 PD_2;//PD传感器2
 //}_sys_data_t;
-#define	STAGE_MAX		10
-#define	STEP_MAX		3
-typedef struct _lab_step	{
+#define	STAGE_MAX		9
+#define	STEP_MAX		9
+#define	LAB_ID_LEN		22
+#define	LAB_NAME_LEN		15
+#define	HOLE_NUM		16
+typedef struct _step	{
 	s16 temp;
 	u16 tim;
-}_lab_step_t;
+}_step_t;
 
-typedef struct _lab_stage	{
-	u8 id;
-	u8 repeat;
-	_lab_step_t step[STEP_MAX];
-}_lab_stage_t;
+typedef struct _stage	{
+	u8 CollEnable;//采集使能
+	u8 Type;//0-repeat模式;1-continue 模式;2-step 模式
+	u16 T_Rate;//升温速率
+	u16 T_Inter;//温度间隔
+	u16 T_Tim;//恒温时间 s
+	u8 Repeat;//
+	u8 StepNum;
+	_step_t step[STEP_MAX];
+}_stage_t;
 
-typedef struct _lab_data	{
+typedef struct _temp_data	{//温度信息
 	u8 StageNum;
 	u8 HeatCoverEnable;
 	s16 HeatCoverTemp;
-	_lab_stage_t stage[STAGE_MAX];
+	_stage_t stage[STAGE_MAX];
+}_temp_data_t;
+
+typedef struct _lab_data	{//实验数据
+	char id[LAB_ID_LEN];
+	char name[LAB_NAME_LEN];
+	char type;//实验类型。0-阴性/阳性；1-定量；2-基因分型
+	char method;//实验方法。0-标准曲线；1-比较CT
 }_lab_data_t;
 
+typedef struct _hole_data	{//孔信息
+	char name[LAB_NAME_LEN];
+	char prj[LAB_NAME_LEN];
+	char sample_t;//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0x20-空
+	char channel;//通道	
+}_hole_data_t;
+
+typedef struct _sample_data	{//样本数据
+//	u8 id;
+	_hole_data_t hole[HOLE_NUM];
+}_sample_data_t;
+
 extern _sys_t Sys;
-//extern _sys_data_t SysData;
 extern RTC_TIME_ST SysTime;
 extern tlsf_t UserMem;
-extern _syserror_t SysError;;
+extern _syserror_t SysError;
+extern _sample_data_t sample_data;
+extern _lab_data_t	lab_data;
+extern _temp_data_t temp_data;
 
 void SysDataInit(void);
 

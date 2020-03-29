@@ -128,6 +128,14 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				SaveUIEditInfor();//保存编辑信息
 				DisplayKeyboardUI();//切换到全键盘界面					
 			}
+			else if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
+				temp_data.HeatCoverEnable = DEF_False;
+			}
+		}
+		else if(status == DEF_Press)	{
+			if(appdis.pUI->ctrl_id == 8)	{//使能热盖温度
+				temp_data.HeatCoverEnable = DEF_True;
+			}
 		}
 	}
 	else if(appdis.pUI->screen_id==Keyboard_UIID)	{//全键盘界面
@@ -137,14 +145,17 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		else if(appdis.pUI->ctrl_id == 42)	{//enter			
 			if(appdis.pUI->editinfo.screen_id == Temp_UIID)	
 			{
-				temp = atoi(appdis.pUI->pdata);
-				if(temp>105||temp<=0)	{
-					DisplayMessageUI((char *)&Code_Message[3][0]);
-				}else	{
-					DisplayEditUI();//显示上次编辑界面
-					appdis.pUI->ctrl_id = 6;
-					appdis.pUI->datlen = strlen(appdis.pUI->pdata);//显示用户输入值
-					DaCai_UpdateTXT(appdis.pUI);
+				if(appdis.pUI->editinfo.ctrl_id == 9)	{//编辑热盖温度
+					temp = atoi(appdis.pUI->pdata);
+					if(temp > HEATCOVER_TEMPMAX || temp < HEATCOVER_TEMPMIN)	{
+						DisplayMessageUI((char *)&Code_Message[3][0]);
+					}else	{
+						DisplayEditUI();//显示上次编辑界面
+						appdis.pUI->ctrl_id = 6;
+						appdis.pUI->datlen = strlen(appdis.pUI->pdata);//显示用户输入值
+						DaCai_UpdateTXT(appdis.pUI);
+						temp_data.HeatCoverEnable = temp;//保存用户输入值
+					}
 				}
 			}
 		}

@@ -8,9 +8,9 @@ __align(4) OS_STK  TASK_TEMP_STK[STK_SIZE_TEMP]; //任务堆栈声?
 _app_temp_t app_temp;
 pid_ctrl_t TempPid[PIDCTRL_NUM];
 #define	HOLE_TECPWM_PLUSE		400
-#define	COVER_TECPWM_PLUSE		80
+#define	COVER_TECPWM_PLUSE		800
 #define	HOLE_TECPWM_MAX		62//TEC pwm占空比最大值
-#define	COVER_TECPWM_MAX		62//TEC pwm占空比最大值
+#define	COVER_TECPWM_MAX		100//TEC pwm占空比最大值
 static  message_pkt_t    msg_pkt_temp;
 static void AppTempTask (void *parg);
 
@@ -33,7 +33,7 @@ static void TempDatInit(void)
 	TempPid[COVER_TEMP].pTECPWM = &htim2;
 	TempPid[COVER_TEMP].TimCH = TIM_CHANNEL_4;
 	TempPid[COVER_TEMP].TimPluse = COVER_TECPWM_PLUSE;
-	TempPid[HOLE_TEMP].DutyMax = COVER_TECPWM_MAX;
+	TempPid[COVER_TEMP].DutyMax = COVER_TECPWM_MAX;
 	TempPid[COVER_TEMP].target_t = 0;	
 	TempPid[COVER_TEMP].PIDParam = 0.0;
 }
@@ -45,10 +45,10 @@ void StartTECPWM(pid_ctrl_t *pTempPid, u8 duty)
 	
 	if(dutybk==duty)
 		return;
-	if(duty==100)	{
-		duty++;
-	}
 	temp = (pTempPid->TimPluse/100)*duty;
+	if(duty==100)	{
+		temp++;
+	}
 	StartPWM(pTempPid->pTECPWM, pTempPid->TimCH, temp);
 	dutybk = duty;
 }
@@ -59,7 +59,7 @@ static u32 StopTempCtrl(pid_ctrl_t *pTempPid)
 	StopPWM(pTempPid->pTECPWM, pTempPid->TimCH);
 	pTempPid->PIDParam = 0.0;
 }
-u8 setval;
+u16 setval;
 //pid调节半导体片温度 采样增量法计算 pwm占空比不能超过50%
 static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
 {
@@ -124,7 +124,7 @@ static void AppTempTask (void *parg)
 //						SetPIDVal(PID_ID1, 1, 0, 0);
 //					if(diff > TEMPCOLLECT_ACCURACY)	
 					{//大于0.1度 
-						TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
+//						TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
 					}
 //					else	{//小<=0.1度 不调节 TEC停止工作
 //						ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
@@ -141,6 +141,7 @@ static void AppTempTask (void *parg)
 			}
 			if(CalcTemperature(GetADCVol(TEMP_ID3), (s32 *)&cur_temp)==0)	{
 				app_temp.current_t[TEMP_ID3] = cur_temp;
+				SetPIDTarget(TempPid[COVER_TEMP].PIDid, TempPid[COVER_TEMP].target_t);//设置控制目标
 				TempCtrl(&TempPid[COVER_TEMP], cur_temp);//热盖pid调节 增量法计算
 			}else	{
 			
