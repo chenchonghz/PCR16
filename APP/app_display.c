@@ -51,6 +51,9 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0x01)	{//回读screen id
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				if(appdis.pUI->screen_id == Temp_UIID)	{//温度程序界面 刷新温度图形
+					DisplayTempProgramUI(0xff);//刷新温度界面
+				}
 			}
 			else if(iPara==0x11)	{//按钮状态
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
@@ -72,12 +75,14 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			break;
 		}
 	}
-}u8 ctrl_type,subtype,status;
+}
+s32 g_tempdata;
 //屏幕相关数据处理
 static void ScreenDataProcess(_dacai_usart_t *pUsart)
 {
+	u8 ctrl_type,subtype,status;
 	s32 temp;
-	
+	u8 iPara;
 	
 	ctrl_type = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//0x10-表示按钮 0x11-表示文本	
 	if(ctrl_type==0x10)	{		
@@ -122,27 +127,130 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			}
 		}
 	}
-	else if(appdis.pUI->screen_id==Temp_UIID)	{
-		if(status == DEF_Releass)	{
+	else if(appdis.pUI->screen_id==Menu_UIID&&status == DEF_Releass)	{//菜单界面
+		if(appdis.pUI->ctrl_id == 2)	{//进入温度程序			
+			DisplayTempProgramUI(1);	//刷新温度界面	
+		}
+	}
+	else if(appdis.pUI->screen_id==Temp_UIID)	{//温度程序	
+		if(status == DEF_Releass)	{		
 			if(appdis.pUI->ctrl_id == 9)	{//编辑热盖温度
 				SaveUIEditInfor();//保存编辑信息
 				DisplayKeyboardUI();//切换到全键盘界面					
 			}
-			else if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
-				temp_data.HeatCoverEnable = DEF_False;
+			else if(appdis.pUI->ctrl_id == 1)	{//加阶
+//				UUIDBackup();
+				DisplayStageUI();
+			}
+			else if(appdis.pUI->ctrl_id == 4)	{//加步
+//				UUIDBackup();
+				DisplayStepUI();
 			}
 		}
-		else if(status == DEF_Press)	{
-			if(appdis.pUI->ctrl_id == 8)	{//使能热盖温度
-				temp_data.HeatCoverEnable = DEF_True;
+		if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
+			if(status == DEF_Releass)	
+				HeatCoverOnOff(DEF_False);
+			else if(status == DEF_Press)
+				HeatCoverOnOff(DEF_True);
+		}		
+	}
+	else if(appdis.pUI->screen_id==Stage_UIID)	{//阶段设置
+		if(Sys.state&SysState_ReadTXT)	{
+			strcpy(appdis.pUI->pdata, (const char *)(pUsart->rx_buf+pUsart->rx_idx));
+			temp = atoi(appdis.pUI->pdata);	
+			if(appdis.pUI->ctrl_id == 4)	{//循环数设置			
+				if(temp > STAGE_REPEAT_MAX||temp <= 0)	{
+					DisplayMessageUI((char *)&Code_Message[3][0]);
+				}
+				else	{
+					temp_data.stage[temp_data.StageNum].Repeat = temp;
+					appdis.pUI->ctrl_id = 8;
+					DaCai_ReadTXT(appdis.pUI);
+				}
+			}
+			else if(appdis.pUI->ctrl_id == 8)	{//总步数设置				
+				if(temp > STEP_MAX||temp <= 0)	{
+					DisplayMessageUI((char *)&Code_Message[3][0]);
+				}
+				else	{
+					temp_data.stage[temp_data.StageNum].StepNum = temp;
+					Sys.state &= ~SysState_ReadTXT;
+					DisplayMessageUI((char *)&Code_Message[4][0]);	
+					Sys.state |= SysState_SetOK;				
+				}
+			}
+		}
+		else if(appdis.pUI->ctrl_id == 24)	{//enter
+			appdis.pUI->ctrl_id = 4;
+			DaCai_ReadTXT(appdis.pUI);
+			Sys.state |= SysState_ReadTXT;
+		}
+		if(appdis.pUI->ctrl_id == 25&&status == DEF_Releass)	{//关闭 
+			Sys.state &= ~SysState_ReadTXT;
+			if(Sys.state & SysState_SetOK)	{
+				Sys.state &= ~SysState_SetOK;
+				temp_data.StageNum++;
+			}
+		}
+	}
+	else if(appdis.pUI->screen_id==Step_UIID)	{//步设置
+		if(Sys.state&SysState_ReadTXT)	{
+			strcpy(appdis.pUI->pdata, (const char *)(pUsart->rx_buf+pUsart->rx_idx));
+			g_tempdata = temp = (int)(atof(appdis.pUI->pdata)*10);	
+			if(appdis.pUI->ctrl_id == 8)	{//温度值设置
+				if(temp > HOLE_TEMP_MAX||temp < HOLE_TEMP_MIN)
+					DisplayMessageUI((char *)&Code_Message[3][0]);
+				else	{
+					iPara = temp_data.StageNum;
+					temp_data.stage[iPara].step[temp_data.stage[iPara].CurStep].temp = temp;
+						appdis.pUI->ctrl_id = 9;
+					DaCai_ReadTXT(appdis.pUI);
+				}
+			}	
+			else if(appdis.pUI->ctrl_id == 9)	{//恒温时间 min	
+				if(temp > 10||temp < 0)	
+					DisplayMessageUI((char *)&Code_Message[3][0]);
+				else	{
+					iPara = temp_data.StageNum;
+					temp_data.stage[iPara].step[temp_data.stage[iPara].CurStep].tim = temp*60;
+					appdis.pUI->ctrl_id = 10;
+					DaCai_ReadTXT(appdis.pUI);
+				}
+			}
+			else if(appdis.pUI->ctrl_id == 10)	{//恒温时间 sec		
+				if(temp > 60||temp < 0)	
+					DisplayMessageUI((char *)&Code_Message[3][0]);
+				else	{
+					iPara = temp_data.StageNum;
+					temp_data.stage[iPara].step[temp_data.stage[iPara].CurStep].tim += temp;
+					Sys.state &= ~SysState_ReadTXT;
+					DisplayMessageUI((char *)&Code_Message[4][0]);					
+					Sys.state |= SysState_SetOK;
+				}
+			}
+		}
+		else if(appdis.pUI->ctrl_id == 24)	{//enter
+			appdis.pUI->ctrl_id = 8;
+			DaCai_ReadTXT(appdis.pUI);
+			Sys.state |= SysState_ReadTXT;//回读所有文本内容
+		}
+		if(appdis.pUI->ctrl_id == 1)	{
+			if(status == DEF_Releass)	
+				CollDataOnOff_InStep(DEF_False);
+			else if(status == DEF_Press)
+				CollDataOnOff_InStep(DEF_True);
+		}
+		else if(appdis.pUI->ctrl_id == 25&&status == DEF_Releass)	{//关闭 
+			Sys.state &= ~SysState_ReadTXT;
+			if(Sys.state & SysState_SetOK)	{
+				Sys.state &= ~SysState_SetOK;
+				temp_data.StageNum++;
 			}
 		}
 	}
 	else if(appdis.pUI->screen_id==Keyboard_UIID)	{//全键盘界面
 		if(appdis.pUI->ctrl_id == 43&&ctrl_type==0x11)	{//用户输入值
-			strcpy(appdis.pUI->pdata, (const char *)(pUsart->rx_buf+pUsart->rx_idx));
-		}
-		else if(appdis.pUI->ctrl_id == 42)	{//enter			
+			strcpy(appdis.pUI->pdata, (const char *)(pUsart->rx_buf+pUsart->rx_idx));		
 			if(appdis.pUI->editinfo.screen_id == Temp_UIID)	
 			{
 				if(appdis.pUI->editinfo.ctrl_id == 9)	{//编辑热盖温度
@@ -219,7 +327,7 @@ static void TaskDisplay(void * ppdata)
 //					OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_3, OS_FLAG_SET, &err);
 				}
 				else {
-					DaCai_TimeGet();
+//					DaCai_TimeGet();
 				}
 			}
 		}

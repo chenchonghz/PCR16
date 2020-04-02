@@ -1,6 +1,7 @@
 #ifndef __SYS_DATA_H
 #define __SYS_DATA_H
 
+#include <string.h>
 #include "sys_bits.h"
 #include "sys_types.h"
 #include "sys_defs.h"
@@ -16,6 +17,8 @@
 #define SysState_None							0
 #define SysState_Standby					DEF_BIT00_MASK
 #define SysState_DeleteLabTB			DEF_BIT01_MASK
+#define SysState_ReadTXT				DEF_BIT02_MASK
+#define SysState_SetOK					DEF_BIT03_MASK
 #define SysState_RunningTB				DEF_BIT04_MASK
 
 //设备运行模式
@@ -52,24 +55,29 @@ typedef struct _sys	{
 #define	LAB_ID_LEN		22
 #define	LAB_NAME_LEN		15
 #define	HOLE_NUM		16
+#define	STAGE_REPEAT_MAX		100
+#define	HOLE_TEMP_MAX		950//0.1
+#define	HOLE_TEMP_MIN		10
 typedef struct _step	{
+	u8 CollEnable;//采集使能
 	s16 temp;
 	u16 tim;
 }_step_t;
 
-typedef struct _stage	{
-	u8 CollEnable;//采集使能
-	u8 Type;//0-repeat模式;1-continue 模式;2-step 模式
+typedef struct _stage	{	
 	u16 T_Rate;//升温速率
 	u16 T_Inter;//温度间隔
 	u16 T_Tim;//恒温时间 s
+	u8 Type;//0-repeat模式;1-continue 模式;2-step 模式
 	u8 Repeat;//
-	u8 StepNum;
+	u8 StepNum;//总步 
+	u8 CurStep;//当前步 不写入json文件
 	_step_t step[STEP_MAX];
 }_stage_t;
 
 typedef struct _temp_data	{//温度信息
-	u8 StageNum;
+	u8 StageNum;//总阶段 
+	u8 CurStage;//当前阶段 不写入json文件
 	u8 HeatCoverEnable;
 	s16 HeatCoverTemp;
 	_stage_t stage[STAGE_MAX];
@@ -103,5 +111,10 @@ extern _lab_data_t	lab_data;
 extern _temp_data_t temp_data;
 
 void SysDataInit(void);
+void HeatCoverOnOff(u8 flag);
+void CollDataOnOff_InStep(u8 flag);
+void ResetSampleData(void);
+void ResetLabData(void);
+void ResetTempData(void);
 
 #endif

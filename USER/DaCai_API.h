@@ -32,6 +32,7 @@ void DaCai_CheckDevice(void);
 void DaCai_SwitchUI(_UI_t *pUI);
 void DaCai_DynamicCtrl(_UI_t *pUI, u8 flag);
 void DaCai_UpdateTXT(_UI_t *pUI);
+void DaCai_ReadTXT(_UI_t *pUI);
 void DaCai_GetScreenID(void);
 void DaCai_StandbyMode(u8 state);
 void DaCai_ButtonCtrl(_UI_t *pUI,u8 state);
@@ -43,7 +44,7 @@ void DaCai_TimeModeSet(void);
 void DaCai_CtrlONOFF(_UI_t *pUI, u8 flag);
 void DaCai_SwitchSubUI(_UI_t *pUI);
 void DaCai_UpdateMultiButton(_UI_t *pUI,u8 *pButtonID, u8 *pVal, u8 num);
-void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiTXT **pMultiTXT, u8 num);
+void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiTxtDat *pMultiTXT, u8 num);
 void DaCai_ScreenSaveMode(u8 enable, u16 standy_t, u8 standy_brightness, u8 brightness);
 void DaCai_AdjustBrightness(u8 brightness);
 void DaCai_ClearScreenAuto(u8 enable);
@@ -53,5 +54,7 @@ void DaCai_SetProgressForecolor(_UI_t *pUI,u8 R,u8 G);
 void DaCai_SetTXTtwinkle(_UI_t *pUI,u16 period);
 void DaCai_EnterStandby(void);
 void DaCai_ExitStandby(void);
-
+void DaCai_PaintRectangle(u16 x, u16 y, u16 w, u16 h);
+void DaCai_DisplayTXT(_UI_t *pUI, u16 x, u16 y, u8 font);
+void  DaCai_DisplayCutPic(u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H);
 #endif

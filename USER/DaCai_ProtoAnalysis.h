@@ -82,8 +82,8 @@ typedef struct _DACAI	{
 typedef struct _MultiTXT	{
 	u8 id;
 	u8 len;
-	char buf[64];	
-}_MultiTXT;
+	char buf[32];	
+}_MultiTxtDat;
 
 //extern const u8 CMD_END[4];
 //extern const u8 CMD_SwitchUI[2];

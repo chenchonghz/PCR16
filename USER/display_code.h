@@ -8,10 +8,14 @@ extern const char Code_Warning[][12];
 extern const char Code_Message[][12];
 	
 void SaveUIEditInfor(void);
+void UUIDBackup(void);
 void DisplayUIIDAndBackup(u8 id);
 void DisplayBackupUIID(void);
 void DisplayMessageUI(char *pbuf);
 void DisplayEditUI(void);
 void DisplayKeyboardUI(void);
+void DisplayStepUI(void);
+void DisplayStageUI(void);
+void DisplayTempProgramUI(u8 clear_s);
 #endif
 

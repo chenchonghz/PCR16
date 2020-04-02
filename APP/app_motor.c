@@ -64,7 +64,7 @@ static void AppMotorTask (void *parg)
 //		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
 //		OSTimeDly(1000);
 //		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
-//		OSTimeDly(1000);
+		OSTimeDly(1000);
 //        msg = (message_pkt_t *)OSMboxPend(tMotor[MOTOR_ID1].Mbox, 0, &err);
 //		if(err==OS_ERR_NONE)    {
 //			
