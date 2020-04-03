@@ -89,12 +89,64 @@ static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
 //	SYS_PRINTF("D:%d,T:%d ",dat,cur_t);
 }
 //
-void StartTempCtrl(u16 target)
+u8 StartAPPTempCtrl(void)
 {
-	TempPid[HOLE_TEMP].target_t = target;
+	if(temp_data.StageNum==0)//无效参数
+		return 0;
+//	temp_data.CurStage = 0;
+//	temp_data.stage[0].CurStep = 0;
+//	temp_data.stage[m].CurRepeat = 0;
 	ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
 	Sys.devstate = DevState_Running;
+	return 1;
 }
+
+void StopAPPTempCtrl(void)
+{
+	Sys.devstate = DevState_IDLE;
+}
+
+//恒温时间达到 调用该函数
+void ConstantTempReadCallback(void)
+{
+	u8 m,n;
+	
+	m = temp_data.CurStage;
+	temp_data.stage[m].CurStep++;
+	if(temp_data.stage[m].CurStep>=temp_data.stage[m].StepNum)	{//达到当前阶段的最后一步 
+		if(temp_data.stage[m].CurRepeat>=temp_data.stage[m].RepeatNum)	{//达到当前阶段的最后一个循环 进入下阶段
+			temp_data.CurStage++;
+			if(temp_data.CurStage>=temp_data.StageNum)	{//达到最后一个阶段 停止控温
+				Sys.devstate = DevState_IDLE;
+			}else	{
+				m = temp_data.CurStage;
+				temp_data.stage[m].CurStep=0;
+			}
+		}else	{//未达到当前阶段的最后一个循环 继续该阶段
+			temp_data.stage[m].CurRepeat ++;
+			temp_data.stage[m].CurStep = 0;
+		}
+	}
+}
+
+//按照设置好的温度程序巡视 设置的温度曲线控温
+void TempProgramLookOver(s16 c_temp)
+{
+	u8 i,j,m,n;
+	s16 target;
+	
+	m = temp_data.CurStage;
+	n = temp_data.stage[m].CurStep;
+	target = temp_data.stage[m].step[n].temp;
+	if(abs(c_temp-target)>100)	{//温度差大于1度 当前处于升降温阶段
+//		ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
+		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, TempPid[HOLE_TEMP].target_t);
+	}
+	else {//到达目标温度 当前处于恒温阶段 设置恒温时间
+		
+	}
+	
+}	
 
 #define	TEMPCTRL_ACCURACY		10//温控精度0.1
 #define	TEMPCOLLECT_ACCURACY		5//温度采集精度 0.05
@@ -112,7 +164,8 @@ static void AppTempTask (void *parg)
     {
 		if(Sys.devstate == DevState_Running)	
 		{
-			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{
+			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{//计算模块温度
+				TempProgramLookOver(cur_temp);
 				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
 				{
 					SetPIDTarget(TempPid[HOLE_TEMP].PIDid, TempPid[HOLE_TEMP].target_t);//设置控制目标

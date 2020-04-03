@@ -24,9 +24,10 @@ void DaCaiAPI_Init(void)
 //检测屏是否在线
 void DaCai_CheckDevice(void)
 {
-	u8 len=0;
+	u8 len;
 	
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_HANDSHAKE;
 	DaCai_SendData(ptxbuf, len);
@@ -34,9 +35,10 @@ void DaCai_CheckDevice(void)
 //获取屏画面当前id
 void DaCai_GetScreenID(void)
 {
-	u8 len=0;
-//	u8 *ptxbuf = dacai.puart->tx_buf;
+	u8 len;
+
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_SwitchUI[0];
 	ptxbuf[len++] = CMD_SwitchUI[1]|0x1;
@@ -45,9 +47,10 @@ void DaCai_GetScreenID(void)
 //切换屏画面
 void DaCai_SwitchUI(_UI_t *pUI)
 {
-	u8 len=0;
+	u8 len;
 
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	memcpy(ptxbuf+len, CMD_SwitchUI, 2);
 	len += 2;
@@ -58,9 +61,10 @@ void DaCai_SwitchUI(_UI_t *pUI)
 //子画面 
 void DaCai_SwitchSubUI(_UI_t *pUI)
 {
-	u8 len=0;
+	u8 len;
 
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xb1;
 	ptxbuf[len++] = 0x0a;
@@ -71,9 +75,10 @@ void DaCai_SwitchSubUI(_UI_t *pUI)
 //dynamic controls flag 0-启动动画；1-停止
 void DaCai_DynamicCtrl(_UI_t *pUI,u8 flag)
 {
-	u8 len=0;	
+	u8 len;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_DynamicCtrl[0];
 	ptxbuf[len++] = CMD_DynamicCtrl[1]|flag;
@@ -87,9 +92,10 @@ void DaCai_DynamicCtrl(_UI_t *pUI,u8 flag)
 //按钮控制 0:弹起 1:按下
 void DaCai_ButtonCtrl(_UI_t *pUI,u8 state)
 {
-	u8 len=0;	
+	u8 len;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_ButtonCtrl[0];
 	ptxbuf[len++] = CMD_ButtonCtrl[1];
@@ -103,9 +109,10 @@ void DaCai_ButtonCtrl(_UI_t *pUI,u8 state)
 //
 void DaCai_ChooseCtrl(_UI_t *pUI)
 {
-	u8 len=0;	
+	u8 len;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_ButtonCtrl[0];
 	ptxbuf[len++] = CMD_ButtonCtrl[1];
@@ -119,9 +126,10 @@ void DaCai_ChooseCtrl(_UI_t *pUI)
 
 void DaCai_SetCursorPos(_UI_t *pUI,u8 state)
 {
-	u8 len=0;	
+	u8 len;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_SetCursorPos[0];
 	ptxbuf[len++] = CMD_SetCursorPos[1];
@@ -135,9 +143,10 @@ void DaCai_SetCursorPos(_UI_t *pUI,u8 state)
 
 void DaCai_DisKeyboard(u16 x,u16 y)
 {
-	u8 len=0;	
+	u8 len;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_KeyBoard[0];
 	ptxbuf[len++] = CMD_KeyBoard[1];
@@ -153,9 +162,10 @@ void DaCai_DisKeyboard(u16 x,u16 y)
 //一次更新多个按钮状态
 void DaCai_UpdateMultiButton(_UI_t *pUI,u8 *pButtonID, u8 *pVal, u8 num)
 {
-	u8 len=0,i;	
+	u8 len,i;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xB1;
 	ptxbuf[len++] = 0X12;
@@ -174,9 +184,10 @@ void DaCai_UpdateMultiButton(_UI_t *pUI,u8 *pButtonID, u8 *pVal, u8 num)
 //一次更新多个文本框
 void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiTxtDat *pMultiTXT, u8 num)
 {
-	u8 len=0,i;	
+	u8 len,i;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xB1;
 	ptxbuf[len++] = 0X12;
@@ -197,9 +208,10 @@ void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiTxtDat *pMultiTXT, u8 num)
 //更新单个文本框
 void DaCai_UpdateTXT(_UI_t *pUI)
 {
-	u16 len=0;	
+	u16 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_UpdateTXT[0];
 	ptxbuf[len++] = CMD_UpdateTXT[1];
@@ -214,9 +226,10 @@ void DaCai_UpdateTXT(_UI_t *pUI)
 //更新单个文本框
 void DaCai_ReadTXT(_UI_t *pUI)
 {
-	u16 len=0;	
+	u16 len;	
 
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xb1;
 	ptxbuf[len++] = 0x11;
@@ -230,9 +243,10 @@ void DaCai_ReadTXT(_UI_t *pUI)
 
 void DaCai_StandbyMode(u8 state)	
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = CMD_StandyMode[0];
 	if(state)	{//进入待机模式					
@@ -246,9 +260,10 @@ void DaCai_StandbyMode(u8 state)
 //画矩形 EE 55 00 01 00 01 00 65 00 C9 FF FC FF FF 填充
 void DaCai_PaintRectangle(u16 x, u16 y, u16 w, u16 h)
 {
-	u16 len=0;	
+	u16 len;	
 
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x55;
 	ptxbuf[len++] = (x>>8)&0xff;
@@ -264,9 +279,10 @@ void DaCai_PaintRectangle(u16 x, u16 y, u16 w, u16 h)
 
 void DaCai_TimeGet(void)	
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x82;
 	DaCai_SendData(ptxbuf, len);
@@ -274,9 +290,10 @@ void DaCai_TimeGet(void)
 
 void DaCai_TimeModeSet(void)	
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x85;
 	ptxbuf[len++] = 0x01;//0 : RTC关闭   1：RTC开启
@@ -291,9 +308,10 @@ void DaCai_TimeModeSet(void)
 //显示or隐藏控件
 void DaCai_CtrlONOFF(_UI_t *pUI, u8 flag)	
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xb1;
 	ptxbuf[len++] = 0x03;
@@ -308,9 +326,10 @@ void DaCai_CtrlONOFF(_UI_t *pUI, u8 flag)
 //屏保模式
 void DaCai_ScreenSaveMode(u8 enable, u16 standy_t, u8 standy_brightness, u8 brightness)
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x77;
 	ptxbuf[len++] = enable;//使能LPM模式
@@ -324,9 +343,10 @@ void DaCai_ScreenSaveMode(u8 enable, u16 standy_t, u8 standy_brightness, u8 brig
 
 void DaCai_AdjustBrightness(u8 brightness)
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x60;
 	ptxbuf[len++] = 0xff - brightness;
@@ -335,9 +355,10 @@ void DaCai_AdjustBrightness(u8 brightness)
 //待机指令 EE AA 02 AC FF FC FF FF
 void DaCai_EnterStandby(void)
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xAA;
 	ptxbuf[len++] = 0x02;
@@ -347,9 +368,10 @@ void DaCai_EnterStandby(void)
 //唤醒指令 FF FF FF FF 00 00 00 00
 void DaCai_ExitStandby(void)
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = 0XFF;
 	ptxbuf[len++] = 0XFF;
 	ptxbuf[len++] = 0XFF;
@@ -366,9 +388,10 @@ void DaCai_ExitStandby(void)
 //EE 06 01 FF FC FF FF 
 void DaCai_ClearScreenAuto(u8 enable)
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x06;
 	ptxbuf[len++] = enable;
@@ -377,9 +400,10 @@ void DaCai_ClearScreenAuto(u8 enable)
 
 void DaCai_ClearTXT(_UI_t *pUI)
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xB1;
 	ptxbuf[len++] = 0X10;
@@ -392,9 +416,10 @@ void DaCai_ClearTXT(_UI_t *pUI)
 //设置进度条前景色
 void DaCai_SetProgressForecolor(_UI_t *pUI,u8 R,u8 G)
 {
-	u8 len=0;
+	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xB1;
 	ptxbuf[len++] = 0X19;
@@ -409,8 +434,9 @@ void DaCai_SetProgressForecolor(_UI_t *pUI,u8 R,u8 G)
 //设置文本闪烁 单位10ms
 void DaCai_SetTXTtwinkle(_UI_t *pUI,u16 period)
 {
-	u8 len=0;
+	u8 len;
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0xB1;
 	ptxbuf[len++] = 0X15;
@@ -426,9 +452,10 @@ void DaCai_SetTXTtwinkle(_UI_t *pUI,u16 period)
 //在指定坐标显示文字 EE 20 00 64 00 65 01 06 39 35 FF FC FF FF 
 void DaCai_DisplayTXT(_UI_t *pUI, u16 x, u16 y, u8 font)
 {
-	u16 len=0;	
+	u16 len;	
 
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x20;
 	ptxbuf[len++] = x>>8;;
@@ -444,9 +471,10 @@ void DaCai_DisplayTXT(_UI_t *pUI, u16 x, u16 y, u8 font)
 //在指定坐标显示剪切的图片 EE 【33 X Y Image_ID Image_X Image_Y Image_W Image_H MaskEn】FF FC FF FF
 void  DaCai_DisplayCutPic(u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H)
 {
-	u16 len=0;	
+	u16 len;	
 
 	mutex_lock(dacai.lock);
+	len = 0;
 	ptxbuf[len++] = DaCaiHEND;
 	ptxbuf[len++] = 0x33;
 	ptxbuf[len++] = x>>8;;
@@ -464,6 +492,94 @@ void  DaCai_DisplayCutPic(u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u
 	ptxbuf[len++] = Image_H>>8;
 	ptxbuf[len++] = Image_H&0xff;
 	ptxbuf[len++] = 0;//0x00:颜色不过滤 ;0x01 执行颜色过滤
+	DaCai_SendData(ptxbuf, len);
+}
+//画折现 EE 69 00 64 00 64 00 5A 00 6E 00 6E 00 6E 00 64 00 64 FF FC FF FF 
+void DaCai_PaintLine(_coordinate_t *pCoo, u8 size)
+{
+	u16 len;	
+	u8 i;
+	
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0x69;
+	for(i=0;i<size;i++)	{
+		ptxbuf[len++] = pCoo->x>>8;;
+		ptxbuf[len++] = pCoo->x&0x0ff;
+		ptxbuf[len++] = pCoo->y>>8;;
+		ptxbuf[len++] = pCoo->y&0x0ff;
+		pCoo ++;
+	}	
+	DaCai_SendData(ptxbuf, len);
+}
+//基本绘图控件头信息
+static u8  DaCai_BasicGraphHead(_UI_t *pUI, u8 ctrl_id)
+{
+	u8 len;
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0xb1;
+	ptxbuf[len++] = 0x10;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->screen_id;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = ctrl_id;
+	return len;
+}	
+//清空基本绘图控件内容
+u8  DaCai_ClearBasicGraph(_UI_t *pUI, u8 ctrl_id)
+{
+	u16 len;
+	len = DaCai_BasicGraphHead(pUI, ctrl_id);
+	ptxbuf[len++] = 0;
+	DaCai_SendData(ptxbuf, len);
+}
+
+//在基本绘图控件内 显示剪切图片
+//EE B1 10 00 06 00 0C 07 00 39 00 11 00 98 00 00 00 00 00 96 00 BE 01 FF FC FF FF 
+void  DaCai_DisplayCutPicInBasicGraph(_UI_t *pUI, u8 ctrl_id,  u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H)
+{
+	u16 len;	
+
+	mutex_lock(dacai.lock);
+	len = DaCai_BasicGraphHead(pUI, ctrl_id);
+	ptxbuf[len++] = 7;
+	ptxbuf[len++] = Image_ID>>8;//要剪切的图片编号
+	ptxbuf[len++] = Image_ID&0xff;
+	ptxbuf[len++] = x>>8;;
+	ptxbuf[len++] = x&0x0ff;
+	ptxbuf[len++] = y>>8;;
+	ptxbuf[len++] = y&0x0ff;
+	ptxbuf[len++] = Image_X>>8;//被剪切的图片起点X坐标
+	ptxbuf[len++] = Image_X&0xff;
+	ptxbuf[len++] = Image_Y>>8;
+	ptxbuf[len++] = Image_Y&0xff;
+	ptxbuf[len++] = Image_W>>8;
+	ptxbuf[len++] = Image_W&0xff;//剪切的宽度
+	ptxbuf[len++] = Image_H>>8;
+	ptxbuf[len++] = Image_H&0xff;
+	ptxbuf[len++] = 0;//0x00:颜色不过滤 ;0x01 执行颜色过滤
+	DaCai_SendData(ptxbuf, len);
+}
+//在基本绘图控件内 画线
+void DaCai_PaintLineInBasicGraph(_UI_t *pUI, u8 ctrl_id, u16 color, _coordinate_t *pCoo, u8 size)
+{
+	u16 len;	
+	u8 i;
+	
+	mutex_lock(dacai.lock);
+	len = DaCai_BasicGraphHead(pUI, ctrl_id);
+	ptxbuf[len++] = 2;
+	ptxbuf[len++] = color>>8;
+	ptxbuf[len++] = color&0xff;
+	for(i=0;i<size;i++)	{
+		ptxbuf[len++] = pCoo->x>>8;;
+		ptxbuf[len++] = pCoo->x&0x0ff;
+		ptxbuf[len++] = pCoo->y>>8;;
+		ptxbuf[len++] = pCoo->y&0x0ff;
+		pCoo ++;
+	}	
 	DaCai_SendData(ptxbuf, len);
 }
 

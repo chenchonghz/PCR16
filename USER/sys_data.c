@@ -30,12 +30,12 @@ void SysDataInit(void)
 	SysTime.tm_sec = 20;
 	SysTime.tm_wday = 3;
 	
-	ResetLabData();
-	ResetSampleData();
-	ResetTempData();
+	ResetLabDataDefault();
+	ResetSampleDataDefault();
+	ResetTempDataDefault();
 }
 
-void ResetSampleData(void)
+void ResetSampleDataDefault(void)
 {
 	u8 i;
 	
@@ -47,37 +47,30 @@ void ResetSampleData(void)
 	}
 }
 
-void ResetLabData(void)
+void ResetLabDataDefault(void)
 {
 	memset(lab_data.name,0x20,LAB_NAME_LEN);
 	lab_data.type = 0xff;
 	lab_data.method = 0xff;
 }
 
-void ResetTempData(void)
+void ResetTempDataDefault(void)
 {
 	u8 i,j;
 	temp_data.HeatCoverEnable = DEF_True;
 	temp_data.HeatCoverTemp = 105;
-	temp_data.StageNum = 1;
+	temp_data.StageNum = 0;
 	temp_data.CurStage = 0;
-	i=0;j=0;
-	temp_data.stage[i].Repeat = 1;
-	temp_data.stage[i].StepNum = 1;
-	temp_data.stage[i].CurStep = 0;
-	temp_data.stage[i].Type = 0;
-	temp_data.stage[i].step[j].CollEnable = DEF_True;
-	temp_data.stage[i].step[j].temp = 950;
-	temp_data.stage[i].step[j].tim = 60;
-	for(i=1;i<STAGE_MAX;i++)	{
-		temp_data.stage[i].Repeat = 1;
+	for(i=0;i<STAGE_MAX;i++)	{
+		temp_data.stage[i].RepeatNum = 1;
 		temp_data.stage[i].StepNum = 1;
 		temp_data.stage[i].CurStep = 0;
+		temp_data.stage[i].CurRepeat = 0;
 		temp_data.stage[i].Type = 0;
 		for(j=0;j<STEP_MAX;j++)	{
-			temp_data.stage[i].step[j].CollEnable = DEF_True;
-			temp_data.stage[i].step[j].temp = 450;
-			temp_data.stage[i].step[j].tim = 15;
+			temp_data.stage[i].step[j].CollEnable = DEF_False;
+			temp_data.stage[i].step[j].temp = 950;
+			temp_data.stage[i].step[j].tim = 60;
 		}
 	}
 }

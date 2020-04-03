@@ -1,6 +1,6 @@
 #include "app_display.h"
 #include "display_code.h"
-
+#include "app_temp.h"
 //堆栈
 __align(4) OS_STK  TASK_DISPLAY_STK[STK_SIZE_DISPLAY]; //任务堆栈声?
 #define N_MESSAGES		5
@@ -76,11 +76,12 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 		}
 	}
 }
+u8 ctrl_type,subtype,status;
 s32 g_tempdata;
 //屏幕相关数据处理
 static void ScreenDataProcess(_dacai_usart_t *pUsart)
 {
-	u8 ctrl_type,subtype,status;
+//	u8 ctrl_type,subtype,status;
 	s32 temp;
 	u8 iPara;
 	
@@ -90,23 +91,24 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		status = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//获取按钮状态 按下/弹起
 	}
 	if(appdis.pUI->screen_id==Main_UIID)	{//主界面按钮响应		
-		if(status == DEF_Releass)	{
+		if(status == DEF_Release)	{
 			if(appdis.pUI->ctrl_id == 1)	{
-				appdis.pUI->screen_id = Lab_UIID;
-				DaCai_SwitchUI(appdis.pUI);
+				DisplayLabUI();
 			}
 			else if(appdis.pUI->ctrl_id == 3||appdis.pUI->ctrl_id == 4)	{//DNA RNA
-				appdis.pUI->screen_id = Menu_UIID;
-				DaCai_SwitchUI(appdis.pUI);
+				DisplaMenuUI();
 			}
 			else if(appdis.pUI->ctrl_id == 5)	{//数据
 				appdis.pUI->screen_id = Data_UIID;
 				DaCai_SwitchUI(appdis.pUI);
 			}
+			else if(appdis.pUI->ctrl_id == 5)	{//数据
+				
+			}
 		}
 	}
 	else if(appdis.pUI->screen_id==Lab_UIID)	{//实验界面
-		if(status == DEF_Releass)	{
+		if(status == DEF_Release)	{
 			if(appdis.pUI->ctrl_id == 6)	{//新建
 				appdis.pUI->screen_id = Menu_UIID;
 				DaCai_SwitchUI(appdis.pUI);
@@ -118,22 +120,21 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DaCai_UpdateTXT(appdis.pUI);
 				Sys.state |= SysState_DeleteLabTB;
 			}
-			else if(appdis.pUI->ctrl_id == 19)	{//启动按键
-				DisplayUIIDAndBackup(Confirm_UIID);//备份当前界面 切换到下一个界面
-				appdis.pUI->ctrl_id = 4;
-				appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[1][0]);//显示 是否启动
-				DaCai_UpdateTXT(appdis.pUI);
-				Sys.state |= SysState_RunningTB;
+			else if(appdis.pUI->ctrl_id == 19)	{//启动实验
+				DisplayQiTingLab();
 			}
 		}
 	}
-	else if(appdis.pUI->screen_id==Menu_UIID&&status == DEF_Releass)	{//菜单界面
+	else if(appdis.pUI->screen_id==Menu_UIID&&status == DEF_Release)	{//菜单界面
 		if(appdis.pUI->ctrl_id == 2)	{//进入温度程序			
-			DisplayTempProgramUI(1);	//刷新温度界面	
+			DisplayTempProgramUI(0);	//刷新温度界面	
+		}
+		else if(appdis.pUI->ctrl_id == 19)	{//启动实验
+			DisplayQiTingLab();
 		}
 	}
 	else if(appdis.pUI->screen_id==Temp_UIID)	{//温度程序	
-		if(status == DEF_Releass)	{		
+		if(status == DEF_Release)	{		
 			if(appdis.pUI->ctrl_id == 9)	{//编辑热盖温度
 				SaveUIEditInfor();//保存编辑信息
 				DisplayKeyboardUI();//切换到全键盘界面					
@@ -148,7 +149,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			}
 		}
 		if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
-			if(status == DEF_Releass)	
+			if(status == DEF_Release)	
 				HeatCoverOnOff(DEF_False);
 			else if(status == DEF_Press)
 				HeatCoverOnOff(DEF_True);
@@ -163,7 +164,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				}
 				else	{
-					temp_data.stage[temp_data.StageNum].Repeat = temp;
+					temp_data.stage[temp_data.StageNum].RepeatNum = temp;
 					appdis.pUI->ctrl_id = 8;
 					DaCai_ReadTXT(appdis.pUI);
 				}
@@ -185,7 +186,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			DaCai_ReadTXT(appdis.pUI);
 			Sys.state |= SysState_ReadTXT;
 		}
-		if(appdis.pUI->ctrl_id == 25&&status == DEF_Releass)	{//关闭 
+		else if(appdis.pUI->ctrl_id == 25&&status == DEF_Press)	{//关闭 
 			Sys.state &= ~SysState_ReadTXT;
 			if(Sys.state & SysState_SetOK)	{
 				Sys.state &= ~SysState_SetOK;
@@ -208,6 +209,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				}
 			}	
 			else if(appdis.pUI->ctrl_id == 9)	{//恒温时间 min	
+				temp /= 10;
 				if(temp > 10||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
@@ -217,7 +219,8 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					DaCai_ReadTXT(appdis.pUI);
 				}
 			}
-			else if(appdis.pUI->ctrl_id == 10)	{//恒温时间 sec		
+			else if(appdis.pUI->ctrl_id == 10)	{//恒温时间 sec	
+				temp /= 10;
 				if(temp > 60||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
@@ -234,19 +237,19 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			DaCai_ReadTXT(appdis.pUI);
 			Sys.state |= SysState_ReadTXT;//回读所有文本内容
 		}
-		if(appdis.pUI->ctrl_id == 1)	{
-			if(status == DEF_Releass)	
-				CollDataOnOff_InStep(DEF_False);
-			else if(status == DEF_Press)
-				CollDataOnOff_InStep(DEF_True);
-		}
-		else if(appdis.pUI->ctrl_id == 25&&status == DEF_Releass)	{//关闭 
+		if(appdis.pUI->ctrl_id == 25&&status == DEF_Press)	{//关闭 			
 			Sys.state &= ~SysState_ReadTXT;
 			if(Sys.state & SysState_SetOK)	{
 				Sys.state &= ~SysState_SetOK;
 				temp_data.StageNum++;
 			}
 		}
+		else if(appdis.pUI->ctrl_id == 1)	{
+			if(status == DEF_Release)	
+				CollDataOnOff_InStep(DEF_False);
+			else if(status == DEF_Press)
+				CollDataOnOff_InStep(DEF_True);
+		}		
 	}
 	else if(appdis.pUI->screen_id==Keyboard_UIID)	{//全键盘界面
 		if(appdis.pUI->ctrl_id == 43&&ctrl_type==0x11)	{//用户输入值
@@ -267,27 +270,41 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				}
 			}
 		}
-		else if(appdis.pUI->ctrl_id == 44&&status == DEF_Releass)	{//关闭 
+		else if(appdis.pUI->ctrl_id == 44&&status == DEF_Release)	{//关闭 
 			DisplayEditUI();//显示上次编辑界面
 		}
 	}
-	else if(appdis.pUI->screen_id == Confirm_UIID&&status == DEF_Releass)	{//确认界面
+	else if(appdis.pUI->screen_id == Confirm_UIID&&status == DEF_Release)	{//确认界面
 		if(appdis.pUI->ctrl_id == 2)	{//取消键
-			
+			Sys.state &= ~SysState_RunningTB;
+			Sys.state &= ~SysState_DeleteLabTB;
 		}
 		else	if(appdis.pUI->ctrl_id == 3)	{//确认键
 			if(Sys.state & SysState_RunningTB)	{//启动实验
-//				Sys.devstate = DevState_Running;
+				Sys.state &= ~SysState_RunningTB;
+				//if(Sys.devstate == DevState_IDLE)	
+				{					
+					iPara = StartAPPTempCtrl();
+					DisplayBackupUIID();	
+					if(iPara==0)	{//启动温控					
+						DisplayMessageUI((char *)&Code_Message[6][0]);//参数错误 无法启动
+					}	
+					return;
+				}
+			}
+			if(Sys.state & SysState_StopTB)	{//启动实验
+				Sys.state &= ~SysState_StopTB;
+				StopAPPTempCtrl();
 			}
 			else if(Sys.state & SysState_DeleteLabTB)	{//删除实验记录
-			
+				Sys.state &= ~SysState_DeleteLabTB;
 			}
 		}
 		else 
 			return;
 		DisplayBackupUIID();		
 	}
-	else if(appdis.pUI->screen_id == Message_UIID&&status == DEF_Releass)	{//确认界面
+	else if(appdis.pUI->screen_id == Message_UIID&&status == DEF_Release)	{//确认界面
 		if(appdis.pUI->ctrl_id == 3)	{//确认键
 			DisplayBackupUIID();
 		}

@@ -16,6 +16,18 @@ static void FLUODatInit(void)
 {
 	fluo.Mbox                = OSMboxCreate((void *)0);
 }
+//开启荧光采集
+void StartCollFluo(void)
+{
+	u8 m,n;
+	
+	m = temp_data.CurStage;
+	n = temp_data.stage[m].CurStep;
+	if(temp_data.stage[m].step[n].CollEnable)	{//如果荧光采集使能 启动电机 采集荧光
+		
+	}
+}
+
 u8 fluoflag=0xff;
 static void AppFLUOTask (void *parg)
 {

@@ -17,5 +17,9 @@ void DisplayKeyboardUI(void);
 void DisplayStepUI(void);
 void DisplayStageUI(void);
 void DisplayTempProgramUI(u8 clear_s);
+void DisplaMenuUI(void);
+void DisplayLabUI(void);
+void DisplayQiTingLab(void);
+void PaintTriangle(u16 x, u16 y, u16 w, u16 h);
 #endif
 

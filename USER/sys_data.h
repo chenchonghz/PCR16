@@ -20,6 +20,7 @@
 #define SysState_ReadTXT				DEF_BIT02_MASK
 #define SysState_SetOK					DEF_BIT03_MASK
 #define SysState_RunningTB				DEF_BIT04_MASK
+#define SysState_StopTB					DEF_BIT05_MASK
 
 //设备运行模式
 enum	{
@@ -69,9 +70,10 @@ typedef struct _stage	{
 	u16 T_Inter;//温度间隔
 	u16 T_Tim;//恒温时间 s
 	u8 Type;//0-repeat模式;1-continue 模式;2-step 模式
-	u8 Repeat;//
+	u8 RepeatNum;//
 	u8 StepNum;//总步 
 	u8 CurStep;//当前步 不写入json文件
+	u8 CurRepeat;//当前循环 不写入json文件
 	_step_t step[STEP_MAX];
 }_stage_t;
 
@@ -113,8 +115,8 @@ extern _temp_data_t temp_data;
 void SysDataInit(void);
 void HeatCoverOnOff(u8 flag);
 void CollDataOnOff_InStep(u8 flag);
-void ResetSampleData(void);
-void ResetLabData(void);
-void ResetTempData(void);
+void ResetSampleDataDefault(void);
+void ResetLabDataDefault(void);
+void ResetTempDataDefault(void);
 
 #endif

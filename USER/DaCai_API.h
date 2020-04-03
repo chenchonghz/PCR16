@@ -13,17 +13,20 @@ typedef struct _UI_EDIT	{
 typedef struct _UI	{
 	s8 screen_id;//µ±Ç°»­Ãæid
 	s8 screen_idbk;
-//	s8 screen_idlifo[SCREEN_BUFSIZE];
 	s8 sub_screen_id;
 	u8 ctrl_id;
 	u8 ctrl_idbk;
 	s8 button_id;
-//	s8 ButtonState;
 	s8 index;
 	_UI_EDIT_T editinfo;
 	char *pdata;
 	u16 datlen;
 }_UI_t;
+
+typedef struct _coordinate	{
+	u16 x;
+	u16 y;
+}_coordinate_t;
 
 extern _UI_t UI;
 
@@ -57,4 +60,8 @@ void DaCai_ExitStandby(void);
 void DaCai_PaintRectangle(u16 x, u16 y, u16 w, u16 h);
 void DaCai_DisplayTXT(_UI_t *pUI, u16 x, u16 y, u8 font);
 void  DaCai_DisplayCutPic(u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H);
+void  DaCai_DisplayCutPicInBasicGraph(_UI_t *pUI, u8 ctrl_id, u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H);
+void DaCai_PaintLine(_coordinate_t *pCoo, u8 size);
+void DaCai_PaintLineInBasicGraph(_UI_t *pUI, u8 ctrl_id, u16 color, _coordinate_t *pCoo, u8 size);
+u8  DaCai_ClearBasicGraph(_UI_t *pUI, u8 ctrl_id);
 #endif

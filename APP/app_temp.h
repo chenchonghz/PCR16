@@ -29,6 +29,7 @@ typedef struct _app_temp	{
 }_app_temp_t;
 
 void AppTempInit (void);
-
+u8 StartAPPTempCtrl(void);
+void StopAPPTempCtrl(void);
 #endif
 

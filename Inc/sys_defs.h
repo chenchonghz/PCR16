@@ -126,8 +126,8 @@
 #ifndef DEF_Press
 #define DEF_Press         1u
 #endif
-#ifndef DEF_Releass
-#define DEF_Releass        0u
+#ifndef DEF_Release
+#define DEF_Release        0u
 #endif
 /*
 ********************************************************************************
