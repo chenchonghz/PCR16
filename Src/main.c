@@ -75,7 +75,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -106,6 +105,7 @@ __set_PRIMASK(1);//¹Ø±Õ×ÜÖÐ¶Ï
   MX_TIM6_Init();
   MX_SPI3_Init();
   MX_TIM2_Init();
+  MX_TIM7_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
   SYS_PRINTF("SYS Startup.");
@@ -212,7 +212,7 @@ void Error_Handler(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(char *file, uint32_t line)
+void assert_failed(uint8_t *file, uint32_t line)
 { 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,

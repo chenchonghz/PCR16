@@ -1,7 +1,7 @@
 #include "app_temp.h"
 #include "ad7124.h"
 #include "PID.h"
-
+#include "timer.h"
 //堆栈
 __align(4) OS_STK  TASK_TEMP_STK[STK_SIZE_TEMP]; //任务堆栈声?
 
@@ -140,13 +140,13 @@ void TempProgramLookOver(s16 c_temp)
 	target = temp_data.stage[m].step[n].temp;
 	if(abs(c_temp-target)>100)	{//温度差大于1度 当前处于升降温阶段
 //		ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
-		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, TempPid[HOLE_TEMP].target_t);
+		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, target);
 	}
 	else {//到达目标温度 当前处于恒温阶段 设置恒温时间
-		
+		SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim);
+		SoftTimer1.pCallBack = &ConstantTempReadCallback;
 	}
-	
-}	
+}
 
 #define	TEMPCTRL_ACCURACY		10//温控精度0.1
 #define	TEMPCOLLECT_ACCURACY		5//温度采集精度 0.05
@@ -167,23 +167,8 @@ static void AppTempTask (void *parg)
 			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{//计算模块温度
 				TempProgramLookOver(cur_temp);
 				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
-				{
-					SetPIDTarget(TempPid[HOLE_TEMP].PIDid, TempPid[HOLE_TEMP].target_t);//设置控制目标
-//					diff = abs(TempPid[HOLE_TEMP].target_t - cur_temp);//获取PID当前误差
-//					if(diff > 200)	{//根据温度差 设置pid参数
-//						SetPIDVal(PID_ID1, 1, 0, 0);
-//					}
-//					else 
-//						SetPIDVal(PID_ID1, 1, 0, 0);
-//					if(diff > TEMPCOLLECT_ACCURACY)	
-					{//大于0.1度 
-//						TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
-					}
-//					else	{//小<=0.1度 不调节 TEC停止工作
-//						ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
-//						StopTempCtrl(&TempPid[HOLE_TEMP]);			
-//					}
-				}
+//				SetPIDTarget(TempPid[HOLE_TEMP].PIDid, TempPid[HOLE_TEMP].target_t);//设置控制目标
+				TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
 			}else	{//温度传感器脱落
 			
 			}
@@ -194,8 +179,8 @@ static void AppTempTask (void *parg)
 			}
 			if(CalcTemperature(GetADCVol(TEMP_ID3), (s32 *)&cur_temp)==0)	{
 				app_temp.current_t[TEMP_ID3] = cur_temp;
-				SetPIDTarget(TempPid[COVER_TEMP].PIDid, TempPid[COVER_TEMP].target_t);//设置控制目标
-				TempCtrl(&TempPid[COVER_TEMP], cur_temp);//热盖pid调节 增量法计算
+//				SetPIDTarget(TempPid[COVER_TEMP].PIDid, TempPid[COVER_TEMP].target_t);//设置控制目标
+//				TempCtrl(&TempPid[COVER_TEMP], cur_temp);//热盖pid调节 增量法计算
 			}else	{
 			
 			}

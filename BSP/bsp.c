@@ -11,6 +11,7 @@ void	bsp_init(void)
 {
 	bsp_spi_init();
 	BSP_W25Qx_Init();
+	SoftTimerInit();
 //	BspAD7091Init();
 }
 //io≈‰÷√

@@ -369,7 +369,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32L476xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                  ../Drivers/STM32L4xx_HAL_Driver/Inc;                  ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                  ../Middlewares/Third_Party/FatFs/src;                  ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;                  ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;                  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                  ../Drivers/CMSIS/Include;                  ..\BSP;                  ..\USER;                  ..\APP;                  ..\UCOSII\CONFIG;                  ..\UCOSII\PORT;                  ..\UCOSII\CORE</IncludePath>
+              <IncludePath>../Inc;                     ../Drivers/STM32L4xx_HAL_Driver/Inc;                     ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                     ../Middlewares/Third_Party/FatFs/src;                     ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;                     ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;                     ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                     ../Drivers/CMSIS/Include;                     ..\BSP;                     ..\USER;                     ..\APP;                     ..\UCOSII\CONFIG;                     ..\UCOSII\PORT;                     ..\UCOSII\CORE</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

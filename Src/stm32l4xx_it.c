@@ -61,6 +61,7 @@
 extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim6;
+extern TIM_HandleTypeDef htim7;
 extern DMA_HandleTypeDef hdma_uart4_tx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart4;
@@ -323,6 +324,20 @@ OSIntEnter();
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 OSIntExit();
   /* USER CODE END TIM6_DAC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM7 global interrupt.
+  */
+void TIM7_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM7_IRQn 0 */
+OSIntEnter();
+	SoftTimerCallback();
+  /* USER CODE END TIM7_IRQn 0 */
+  /* USER CODE BEGIN TIM7_IRQn 1 */
+OSIntExit();
+  /* USER CODE END TIM7_IRQn 1 */
 }
 
 /**
