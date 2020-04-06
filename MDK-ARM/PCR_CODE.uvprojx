@@ -557,6 +557,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\misc.c</FilePath>
             </File>
+            <File>
+              <FileName>DaCai_TouchEvent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\DaCai_TouchEvent.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

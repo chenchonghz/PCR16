@@ -63,7 +63,7 @@ void ResetTempDataDefault(void)
 	temp_data.CurStage = 0;
 	for(i=0;i<STAGE_MAX;i++)	{
 		temp_data.stage[i].RepeatNum = 1;
-		temp_data.stage[i].StepNum = 1;
+		temp_data.stage[i].StepNum = 0;
 		temp_data.stage[i].CurStep = 0;
 		temp_data.stage[i].CurRepeat = 0;
 		temp_data.stage[i].Type = 0;
@@ -80,11 +80,13 @@ void HeatCoverOnOff(u8 flag)
 	temp_data.HeatCoverEnable = flag;
 }
 
-void CollDataOnOff_InStep(u8 flag)
-{
-	u8 i,j;
-	
-	i = temp_data.CurStage;
-	j = temp_data.stage[i].CurStep;
-	temp_data.stage[i].step[j].CollEnable = flag;
-}
+//void CollDataOnOff_InStep(u8 flag)
+//{
+//	u8 m,n;
+//	
+//	m = temp_data.StageNum-1;
+//	if(m<0)	m = 0;
+//	n = temp_data.stage[m].StepNum-1;
+//	if(n<0)	n = 0;
+//	temp_data.stage[m].step[n].CollEnable = flag;
+//}

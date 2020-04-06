@@ -58,6 +58,7 @@ void SoftTimerCallback(void)
 			SoftTimer1.cnt = 0;
 			if(SoftTimer1.pCallBack != NULL)
 				(*SoftTimer1.pCallBack)();
+			SoftTimerStop(&SoftTimer1);
 		}
 	}
 }

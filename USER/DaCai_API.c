@@ -514,7 +514,7 @@ void DaCai_PaintLine(_coordinate_t *pCoo, u8 size)
 	DaCai_SendData(ptxbuf, len);
 }
 //基本绘图控件头信息
-static u8  DaCai_BasicGraphHead(_UI_t *pUI, u8 ctrl_id)
+static u8  DaCai_BasicGraphHead(_UI_t *pUI)
 {
 	u8 len;
 	len = 0;
@@ -524,26 +524,26 @@ static u8  DaCai_BasicGraphHead(_UI_t *pUI, u8 ctrl_id)
 	ptxbuf[len++] = 0;
 	ptxbuf[len++] = pUI->screen_id;
 	ptxbuf[len++] = 0;
-	ptxbuf[len++] = ctrl_id;
+	ptxbuf[len++] = pUI->ctrl_id;
 	return len;
 }	
 //清空基本绘图控件内容
-u8  DaCai_ClearBasicGraph(_UI_t *pUI, u8 ctrl_id)
+u8  DaCai_ClearBasicGraph(_UI_t *pUI)
 {
 	u16 len;
-	len = DaCai_BasicGraphHead(pUI, ctrl_id);
+	len = DaCai_BasicGraphHead(pUI);
 	ptxbuf[len++] = 0;
 	DaCai_SendData(ptxbuf, len);
 }
 
 //在基本绘图控件内 显示剪切图片
 //EE B1 10 00 06 00 0C 07 00 39 00 11 00 98 00 00 00 00 00 96 00 BE 01 FF FC FF FF 
-void  DaCai_DisplayCutPicInBasicGraph(_UI_t *pUI, u8 ctrl_id,  u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H)
+void  DaCai_DisplayCutPicInBasicGraph(_UI_t *pUI, u8 Image_ID ,u16 x, u16 y, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H)
 {
 	u16 len;	
 
 	mutex_lock(dacai.lock);
-	len = DaCai_BasicGraphHead(pUI, ctrl_id);
+	len = DaCai_BasicGraphHead(pUI);
 	ptxbuf[len++] = 7;
 	ptxbuf[len++] = Image_ID>>8;//要剪切的图片编号
 	ptxbuf[len++] = Image_ID&0xff;
@@ -563,13 +563,13 @@ void  DaCai_DisplayCutPicInBasicGraph(_UI_t *pUI, u8 ctrl_id,  u16 x, u16 y, u8 
 	DaCai_SendData(ptxbuf, len);
 }
 //在基本绘图控件内 画线
-void DaCai_PaintLineInBasicGraph(_UI_t *pUI, u8 ctrl_id, u16 color, _coordinate_t *pCoo, u8 size)
+void DaCai_PaintLineInBasicGraph(_UI_t *pUI, u16 color, _coordinate_t *pCoo, u8 size)
 {
 	u16 len;	
 	u8 i;
 	
 	mutex_lock(dacai.lock);
-	len = DaCai_BasicGraphHead(pUI, ctrl_id);
+	len = DaCai_BasicGraphHead(pUI);
 	ptxbuf[len++] = 2;
 	ptxbuf[len++] = color>>8;
 	ptxbuf[len++] = color&0xff;

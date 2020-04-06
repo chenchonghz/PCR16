@@ -143,7 +143,7 @@ void TempProgramLookOver(s16 c_temp)
 		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, target);
 	}
 	else {//到达目标温度 当前处于恒温阶段 设置恒温时间
-		SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim);
+		SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim*10);//100ms 为单位
 		SoftTimer1.pCallBack = &ConstantTempReadCallback;
 	}
 }

@@ -262,12 +262,12 @@ void DisplayTempProgramUI(u8 clear_s)
 			temp = temp_data.stage[j].step[k].temp/10;
 			height = temp*(TEMP_RECTANGLE_H/100);
 			rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*stepcnt;			
-			DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 58, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);			
+//			DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 58, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);			
 			
 			if(temp>templast)	{
 				rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
 				DaCai_DisplayCutPic(rec_x, rec_y, 57, 0, 0, TEMP_RECTANGLE_W, height);
-				xie_h = TEMP_RECTANGLE_H - templast*(TEMP_RECTANGLE_H/100);
+				xie_h = (temp - templast)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
 				DaCai_DisplayCutPic(rec_x, rec_y, 56, 50-xie_w, 0, xie_w, xie_h);
 			}
@@ -297,17 +297,20 @@ void PaintTriangle(u16 x, u16 y, u16 w, u16 h)
 {
 	_coordinate_t coo[4];
 	u16 w2,h2;
+	u8 i;
 	
 	w2 = w/2;
 	h2 = h/2;
-	coo[0].x = x;
-	coo[0].y = y;
-	coo[1].x = x-w2;
-	coo[1].y = y+h2;
-	coo[2].x = x+w2;
-	coo[2].y = y+h2;
-	coo[3].x = x;
-	coo[3].y = y;
-	DaCai_PaintLine(coo, 4);
+	for(i=0;i<2;i++)	{
+		coo[0].x = x+i;
+		coo[0].y = y+i;
+		coo[1].x = x-w2+i;
+		coo[1].y = y+h2+i;
+		coo[2].x = x+w2+i;
+		coo[2].y = y+h2+i;
+		coo[3].x = x+i;
+		coo[3].y = y+i;
+		DaCai_PaintLine(coo, 4);
+	}
 }
 
