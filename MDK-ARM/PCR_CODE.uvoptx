@@ -262,7 +262,7 @@
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>status</ItemText>
+          <ItemText>touchid,0x10</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

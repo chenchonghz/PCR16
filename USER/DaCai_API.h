@@ -64,4 +64,5 @@ void  DaCai_DisplayCutPicInBasicGraph(_UI_t *pUI, u8 Image_ID, u16 x, u16 y, u16
 void DaCai_PaintLine(_coordinate_t *pCoo, u8 size);
 void DaCai_PaintLineInBasicGraph(_UI_t *pUI, u16 color, _coordinate_t *pCoo, u8 size);
 u8  DaCai_ClearBasicGraph(_UI_t *pUI);
+void DaCai_IconCtrl(_UI_t *pUI, u8 icon);
 #endif

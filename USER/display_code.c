@@ -228,8 +228,9 @@ void DisplayTempProgramUI(u8 clear_s)
 	
 	appdis.pUI->screen_id = Temp_UIID;
 	DaCai_SwitchUI(appdis.pUI);
-	appdis.pUI->button_id = 8;
-	DaCai_ButtonCtrl(appdis.pUI, temp_data.HeatCoverEnable);
+	appdis.pUI->button_id = 10;
+//	DaCai_ButtonCtrl(appdis.pUI, temp_data.HeatCoverEnable);
+	DaCai_IconCtrl(appdis.pUI,temp_data.HeatCoverEnable);
 
 	ClearTempProgramUI(clear_s);
 	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));

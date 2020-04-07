@@ -1,6 +1,7 @@
 #include "app_display.h"
 #include "display_code.h"
 #include "app_temp.h"
+#include "DaCai_TouchEvent.h"
 //堆栈
 __align(4) OS_STK  TASK_DISPLAY_STK[STK_SIZE_DISPLAY]; //任务堆栈声?
 #define N_MESSAGES		5
@@ -31,7 +32,7 @@ static void DisDatInit(void)
 	appdis.pUI = &UI;
 //	LIFOBuffer_Init(&ScreenIDLIFO,(u8 *)appdis.pUI->screen_idlifo, 1 ,SCREEN_BUFSIZE);
 }
-
+u8 touchid;
 static void ScreenDataProcess(_dacai_usart_t *pUsart);
 static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 {
@@ -47,6 +48,25 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			appdis.pDaCai->state = DEF_OFFLINE;
 			appdis.pUI->screen_id = Invalid_UIID;
 			break;
+		case 0x01:
+			if(appdis.pUI->screen_id == Temp_UIID)	{
+				u16 x,y;
+				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				touchid = TempButtonClick(x,y);
+				if(touchid==5)	{
+					appdis.pUI->ctrl_id = 10;
+					if(temp_data.HeatCoverEnable == DEF_False)	{						
+						DaCai_IconCtrl(appdis.pUI,1);
+						temp_data.HeatCoverEnable = DEF_True;
+					}
+					else if(temp_data.HeatCoverEnable == DEF_True)	{
+						DaCai_IconCtrl(appdis.pUI,0);
+						temp_data.HeatCoverEnable = DEF_False;
+					}
+					DisplayTempProgramUI(0xff);
+				}
+			}
 		case 0xb1:	{//画面相关指令
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0x01)	{//回读screen id
@@ -58,8 +78,6 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			else if(iPara==0x11)	{//按钮状态
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				appdis.pUI->ctrl_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-//				UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-//				appdis.pUI->ButtonState = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 				ScreenDataProcess(pUsart);
 			}
 			break;

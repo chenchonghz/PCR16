@@ -2,6 +2,7 @@
 
 #define	TOUCH_W		150
 #define	TOUCH_H		240
+#define	T_BUTTON_NUM		6
 
  struct touch_area_t	{
 	u16 x1;
@@ -9,7 +10,7 @@
 	u16 x2;
 	u16 y2;
 };
-const struct touch_area_t	touch_area[6]	=	{
+const struct touch_area_t	touch_area[T_BUTTON_NUM]	=	{
 	[0]	=	{
 		.x1 = 17,
 		.y1	= 102,
@@ -47,31 +48,35 @@ const struct touch_area_t	touch_area[6]	=	{
 		.y2 = 21+60,
 	},
 };
-u32 LaseClickTim=0;
-u8 TempButtonDoubleClick(u16 touch_x, u16 touch_y)
+u32 LaseClickTim[T_BUTTON_NUM]={0};
+u8 TempButtonClick(u16 touch_x, u16 touch_y)
 {
-	static u8 touchcnt[5];
+//	static u8 touchcnt[T_BUTTON_NUM];
 	u8 i;
 	s32 time_diff;
 	
-	for(i=0;i<5;i++)	{
+	for(i=0;i<T_BUTTON_NUM;i++)	{
 		if(touch_x>touch_area[i].x1 && touch_x<touch_area[i].x2 && touch_y>touch_area[i].y1 && touch_y<touch_area[i].y2)	{
-			touchcnt[i] ++;
-			if(touchcnt[i]>=2)	{
-				touchcnt[i] = 0;
-				time_diff = OSTimeGet() - LaseClickTim;
+//			touchcnt[i] ++;
+//			if(touchcnt[i]>=2)	
+//			{
+//				touchcnt[i] = 0;
+				time_diff = OSTimeGet() - LaseClickTim[i];
 				if(time_diff<0)	{
 					time_diff += 0xffffffff;
 				}
-				if(time_diff>2000)	{//双击间隔要求小于1s
-					break;
+				if(time_diff>1000||time_diff<200)	{//双击间隔要求小于1s
+//					break;
 				}
-				LaseClickTim = OSTimeGet();
-				return i;
-			}	
+				else	{
+					i |= 0x80;//双击
+				}
+				LaseClickTim[i] = OSTimeGet();
+				return i;//单击
+//			}	
 		}
-		else
-			touchcnt[i] = 0;		
+//		else
+//			touchcnt[i] = 0;		
 	}
 	return 0xff;
 }

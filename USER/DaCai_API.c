@@ -323,6 +323,23 @@ void DaCai_CtrlONOFF(_UI_t *pUI, u8 flag)
 	DaCai_SendData(ptxbuf, len);
 }
 
+void DaCai_IconCtrl(_UI_t *pUI, u8 icon)	
+{
+	u8 len;
+
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0xb1;
+	ptxbuf[len++] = 0x23;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->screen_id;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->ctrl_id;
+	ptxbuf[len++] = icon;
+	DaCai_SendData(ptxbuf, len);
+}
+
 //ÆÁ±£Ä£Ê½
 void DaCai_ScreenSaveMode(u8 enable, u16 standy_t, u8 standy_brightness, u8 brightness)
 {
