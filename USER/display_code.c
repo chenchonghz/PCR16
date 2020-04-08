@@ -227,11 +227,18 @@ void ClearTempProgramUI(u8 clear_flag)
 		DaCai_IconCtrl(appdis.pUI, TempButtonState[j]);
 	}
 }
-u8 DisStageIdx,DisStepIdx;
+ struct _dis_idx_t	{
+	u8 StageIdx;
+	u8 StepIdx;
+ }CurIdx,LastIdx;
+static u16 g_templast;
 void ClearTempProgramIdx(void)
 {
-	DisStageIdx = 0;
-	DisStepIdx = 0;
+	CurIdx.StageIdx = 0;
+	CurIdx.StepIdx = 0;
+	LastIdx.StageIdx = 0;
+	LastIdx.StepIdx = 0;
+	g_templast = 30;
 }
 
 //温度程序 界面刷新
@@ -242,6 +249,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	u16 rec_x,rec_y,height;
 	u16 xie_w,xie_h;
 	u16 temp,templast;
+	u8 flag;
 	
 	appdis.pUI->screen_id = Temp_UIID;
 	DaCai_SwitchUI(appdis.pUI);
@@ -250,49 +258,69 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	ClearTempProgramUI(clear_flag);
 	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
 	i=0;
+	if(page_flag)	{
+		CurIdx.StageIdx = LastIdx.StageIdx;
+		CurIdx.StepIdx = LastIdx.StepIdx;
+	}
 	pMultiTXT_t->data[i].id = 6;
 	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.HeatCoverTemp);
 
 	stage_id = 14;repeat_id = 23;
-	for(j=DisStageIdx;j<temp_data.StageNum;j++)	{//刷新文字
-		stage_id += temp_data.stage[j].StepNum;
+	j = CurIdx.StageIdx;
+	flag = temp_data.stage[j].StepNum - CurIdx.StepIdx;
+	for(;temp_data.stage[j].StepNum>0;)	{
+		stage_id += flag;
 		pMultiTXT_t->data[++i].id = stage_id;
-		stage_id += temp_data.stage[j].StepNum;
+		stage_id += flag;
 		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "Stage%d", j+1);
-		repeat_id += temp_data.stage[j].StepNum;
+		repeat_id += flag;
 		pMultiTXT_t->data[++i].id = repeat_id;
-		repeat_id += temp_data.stage[j].StepNum;
+		repeat_id += flag;
 		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "x%d", temp_data.stage[j].RepeatNum);
 		if(repeat_id>=32)
+			break;		
+		j++;
+		if(j>=temp_data.StageNum)
 			break;
+		flag = temp_data.stage[j].StepNum;
 	}
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);
 	tlsf_free(UserMem, pMultiTXT_t);
-	templast = 30;
+	templast = g_templast;
 	stepcnt = 0;
-	for(j=DisStageIdx;j<temp_data.StageNum;j++)	{//刷新图形
-		for(k=DisStepIdx;k<temp_data.stage[j].StepNum;k++)	{	
-			if(stepcnt>=TEMP_UI_MAXSTEP)	{
-				goto _exit;
+	flag = 0;
+	k=CurIdx.StepIdx;
+	for(j=CurIdx.StageIdx;j<temp_data.StageNum;j++)	{//刷新图形
+		for(;k<temp_data.stage[j].StepNum;k++)	{
+			if(stepcnt==TEMP_UI_MAXSTEP-1)	{//显示已满 
+				flag = 1;//需要翻到第1页
 			}
-			temp = temp_data.stage[j].step[k].temp/10;
+			else if(stepcnt>=TEMP_UI_MAXSTEP)	{
+				g_templast = temp;
+				LastIdx.StageIdx = j;
+				if(k>=temp_data.stage[j].StepNum)
+					LastIdx.StepIdx = 0;
+				else
+					LastIdx.StepIdx = k;
+				return;
+			}
+			temp = temp_data.stage[j].step[k].temp/10;			
+			rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*stepcnt;
 			height = temp*(TEMP_RECTANGLE_H/100);
-			rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*stepcnt;			
-//			DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 59, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);			
-			
-			if(temp>templast)	{
-				rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
+			rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
+			if(temp>templast)	{		
 				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
 				xie_h = (temp - templast)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
 				DaCai_DisplayCutPic(rec_x, rec_y, 57, 50-xie_w, 0, xie_w, xie_h);
 			}
 			else	if(temp<templast)	{
+				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
+				height = templast*(TEMP_RECTANGLE_H/100);
+				rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
 				xie_h = (templast-temp)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
 				DaCai_DisplayCutPic(rec_x, rec_y, 56, 0, 0, xie_w, xie_h);
-				rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
-				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
 			}
 			else	{
 				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
@@ -306,11 +334,15 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 			templast = temp;
 			stepcnt	++;
 		}
+		k=0;
 	}
-_exit:
-	if(page_flag)	{
-		DisStageIdx = j;
-		DisStepIdx = k;
+	if(flag)	{
+		g_templast = temp;
+		LastIdx.StageIdx = j;
+		if(k>=temp_data.stage[j].StepNum)
+			LastIdx.StepIdx = 0;
+		else
+			LastIdx.StepIdx = k;
 	}
 }
 //画三角形 (x,y)是顶点坐标 w,h是三角形宽和高

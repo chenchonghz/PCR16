@@ -32,7 +32,7 @@ static void DisDatInit(void)
 	appdis.pUI = &UI;
 //	LIFOBuffer_Init(&ScreenIDLIFO,(u8 *)appdis.pUI->screen_idlifo, 1 ,SCREEN_BUFSIZE);
 }
-u8 touchid;
+//u8 touchid;
 static void ButtonClickProcess(u8 button);
 static void ScreenDataProcess(_dacai_usart_t *pUsart);
 static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
@@ -54,15 +54,15 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 				u16 x,y;
 				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-				touchid = TempButtonClick(x,y);
-				ButtonClickProcess(touchid);
+				appdis.pUI->button_id = TempButtonClick(x,y);
+				ButtonClickProcess(appdis.pUI->button_id);
 			}
 		case 0xb1:	{//画面相关指令
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0x01)	{//回读screen id
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				if(appdis.pUI->screen_id == Temp_UIID)	{//温度程序界面 刷新温度图形
-					DisplayTempProgramUI(0,0);//刷新温度界面
+					DisplayTempProgramUI(1,1);//刷新温度界面
 				}
 			}
 			else if(iPara==0x11)	{//按钮状态
@@ -89,7 +89,7 @@ static void ButtonClickProcess(u8 button)
 {
 	if(button>=0&&button<=5)	
 	{
-		if(touchid==5)	{
+		if(button==5)	{
 			if(temp_data.HeatCoverEnable == DEF_False)	{									
 				temp_data.HeatCoverEnable = DEF_True;
 			}
@@ -225,12 +225,15 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			DaCai_ReadTXT(appdis.pUI);
 			Sys.state |= SysState_ReadTXT;
 		}
-		else if(appdis.pUI->ctrl_id == 25&&status == DEF_Press)	{//关闭 
-			Sys.state &= ~SysState_ReadTXT;
-			if(Sys.state & SysState_SetOK)	{
-				Sys.state &= ~SysState_SetOK;
-				temp_data.StageNum++;
+		else if(appdis.pUI->ctrl_id == 25)	{//关闭 
+			if(status == DEF_Press)	{
+				Sys.state &= ~SysState_ReadTXT;
+				if(Sys.state & SysState_SetOK)	{
+					Sys.state &= ~SysState_SetOK;
+					temp_data.StageNum++;
+				}
 			}
+			appdis.pUI->screen_id = Temp_UIID;
 		}
 	}
 	else if(appdis.pUI->screen_id==Step_UIID)	{//步设置
@@ -276,14 +279,17 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			DaCai_ReadTXT(appdis.pUI);
 			Sys.state |= SysState_ReadTXT;//回读所有文本内容
 		}
-		if(appdis.pUI->ctrl_id == 25&&status == DEF_Press)	{//关闭 			
-			Sys.state &= ~SysState_ReadTXT;
-			if(Sys.state & SysState_SetOK)	{
-				Sys.state &= ~SysState_SetOK;
-				iPara = temp_data.StageNum;
-				temp_data.stage[iPara].StepNum++;
-				temp_data.StageNum++;
+		if(appdis.pUI->ctrl_id == 25)	{//关闭 	
+			if(status == DEF_Press)	{
+				Sys.state &= ~SysState_ReadTXT;
+				if(Sys.state & SysState_SetOK)	{
+					Sys.state &= ~SysState_SetOK;
+					iPara = temp_data.StageNum;
+					temp_data.stage[iPara].StepNum++;
+					temp_data.StageNum++;
+				}
 			}
+			appdis.pUI->screen_id = Temp_UIID;
 		}
 		else if(appdis.pUI->ctrl_id == 1)	{
 			if(status == DEF_Release)	{
