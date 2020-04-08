@@ -79,11 +79,11 @@ typedef struct _DACAI	{
 }_DACAI_t;
 
 
-typedef struct _MultiTXT	{
+typedef struct _Multi_	{
 	u8 id;
 	u8 len;
 	char buf[32];	
-}_MultiTxtDat;
+}_MultiDat;
 
 //extern const u8 CMD_END[4];
 //extern const u8 CMD_SwitchUI[2];

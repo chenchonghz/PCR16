@@ -33,6 +33,7 @@ static void DisDatInit(void)
 //	LIFOBuffer_Init(&ScreenIDLIFO,(u8 *)appdis.pUI->screen_idlifo, 1 ,SCREEN_BUFSIZE);
 }
 u8 touchid;
+static void ButtonClickProcess(u8 button);
 static void ScreenDataProcess(_dacai_usart_t *pUsart);
 static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 {
@@ -54,25 +55,14 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				touchid = TempButtonClick(x,y);
-				if(touchid==5)	{
-					appdis.pUI->ctrl_id = 10;
-					if(temp_data.HeatCoverEnable == DEF_False)	{						
-						DaCai_IconCtrl(appdis.pUI,1);
-						temp_data.HeatCoverEnable = DEF_True;
-					}
-					else if(temp_data.HeatCoverEnable == DEF_True)	{
-						DaCai_IconCtrl(appdis.pUI,0);
-						temp_data.HeatCoverEnable = DEF_False;
-					}
-					DisplayTempProgramUI(0xff);
-				}
+				ButtonClickProcess(touchid);
 			}
 		case 0xb1:	{//画面相关指令
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0x01)	{//回读screen id
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				if(appdis.pUI->screen_id == Temp_UIID)	{//温度程序界面 刷新温度图形
-					DisplayTempProgramUI(0xff);//刷新温度界面
+					DisplayTempProgramUI(0,0);//刷新温度界面
 				}
 			}
 			else if(iPara==0x11)	{//按钮状态
@@ -94,6 +84,28 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 		}
 	}
 }
+
+static void ButtonClickProcess(u8 button)
+{
+	if(button>=0&&button<=5)	
+	{
+		if(touchid==5)	{
+			if(temp_data.HeatCoverEnable == DEF_False)	{									
+				temp_data.HeatCoverEnable = DEF_True;
+			}
+			else if(temp_data.HeatCoverEnable == DEF_True)	{
+				temp_data.HeatCoverEnable = DEF_False;
+			}
+			DisplayHeatCoverIcon();		
+		}
+		else 	{
+			TempButtonCheckOn(button);
+		}
+		OSTimeDly(10);
+		DisplayTempProgramUI(0,0);
+	}
+}
+
 u8 ctrl_type,subtype,status;
 s32 g_tempdata;
 //屏幕相关数据处理
@@ -114,7 +126,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DisplayLabUI();
 			}
 			else if(appdis.pUI->ctrl_id == 3||appdis.pUI->ctrl_id == 4)	{//DNA RNA
-				DisplaMenuUI();
+				DisplayMenuUI();
 			}
 			else if(appdis.pUI->ctrl_id == 5)	{//数据
 				appdis.pUI->screen_id = Data_UIID;
@@ -144,8 +156,9 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		}
 	}
 	else if(appdis.pUI->screen_id==Menu_UIID&&status == DEF_Release)	{//菜单界面
-		if(appdis.pUI->ctrl_id == 2)	{//进入温度程序			
-			DisplayTempProgramUI(0);	//刷新温度界面	
+		if(appdis.pUI->ctrl_id == 2)	{//进入温度程序		
+			ClearTempProgramIdx();		
+			DisplayTempProgramUI(0,1);	//刷新温度界面	清屏
 		}
 		else if(appdis.pUI->ctrl_id == 19)	{//启动实验
 			DisplayQiTingLab();
@@ -164,6 +177,13 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			else if(appdis.pUI->ctrl_id == 4)	{//加步
 //				UUIDBackup();
 				DisplayStepUI();
+			}
+			else if(appdis.pUI->ctrl_id == 33)	{//上一页
+				ClearTempProgramIdx();
+				DisplayTempProgramUI(0,1);
+			}
+			else if(appdis.pUI->ctrl_id == 34)	{//下一页
+				DisplayTempProgramUI(1,1);
 			}
 		}
 //		if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
@@ -298,7 +318,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		else if(appdis.pUI->ctrl_id == 44&&status == DEF_Release)	{//关闭 
 			DisplayEditUI();//显示上次编辑界面
 			if(appdis.pUI->screen_id==Temp_UIID&&appdis.pUI->ctrl_id == 9)	
-				DisplayTempProgramUI(0xff);//刷新温度界面
+				DisplayTempProgramUI(0,0);//刷新温度界面
 		}
 	}
 	else if(appdis.pUI->screen_id == Confirm_UIID&&status == DEF_Release)	{//确认界面

@@ -2,7 +2,7 @@
 #include "rw_spiflash.h"
 
 typedef struct 	{
-	_MultiTxtDat data[8];
+	_MultiDat data[8];
 }_MultiTXT_;
 _MultiTXT_ *pMultiTXT_t;
 
@@ -113,7 +113,7 @@ void DisplayLabUI(void)
 	}
 }
 
-void DisplaMenuUI(void)
+void DisplayMenuUI(void)
 {
 	appdis.pUI->screen_id = Menu_UIID;
 	DaCai_SwitchUI(appdis.pUI);
@@ -124,6 +124,12 @@ void DisplaMenuUI(void)
 	else	{
 		DaCai_ButtonCtrl(appdis.pUI, DEF_Release);
 	}
+}
+
+void DisplayHeatCoverIcon(void)
+{
+	appdis.pUI->ctrl_id = 8;
+	DaCai_IconCtrl(appdis.pUI,temp_data.HeatCoverEnable);
 }
 
 void DisplayQiTingLab(void)
@@ -198,27 +204,38 @@ void DisplayStageUI(void)
 #define TEMP_RECTANGLE_W	150
 #define TEMP_RECTANGLE_H	200
 #define TEMP_UI_MAXSTEP		5
-
-void ClearTempProgramUI(u8 start)
+#include "DaCai_TouchEvent.h"
+extern u8 TempButtonState[T_BUTTON_NUM-1];
+void ClearTempProgramUI(u8 clear_flag)
 {
 	u8 j;
 	u16 rec_x;
 	
-	if(start==0xff)
+	if(clear_flag==0)
 		return;
-	for(j=start;j<9;j++)	{
+	for(j=0;j<9;j++)	{
 		appdis.pUI->ctrl_id = 15+j;
 		DaCai_ClearTXT(appdis.pUI);
 		appdis.pUI->ctrl_id = 24+j;
 		DaCai_ClearTXT(appdis.pUI);
 	}
-	for(j=start;j<TEMP_UI_MAXSTEP;j++)	{//清文字 图片
-		rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*j;	
-		DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 58, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);	
+	for(j=0;j<TEMP_UI_MAXSTEP;j++)	{//清文字 图片
+//		rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*j;	
+//		DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 59, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);
+		TempButtonState[j] = 0;
+		appdis.pUI->ctrl_id = 10 + j;
+		DaCai_IconCtrl(appdis.pUI, TempButtonState[j]);
 	}
 }
+u8 DisStageIdx,DisStepIdx;
+void ClearTempProgramIdx(void)
+{
+	DisStageIdx = 0;
+	DisStepIdx = 0;
+}
+
 //温度程序 界面刷新
-void DisplayTempProgramUI(u8 clear_s)
+void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 {
 	u8 i,j,k,stepcnt;
 	u8 stage_id,repeat_id;
@@ -228,18 +245,16 @@ void DisplayTempProgramUI(u8 clear_s)
 	
 	appdis.pUI->screen_id = Temp_UIID;
 	DaCai_SwitchUI(appdis.pUI);
-	appdis.pUI->button_id = 10;
-//	DaCai_ButtonCtrl(appdis.pUI, temp_data.HeatCoverEnable);
-	DaCai_IconCtrl(appdis.pUI,temp_data.HeatCoverEnable);
+	DisplayHeatCoverIcon();	
 
-	ClearTempProgramUI(clear_s);
+	ClearTempProgramUI(clear_flag);
 	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
 	i=0;
 	pMultiTXT_t->data[i].id = 6;
 	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.HeatCoverTemp);
 
 	stage_id = 14;repeat_id = 23;
-	for(j=0;j<temp_data.StageNum;j++)	{//刷新文字
+	for(j=DisStageIdx;j<temp_data.StageNum;j++)	{//刷新文字
 		stage_id += temp_data.stage[j].StepNum;
 		pMultiTXT_t->data[++i].id = stage_id;
 		stage_id += temp_data.stage[j].StepNum;
@@ -255,32 +270,32 @@ void DisplayTempProgramUI(u8 clear_s)
 	tlsf_free(UserMem, pMultiTXT_t);
 	templast = 30;
 	stepcnt = 0;
-	for(j=0;j<temp_data.StageNum;j++)	{//刷新图形
-		for(k=0;k<temp_data.stage[j].StepNum;k++)	{	
+	for(j=DisStageIdx;j<temp_data.StageNum;j++)	{//刷新图形
+		for(k=DisStepIdx;k<temp_data.stage[j].StepNum;k++)	{	
 			if(stepcnt>=TEMP_UI_MAXSTEP)	{
-				return;
+				goto _exit;
 			}
 			temp = temp_data.stage[j].step[k].temp/10;
 			height = temp*(TEMP_RECTANGLE_H/100);
 			rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*stepcnt;			
-//			DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 58, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);			
+//			DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 59, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);			
 			
 			if(temp>templast)	{
 				rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
-				DaCai_DisplayCutPic(rec_x, rec_y, 57, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
 				xie_h = (temp - templast)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y, 56, 50-xie_w, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y, 57, 50-xie_w, 0, xie_w, xie_h);
 			}
 			else	if(temp<templast)	{
 				xie_h = (templast-temp)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y, 55, 0, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y, 56, 0, 0, xie_w, xie_h);
 				rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
-				DaCai_DisplayCutPic(rec_x, rec_y, 57, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
 			}
 			else	{
-				DaCai_DisplayCutPic(rec_x, rec_y, 57, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
 			}
 			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%d.%d℃", temp, temp_data.stage[j].step[k].temp%10);
 			DaCai_DisplayTXT(appdis.pUI, rec_x+60, rec_y-18, 6);
@@ -291,6 +306,11 @@ void DisplayTempProgramUI(u8 clear_s)
 			templast = temp;
 			stepcnt	++;
 		}
+	}
+_exit:
+	if(page_flag)	{
+		DisStageIdx = j;
+		DisStepIdx = k;
 	}
 }
 //画三角形 (x,y)是顶点坐标 w,h是三角形宽和高
@@ -314,4 +334,5 @@ void PaintTriangle(u16 x, u16 y, u16 w, u16 h)
 		DaCai_PaintLine(coo, 4);
 	}
 }
+
 

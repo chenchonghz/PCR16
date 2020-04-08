@@ -47,7 +47,8 @@ void DaCai_TimeModeSet(void);
 void DaCai_CtrlONOFF(_UI_t *pUI, u8 flag);
 void DaCai_SwitchSubUI(_UI_t *pUI);
 void DaCai_UpdateMultiButton(_UI_t *pUI,u8 *pButtonID, u8 *pVal, u8 num);
-void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiTxtDat *pMultiTXT, u8 num);
+void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiDat *pMultiTXT, u8 num);
+void DaCai_UpdateMultiIcon(_UI_t *pUI,_MultiDat *pMultiIcon, u8 num);
 void DaCai_ScreenSaveMode(u8 enable, u16 standy_t, u8 standy_brightness, u8 brightness);
 void DaCai_AdjustBrightness(u8 brightness);
 void DaCai_ClearScreenAuto(u8 enable);
@@ -65,4 +66,5 @@ void DaCai_PaintLine(_coordinate_t *pCoo, u8 size);
 void DaCai_PaintLineInBasicGraph(_UI_t *pUI, u16 color, _coordinate_t *pCoo, u8 size);
 u8  DaCai_ClearBasicGraph(_UI_t *pUI);
 void DaCai_IconCtrl(_UI_t *pUI, u8 icon);
+void DaCai_PaintHollowRectangle(u16 x, u16 y, u16 w, u16 h);
 #endif

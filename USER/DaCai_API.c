@@ -182,7 +182,7 @@ void DaCai_UpdateMultiButton(_UI_t *pUI,u8 *pButtonID, u8 *pVal, u8 num)
 }
 //u8 xxlen;
 //一次更新多个文本框
-void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiTxtDat *pMultiTXT, u8 num)
+void DaCai_UpdateMultiTXT(_UI_t *pUI,_MultiDat *pMultiTXT, u8 num)
 {
 	u8 len,i;	
 	//u8 *ptxbuf = dacai.puart->tx_buf;
@@ -340,6 +340,29 @@ void DaCai_IconCtrl(_UI_t *pUI, u8 icon)
 	DaCai_SendData(ptxbuf, len);
 }
 
+void DaCai_UpdateMultiIcon(_UI_t *pUI,_MultiDat *pMultiIcon, u8 num)
+{
+	u8 len,i;	
+	//u8 *ptxbuf = dacai.puart->tx_buf;
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0xB1;
+	ptxbuf[len++] = 0X12;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->screen_id;
+	for(i=0;i<num;i++)	{
+		ptxbuf[len++] = 0;
+		ptxbuf[len++] = pMultiIcon->id;
+		ptxbuf[len++] = 0;
+		ptxbuf[len++] = pMultiIcon->len;
+		memcpy(ptxbuf+len, pMultiIcon->buf, pMultiIcon->len);
+		len += pMultiIcon->len;
+		pMultiIcon ++;
+	}
+	//xxlen = len;
+	DaCai_SendData(ptxbuf, len);
+}
 //屏保模式
 void DaCai_ScreenSaveMode(u8 enable, u16 standy_t, u8 standy_brightness, u8 brightness)
 {
@@ -530,6 +553,27 @@ void DaCai_PaintLine(_coordinate_t *pCoo, u8 size)
 	}	
 	DaCai_SendData(ptxbuf, len);
 }
+//画空心矩 EE 54 00 01 00 01 00 64 00 C8 FF FC FF FF 
+void DaCai_PaintHollowRectangle(u16 x, u16 y, u16 w, u16 h)
+{
+	u16 len;	
+	
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0x54;
+	ptxbuf[len++] = x>>8;;
+	ptxbuf[len++] = x&0x0ff;
+	ptxbuf[len++] = y>>8;;
+	ptxbuf[len++] = y&0x0ff;
+		ptxbuf[len++] = w>>8;;
+	ptxbuf[len++] = w&0x0ff;
+		ptxbuf[len++] = h>>8;;
+	ptxbuf[len++] = h&0x0ff;
+
+	DaCai_SendData(ptxbuf, len);
+}
+
 //基本绘图控件头信息
 static u8  DaCai_BasicGraphHead(_UI_t *pUI)
 {
