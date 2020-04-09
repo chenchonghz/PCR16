@@ -32,7 +32,7 @@ static void DisDatInit(void)
 	appdis.pUI = &UI;
 //	LIFOBuffer_Init(&ScreenIDLIFO,(u8 *)appdis.pUI->screen_idlifo, 1 ,SCREEN_BUFSIZE);
 }
-//u8 touchid;
+u8 touchid;
 static void ButtonClickProcess(u8 button);
 static void ScreenDataProcess(_dacai_usart_t *pUsart);
 static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
@@ -54,8 +54,8 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 				u16 x,y;
 				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-				appdis.pUI->button_id = TempButtonClick(x,y);
-				ButtonClickProcess(appdis.pUI->button_id);
+				touchid = TempButtonClick(x,y);
+				ButtonClickProcess(touchid);
 			}
 		case 0xb1:	{//画面相关指令
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
@@ -87,7 +87,7 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 
 static void ButtonClickProcess(u8 button)
 {
-	if(button>=0&&button<=5)	
+	if(button>=0&&button<=5)	//单击
 	{
 		if(button==5)	{
 			if(temp_data.HeatCoverEnable == DEF_False)	{									
@@ -100,9 +100,13 @@ static void ButtonClickProcess(u8 button)
 		}
 		else 	{
 			TempButtonCheckOn(button);
+			appdis.pUI->button_id = button;			
 		}
 		OSTimeDly(10);
 		DisplayTempProgramUI(0,0);
+	}
+	else if(button>=0x80&&button<=0x84)	{//双击
+		
 	}
 }
 
@@ -144,10 +148,11 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DaCai_SwitchUI(appdis.pUI);
 			}
 			else if(appdis.pUI->ctrl_id == 7)	{//删除
-				DisplayUIIDAndBackup(Confirm_UIID);//备份当前界面 切换到下一个界面
-				appdis.pUI->ctrl_id = 4;
-				appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[0][0]);//显示 是否删除 
-				DaCai_UpdateTXT(appdis.pUI);
+//				DisplayUIIDAndBackup(Confirm_UIID);//备份当前界面 切换到下一个界面
+//				appdis.pUI->ctrl_id = 4;
+//				appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[0][0]);//显示 是否删除 
+//				DaCai_UpdateTXT(appdis.pUI);
+				DisplayWarningUI(&Code_Warning[0][0]);
 				Sys.state |= SysState_DeleteLabTB;
 			}
 			else if(appdis.pUI->ctrl_id == 19)	{//启动实验
@@ -171,12 +176,20 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DisplayKeyboardUI();//切换到全键盘界面					
 			}
 			else if(appdis.pUI->ctrl_id == 1)	{//加阶
-//				UUIDBackup();
 				DisplayStageUI();
 			}
+			else if(appdis.pUI->ctrl_id == 3)	{//删阶
+				DisplayWarningUI(&Code_Warning[0][0]);
+				Sys.state |= SysState_DelStageTB;
+//				DeleTempProgam(appdis.pUI->button_id, 0);
+			}
 			else if(appdis.pUI->ctrl_id == 4)	{//加步
-//				UUIDBackup();
 				DisplayStepUI();
+			}
+			else if(appdis.pUI->ctrl_id == 5)	{//删步
+				DisplayWarningUI(&Code_Warning[0][0]);
+				Sys.state |= SysState_DelStepTB;
+//				DeleTempProgam(appdis.pUI->button_id, 1);
 			}
 			else if(appdis.pUI->ctrl_id == 33)	{//上一页
 				ClearTempProgramIdx();
@@ -285,7 +298,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				if(Sys.state & SysState_SetOK)	{
 					Sys.state &= ~SysState_SetOK;
 					iPara = temp_data.StageNum;
-					temp_data.stage[iPara].StepNum++;
+					temp_data.stage[iPara].StepNum = 1;//加一步
 					temp_data.StageNum++;
 				}
 			}
@@ -329,12 +342,10 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 	}
 	else if(appdis.pUI->screen_id == Confirm_UIID&&status == DEF_Release)	{//确认界面
 		if(appdis.pUI->ctrl_id == 2)	{//取消键
-			Sys.state &= ~SysState_RunningTB;
-			Sys.state &= ~SysState_DeleteLabTB;
+			appdis.pUI->button_id = 0xff;
 		}
 		else	if(appdis.pUI->ctrl_id == 3)	{//确认键
 			if(Sys.state & SysState_RunningTB)	{//启动实验
-				Sys.state &= ~SysState_RunningTB;
 				//if(Sys.devstate == DevState_IDLE)	
 				{					
 					iPara = StartAPPTempCtrl();
@@ -345,16 +356,22 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					return;
 				}
 			}
-			if(Sys.state & SysState_StopTB)	{//启动实验
-				Sys.state &= ~SysState_StopTB;
+			else if(Sys.state & SysState_StopTB)	{//启动实验
 				StopAPPTempCtrl();
 			}
 			else if(Sys.state & SysState_DeleteLabTB)	{//删除实验记录
-				Sys.state &= ~SysState_DeleteLabTB;
+				
+			}
+			else if(Sys.state & SysState_DelStageTB)	{//删除阶段
+				DeleTempProgam(appdis.pUI->button_id, 0);
+				appdis.pUI->button_id = 0xff;
+			}
+			else if(Sys.state & SysState_DelStepTB)	{//删除步
+				DeleTempProgam(appdis.pUI->button_id, 1);
+				appdis.pUI->button_id = 0xff;
 			}
 		}
-		else 
-			return;
+		ClearAllSysStateTB();
 		DisplayBackupUIID();		
 	}
 	else if(appdis.pUI->screen_id == Message_UIID&&status == DEF_Release)	{//确认界面

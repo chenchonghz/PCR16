@@ -21,6 +21,8 @@
 #define SysState_SetOK					DEF_BIT03_MASK
 #define SysState_RunningTB				DEF_BIT04_MASK
 #define SysState_StopTB					DEF_BIT05_MASK
+#define SysState_DelStageTB					DEF_BIT06_MASK
+#define SysState_DelStepTB					DEF_BIT07_MASK
 
 //设备运行模式
 enum	{

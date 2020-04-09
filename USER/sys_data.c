@@ -90,3 +90,13 @@ void HeatCoverOnOff(u8 flag)
 //	if(n<0)	n = 0;
 //	temp_data.stage[m].step[n].CollEnable = flag;
 //}
+
+void ClearAllSysStateTB(void)
+{
+	Sys.state &= ~SysState_RunningTB;
+	Sys.state &= ~SysState_StopTB;
+	Sys.state &= ~SysState_DeleteLabTB;
+	Sys.state &= ~SysState_DelStageTB;
+	Sys.state &= ~SysState_DelStepTB;
+}
+

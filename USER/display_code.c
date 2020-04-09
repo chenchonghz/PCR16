@@ -86,6 +86,14 @@ void DisplayMessageUI(char *pbuf)
 	DaCai_UpdateTXT(appdis.pUI);
 }
 
+void DisplayWarningUI(char *pbuf)
+{	
+	DisplayUIIDAndBackup(Confirm_UIID);
+	appdis.pUI->ctrl_id  = 4;	
+	appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", pbuf);
+	DaCai_UpdateTXT(appdis.pUI);
+}
+
 void DisplayLogUI(void)
 {
 	u32 ret;
@@ -205,11 +213,10 @@ void DisplayStageUI(void)
 #define TEMP_RECTANGLE_H	200
 #define TEMP_UI_MAXSTEP		5
 #include "DaCai_TouchEvent.h"
-extern u8 TempButtonState[T_BUTTON_NUM-1];
-void ClearTempProgramUI(u8 clear_flag)
+
+static void ClearTempProgramUI(u8 clear_flag)
 {
 	u8 j;
-	u16 rec_x;
 	
 	if(clear_flag==0)
 		return;
@@ -227,7 +234,7 @@ void ClearTempProgramUI(u8 clear_flag)
 		DaCai_IconCtrl(appdis.pUI, TempButtonState[j]);
 	}
 }
- struct _dis_idx_t	{
+struct _dis_idx_t	{
 	u8 StageIdx;
 	u8 StepIdx;
  }CurIdx,LastIdx;
@@ -239,6 +246,80 @@ void ClearTempProgramIdx(void)
 	LastIdx.StageIdx = 0;
 	LastIdx.StepIdx = 0;
 	g_templast = 30;
+}
+//删除阶段
+static void DelStage(u8 del_id)
+{
+	s8 i,j;
+	
+	j = temp_data.StageNum-1;
+	if(j>=0)	{
+		for(i=del_id;i<j;i++)	{
+			memcpy(&temp_data.stage[i], &temp_data.stage[i+1], sizeof(_stage_t));
+		}
+		temp_data.StageNum = j;
+	}
+}
+//按照按钮id 查找当前是那个stage step
+static void CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid)
+{
+	s8 i,j;
+	u8 flag;
+	u8 Stageid,Stepid,stepcnt;
+	
+	Stageid = 0;
+	Stepid = 0;
+	flag = 0;
+	stepcnt = 0;
+	j = CurIdx.StepIdx;
+	for(i=CurIdx.StageIdx;i<temp_data.StageNum;i++)	{//根据按钮id 找到要删除的stage id和step id
+		for(;j<temp_data.stage[j].StepNum;j++)	{
+			if(button==stepcnt)	{
+				flag=1;
+				Stageid = i;
+				Stepid = j;
+				break;
+			}
+			stepcnt ++;
+			if(stepcnt>=TEMP_UI_MAXSTEP)	{
+				flag=1;
+				break;
+			}
+		}
+		if(flag)
+			break;
+		j=0;
+	}
+	*stageid = Stageid;
+	*stepid = Stepid;
+}
+//删除操作 type=0 删阶段，type=1 删除步
+void DeleTempProgam(u8 button, u8 type)
+{
+	s8 i,j,k;
+	u8 Stageid,Stepid;
+
+	CheckIdFromButton(button, &Stageid, &Stepid);
+//	flag = 0;
+	if(type==0)	{//删阶
+		DelStage(Stageid);
+	}
+	else if(type==1)	{//删步
+		i = Stageid;
+		j = temp_data.stage[i].StepNum-1;
+		if(j==0)	{//该阶段无步 直接删除该阶段
+			DelStage(Stageid);
+			temp_data.stage[i].StepNum = j;
+		}
+		else if(j>0)	{
+			for(k=Stepid;i<j;k++)	{
+				memcpy(&temp_data.stage[i].step[k], &temp_data.stage[i].step[k+1], sizeof(_step_t));
+			}
+			temp_data.stage[i].StepNum = j;
+		}
+	}
+	ClearTempProgramIdx();		
+	DisplayTempProgramUI(0,1);
 }
 
 //温度程序 界面刷新
@@ -268,7 +349,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	stage_id = 14;repeat_id = 23;
 	j = CurIdx.StageIdx;
 	flag = temp_data.stage[j].StepNum - CurIdx.StepIdx;
-	for(;temp_data.stage[j].StepNum>0;)	{
+	for(;temp_data.StageNum>0;)	{
 		stage_id += flag;
 		pMultiTXT_t->data[++i].id = stage_id;
 		stage_id += flag;
