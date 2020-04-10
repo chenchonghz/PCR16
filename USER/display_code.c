@@ -86,9 +86,12 @@ void DisplayMessageUI(char *pbuf)
 	DaCai_UpdateTXT(appdis.pUI);
 }
 
-void DisplayWarningUI(char *pbuf)
+void DisplayWarningUI(const char *pbuf)
 {	
-	DisplayUIIDAndBackup(Confirm_UIID);
+//	DisplayUIIDAndBackup(Confirm_UIID);
+	UUIDBackup();
+	appdis.pUI->sub_screen_id = Confirm_UIID;
+	DaCai_SwitchSubUI(appdis.pUI);
 	appdis.pUI->ctrl_id  = 4;	
 	appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", pbuf);
 	DaCai_UpdateTXT(appdis.pUI);
@@ -247,21 +250,9 @@ void ClearTempProgramIdx(void)
 	LastIdx.StepIdx = 0;
 	g_templast = 30;
 }
-//删除阶段
-static void DelStage(u8 del_id)
-{
-	s8 i,j;
-	
-	j = temp_data.StageNum-1;
-	if(j>=0)	{
-		for(i=del_id;i<j;i++)	{
-			memcpy(&temp_data.stage[i], &temp_data.stage[i+1], sizeof(_stage_t));
-		}
-		temp_data.StageNum = j;
-	}
-}
+
 //按照按钮id 查找当前是那个stage step
-static void CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid)
+static u8 CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid)
 {
 	s8 i,j;
 	u8 flag;
@@ -273,7 +264,7 @@ static void CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid)
 	stepcnt = 0;
 	j = CurIdx.StepIdx;
 	for(i=CurIdx.StageIdx;i<temp_data.StageNum;i++)	{//根据按钮id 找到要删除的stage id和step id
-		for(;j<temp_data.stage[j].StepNum;j++)	{
+		for(;j<temp_data.stage[i].StepNum;j++)	{
 			if(button==stepcnt)	{
 				flag=1;
 				Stageid = i;
@@ -282,16 +273,17 @@ static void CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid)
 			}
 			stepcnt ++;
 			if(stepcnt>=TEMP_UI_MAXSTEP)	{
-				flag=1;
-				break;
+				return 0;
 			}
 		}
-		if(flag)
-			break;
+		if(flag)	{
+			*stageid = Stageid;
+			*stepid = Stepid;
+			return 1;
+		}
 		j=0;
 	}
-	*stageid = Stageid;
-	*stepid = Stepid;
+	return 0;
 }
 //删除操作 type=0 删阶段，type=1 删除步
 void DeleTempProgam(u8 button, u8 type)
@@ -299,23 +291,25 @@ void DeleTempProgam(u8 button, u8 type)
 	s8 i,j,k;
 	u8 Stageid,Stepid;
 
-	CheckIdFromButton(button, &Stageid, &Stepid);
-//	flag = 0;
-	if(type==0)	{//删阶
-		DelStage(Stageid);
-	}
-	else if(type==1)	{//删步
-		i = Stageid;
-		j = temp_data.stage[i].StepNum-1;
-		if(j==0)	{//该阶段无步 直接删除该阶段
+	if(CheckIdFromButton(button, &Stageid, &Stepid)==1)
+	{
+		if(type==0)	{//删阶
 			DelStage(Stageid);
-			temp_data.stage[i].StepNum = j;
 		}
-		else if(j>0)	{
-			for(k=Stepid;i<j;k++)	{
-				memcpy(&temp_data.stage[i].step[k], &temp_data.stage[i].step[k+1], sizeof(_step_t));
+		else if(type==1)	{//删步
+			i = Stageid;
+			j = temp_data.stage[i].StepNum-1;
+			if(j==0)	{//该阶段无步 直接删除该阶段
+				DelStage(Stageid);
+				temp_data.stage[i].StepNum = j;				
 			}
-			temp_data.stage[i].StepNum = j;
+			else if(j>0)	{
+				for(k=Stepid;k<j;k++)	{
+					memcpy(&temp_data.stage[i].step[k], &temp_data.stage[i].step[k+1], sizeof(_step_t));
+				}
+				temp_data.stage[i].StepNum = j;
+				ResetStep(i,k);
+			}
 		}
 	}
 	ClearTempProgramIdx();		

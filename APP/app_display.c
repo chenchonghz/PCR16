@@ -99,14 +99,13 @@ static void ButtonClickProcess(u8 button)
 			DisplayHeatCoverIcon();		
 		}
 		else 	{
-			TempButtonCheckOn(button);
-			appdis.pUI->button_id = button;			
+			TempButtonCheckOn(button);		
 		}
 		OSTimeDly(10);
 		DisplayTempProgramUI(0,0);
 	}
 	else if(button>=0x80&&button<=0x84)	{//Ë«»÷
-		
+		TempButtonPressID = button&0x7f;
 	}
 }
 
@@ -179,17 +178,19 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DisplayStageUI();
 			}
 			else if(appdis.pUI->ctrl_id == 3)	{//É¾½×
-				DisplayWarningUI(&Code_Warning[0][0]);
-				Sys.state |= SysState_DelStageTB;
-//				DeleTempProgam(appdis.pUI->button_id, 0);
+//				DisplayWarningUI(&Code_Warning[0][0]);
+//				Sys.state |= SysState_DelStageTB;
+				DeleTempProgam(TempButtonPressID, 0);
+				TempButtonPressID = 0xff;
 			}
 			else if(appdis.pUI->ctrl_id == 4)	{//¼Ó²½
 				DisplayStepUI();
 			}
 			else if(appdis.pUI->ctrl_id == 5)	{//É¾²½
-				DisplayWarningUI(&Code_Warning[0][0]);
-				Sys.state |= SysState_DelStepTB;
-//				DeleTempProgam(appdis.pUI->button_id, 1);
+//				DisplayWarningUI(&Code_Warning[0][0]);
+//				Sys.state |= SysState_DelStepTB;
+				DeleTempProgam(TempButtonPressID, 1);
+				TempButtonPressID = 0xff;
 			}
 			else if(appdis.pUI->ctrl_id == 33)	{//ÉÏÒ»Ò³
 				ClearTempProgramIdx();
@@ -362,14 +363,14 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			else if(Sys.state & SysState_DeleteLabTB)	{//É¾³ýÊµÑé¼ÇÂ¼
 				
 			}
-			else if(Sys.state & SysState_DelStageTB)	{//É¾³ý½×¶Î
-				DeleTempProgam(appdis.pUI->button_id, 0);
-				appdis.pUI->button_id = 0xff;
-			}
-			else if(Sys.state & SysState_DelStepTB)	{//É¾³ý²½
-				DeleTempProgam(appdis.pUI->button_id, 1);
-				appdis.pUI->button_id = 0xff;
-			}
+//			else if(Sys.state & SysState_DelStageTB)	{//É¾³ý½×¶Î
+//				DeleTempProgam(TempButtonPressID, 0);
+//				TempButtonPressID = 0xff;
+//			}
+//			else if(Sys.state & SysState_DelStepTB)	{//É¾³ý²½
+//				DeleTempProgam(TempButtonPressID, 1);
+//				TempButtonPressID = 0xff;
+//			}
 		}
 		ClearAllSysStateTB();
 		DisplayBackupUIID();		

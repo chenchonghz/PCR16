@@ -120,5 +120,7 @@ void CollDataOnOff_InStep(u8 flag);
 void ResetSampleDataDefault(void);
 void ResetLabDataDefault(void);
 void ResetTempDataDefault(void);
-
+void ResetStage(u8 id);
+void DelStage(u8 del_id);
+void ResetStep(u8 stageid, u8 stepid);
 #endif

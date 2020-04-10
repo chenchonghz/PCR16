@@ -12,6 +12,7 @@ void UUIDBackup(void);
 void DisplayUIIDAndBackup(u8 id);
 void DisplayBackupUIID(void);
 void DisplayMessageUI(char *pbuf);
+void DisplayWarningUI(const char *pbuf);
 void DisplayEditUI(void);
 void DisplayKeyboardUI(void);
 void DisplayStepUI(void);

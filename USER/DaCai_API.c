@@ -17,6 +17,7 @@ void DaCaiAPI_Init(void)
 {
 	ptxbuf = dacai.puart_t->tx_buf;
 	UI.screen_id = Invalid_UIID;
+	UI.button_id = 0XFF;
 	UI.ctrl_id = 0;
 	UI.datlen=0;
 	UI.pdata = (char *)tlsf_malloc(UserMem,DACAITXTBUF_SIZE);//用于向串口屏发送大数据缓存

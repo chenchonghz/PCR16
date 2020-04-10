@@ -85,7 +85,8 @@ u8 TempButtonClick(u16 touch_x, u16 touch_y)
 }
 
 u8 TempButtonState[T_BUTTON_NUM-1]={0};
-u8 TempButtonCheckOn(u8 id)
+u8 TempButtonPressID=0xff;
+void TempButtonCheckOn(u8 id)
 {
 	u8 i;
 	_MultiDat icon[T_BUTTON_NUM-1];
@@ -103,4 +104,6 @@ u8 TempButtonCheckOn(u8 id)
 		icon[i].buf[1] = TempButtonState[i];
 	}
 	DaCai_UpdateMultiIcon(appdis.pUI, icon, i);
+	TempButtonPressID = id;
 }
+
