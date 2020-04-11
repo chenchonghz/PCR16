@@ -509,6 +509,18 @@ void DaCai_DisplayTXT(_UI_t *pUI, u16 x, u16 y, u8 font)
 	len += pUI->datlen;
 	DaCai_SendData(ptxbuf, len);
 }
+//EE B3 00 FF FC FF FF 
+void DaCai_DisplayUpdateOnOff(u8 flag)
+{
+	u16 len;	
+
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0xb3;
+	ptxbuf[len++] = flag;
+	DaCai_SendData(ptxbuf, len);	
+}
 //在指定坐标显示剪切的图片 EE 【33 X Y Image_ID Image_X Image_Y Image_W Image_H MaskEn】FF FC FF FF
 void  DaCai_DisplayCutPic(u16 x, u16 y, u8 Image_ID, u16 Image_X, u16 Image_Y, u16 Image_W, u16 Image_H)
 {

@@ -333,7 +333,10 @@ void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */
 OSIntEnter();
-	SoftTimerCallback();
+	if(__HAL_TIM_GET_FLAG(&htim7, TIM_IT_UPDATE)==SET)	{
+		__HAL_TIM_CLEAR_FLAG(&htim7, TIM_IT_UPDATE); 
+		SoftTimerCallback();
+	}
   /* USER CODE END TIM7_IRQn 0 */
   /* USER CODE BEGIN TIM7_IRQn 1 */
 OSIntExit();

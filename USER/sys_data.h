@@ -18,11 +18,12 @@
 #define SysState_Standby					DEF_BIT00_MASK
 #define SysState_DeleteLabTB			DEF_BIT01_MASK
 #define SysState_ReadTXT				DEF_BIT02_MASK
-#define SysState_SetOK					DEF_BIT03_MASK
+#define SysState_ReadTXTOK					DEF_BIT03_MASK
 #define SysState_RunningTB				DEF_BIT04_MASK
 #define SysState_StopTB					DEF_BIT05_MASK
 #define SysState_DelStageTB					DEF_BIT06_MASK
 #define SysState_DelStepTB					DEF_BIT07_MASK
+#define SysState_AddStep					DEF_BIT08_MASK
 
 //设备运行模式
 enum	{

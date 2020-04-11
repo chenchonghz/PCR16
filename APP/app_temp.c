@@ -105,7 +105,7 @@ void StopAPPTempCtrl(void)
 {
 	Sys.devstate = DevState_IDLE;
 }
-
+u8 hengwenflag;
 //恒温时间达到 调用该函数
 void ConstantTempReadCallback(void)
 {
@@ -113,7 +113,8 @@ void ConstantTempReadCallback(void)
 	
 	m = temp_data.CurStage;
 	temp_data.stage[m].CurStep++;
-	if(temp_data.stage[m].CurStep>=temp_data.stage[m].StepNum)	{//达到当前阶段的最后一步 
+	if(temp_data.stage[m].CurStep>=temp_data.stage[m].StepNum)	{//达到当前阶段的最后一步
+		temp_data.stage[m].CurRepeat ++;
 		if(temp_data.stage[m].CurRepeat>=temp_data.stage[m].RepeatNum)	{//达到当前阶段的最后一个循环 进入下阶段
 			temp_data.CurStage++;
 			if(temp_data.CurStage>=temp_data.StageNum)	{//达到最后一个阶段 停止控温
@@ -122,8 +123,7 @@ void ConstantTempReadCallback(void)
 				m = temp_data.CurStage;
 				temp_data.stage[m].CurStep=0;
 			}
-		}else	{//未达到当前阶段的最后一个循环 继续该阶段
-			temp_data.stage[m].CurRepeat ++;
+		}else	{//未达到当前阶段的最后一个循环 继续该阶段			
 			temp_data.stage[m].CurStep = 0;
 		}
 	}
@@ -137,14 +137,16 @@ void TempProgramLookOver(s16 c_temp)
 	
 	m = temp_data.CurStage;
 	n = temp_data.stage[m].CurStep;
-	target = temp_data.stage[m].step[n].temp;
+	target = temp_data.stage[m].step[n].temp*10;
 	if(abs(c_temp-target)>100)	{//温度差大于1度 当前处于升降温阶段
 //		ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
 		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, target);
+		hengwenflag = 0;
 	}
 	else {//到达目标温度 当前处于恒温阶段 设置恒温时间
-		SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim*10);//100ms 为单位
-		SoftTimer1.pCallBack = &ConstantTempReadCallback;
+		if(SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim*10)==1)//100ms 为单位
+			SoftTimer1.pCallBack = &ConstantTempReadCallback;
+		hengwenflag = target;
 	}
 }
 
@@ -159,7 +161,7 @@ static void AppTempTask (void *parg)
 	StopTempCtrl(&TempPid[HOLE_TEMP]);
 	OSTimeDly(1000);
 //	COOLFAN_ON();
-//	SetPIDVal(PID_ID1, 1, 0, 0);
+	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
 	for(;;)
     {
 		if(Sys.devstate == DevState_Running)	

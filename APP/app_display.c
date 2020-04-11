@@ -84,7 +84,7 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 		}
 	}
 }
-
+s8 modify_stageid,modify_stepid;
 static void ButtonClickProcess(u8 button)
 {
 	if(button>=0&&button<=5)	//单击
@@ -106,15 +106,17 @@ static void ButtonClickProcess(u8 button)
 	}
 	else if(button>=0x80&&button<=0x84)	{//双击
 		TempButtonPressID = button&0x7f;
+		CheckIdFromButton(TempButtonPressID, &modify_stageid,&modify_stepid);
+		DisplayStepUI(modify_stageid, modify_stepid);
+		Sys.state &= ~SysState_AddStep;
 	}
 }
-
-u8 ctrl_type,subtype,status;
-s32 g_tempdata;
+//u8 ctrl_type,subtype,status;
+//s32 g_tempdata;
 //屏幕相关数据处理
 static void ScreenDataProcess(_dacai_usart_t *pUsart)
 {
-//	u8 ctrl_type,subtype,status;
+	u8 ctrl_type,subtype,status;
 	s32 temp;
 	u8 iPara;
 	
@@ -147,10 +149,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DaCai_SwitchUI(appdis.pUI);
 			}
 			else if(appdis.pUI->ctrl_id == 7)	{//删除
-//				DisplayUIIDAndBackup(Confirm_UIID);//备份当前界面 切换到下一个界面
-//				appdis.pUI->ctrl_id = 4;
-//				appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[0][0]);//显示 是否删除 
-//				DaCai_UpdateTXT(appdis.pUI);
 				DisplayWarningUI(&Code_Warning[0][0]);
 				Sys.state |= SysState_DeleteLabTB;
 			}
@@ -163,32 +161,41 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		if(appdis.pUI->ctrl_id == 2)	{//进入温度程序		
 			ClearTempProgramIdx();		
 			DisplayTempProgramUI(0,1);	//刷新温度界面	清屏
+//			if(Sys.devstate != DevState_Running)	{
+//				ResetTempDataDefault();
+//			}
 		}
 		else if(appdis.pUI->ctrl_id == 19)	{//启动实验
 			DisplayQiTingLab();
 		}
 	}
 	else if(appdis.pUI->screen_id==Temp_UIID)	{//温度程序	
-		if(status == DEF_Release)	{		
+		if(status == DEF_Release)	{
 			if(appdis.pUI->ctrl_id == 9)	{//编辑热盖温度
 				SaveUIEditInfor();//保存编辑信息
 				DisplayKeyboardUI();//切换到全键盘界面					
 			}
-			else if(appdis.pUI->ctrl_id == 1)	{//加阶
+			else if(appdis.pUI->ctrl_id == 1)	{//加阶				
 				DisplayStageUI();
+				Sys.state &= ~SysState_ReadTXT;
 			}
 			else if(appdis.pUI->ctrl_id == 3)	{//删阶
-//				DisplayWarningUI(&Code_Warning[0][0]);
-//				Sys.state |= SysState_DelStageTB;
 				DeleTempProgam(TempButtonPressID, 0);
 				TempButtonPressID = 0xff;
 			}
 			else if(appdis.pUI->ctrl_id == 4)	{//加步
-				DisplayStepUI();
+				s8 m,n;
+				m = temp_data.StageNum-1;
+				if(m<0)	m=0;
+				n = temp_data.stage[m].StepNum-1;
+				if(n<0)	n=0;
+				DisplayStepUI(m, n);
+				modify_stageid = temp_data.StageNum;
+				modify_stepid = temp_data.stage[m].StepNum;				
+				Sys.state |= SysState_AddStep;
+				Sys.state &= ~SysState_ReadTXT;
 			}
 			else if(appdis.pUI->ctrl_id == 5)	{//删步
-//				DisplayWarningUI(&Code_Warning[0][0]);
-//				Sys.state |= SysState_DelStepTB;
 				DeleTempProgam(TempButtonPressID, 1);
 				TempButtonPressID = 0xff;
 			}
@@ -230,7 +237,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					temp_data.stage[temp_data.StageNum].StepNum = temp;
 					Sys.state &= ~SysState_ReadTXT;
 					DisplayMessageUI((char *)&Code_Message[4][0]);	
-					Sys.state |= SysState_SetOK;				
+					Sys.state |= SysState_ReadTXTOK;				
 				}
 			}
 		}
@@ -238,12 +245,13 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			appdis.pUI->ctrl_id = 4;
 			DaCai_ReadTXT(appdis.pUI);
 			Sys.state |= SysState_ReadTXT;
+			Sys.state &= ~SysState_ReadTXTOK;
 		}
 		else if(appdis.pUI->ctrl_id == 25)	{//关闭 
 			if(status == DEF_Press)	{
 				Sys.state &= ~SysState_ReadTXT;
-				if(Sys.state & SysState_SetOK)	{
-					Sys.state &= ~SysState_SetOK;
+				if(Sys.state & SysState_ReadTXTOK)	{
+					Sys.state &= ~SysState_ReadTXTOK;
 					temp_data.StageNum++;
 				}
 			}
@@ -253,13 +261,13 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 	else if(appdis.pUI->screen_id==Step_UIID)	{//步设置
 		if(Sys.state&SysState_ReadTXT)	{
 			strcpy(appdis.pUI->pdata, (const char *)(pUsart->rx_buf+pUsart->rx_idx));
-			g_tempdata = temp = (int)(atof(appdis.pUI->pdata)*10);	
+			temp = (int)(atof(appdis.pUI->pdata)*10);
 			if(appdis.pUI->ctrl_id == 8)	{//温度值设置
 				if(temp > HOLE_TEMP_MAX||temp < HOLE_TEMP_MIN)
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
-					iPara = temp_data.StageNum;
-					temp_data.stage[iPara].step[temp_data.stage[iPara].StepNum].temp = temp;
+//					iPara = temp_data.StageNum;
+					temp_data.stage[modify_stageid].step[modify_stepid].temp = temp;
 					appdis.pUI->ctrl_id = 9;
 					DaCai_ReadTXT(appdis.pUI);
 				}
@@ -269,8 +277,8 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				if(temp > 10||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
-					iPara = temp_data.StageNum;
-					temp_data.stage[iPara].step[temp_data.stage[iPara].StepNum].tim = temp*60;
+//					iPara = temp_data.StageNum;
+					temp_data.stage[modify_stageid].step[modify_stepid].tim = temp*60;
 					appdis.pUI->ctrl_id = 10;
 					DaCai_ReadTXT(appdis.pUI);
 				}
@@ -280,11 +288,11 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				if(temp > 60||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
-					iPara = temp_data.StageNum;
-					temp_data.stage[iPara].step[temp_data.stage[iPara].StepNum].tim += temp;
+//					iPara = temp_data.StageNum;
+					temp_data.stage[modify_stageid].step[modify_stepid].tim += temp;
 					Sys.state &= ~SysState_ReadTXT;
 					DisplayMessageUI((char *)&Code_Message[4][0]);					
-					Sys.state |= SysState_SetOK;
+					Sys.state |= SysState_ReadTXTOK;
 				}
 			}
 		}
@@ -292,27 +300,31 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			appdis.pUI->ctrl_id = 8;
 			DaCai_ReadTXT(appdis.pUI);
 			Sys.state |= SysState_ReadTXT;//回读所有文本内容
+			Sys.state &= ~SysState_ReadTXTOK;
 		}
 		if(appdis.pUI->ctrl_id == 25)	{//关闭 	
 			if(status == DEF_Press)	{
 				Sys.state &= ~SysState_ReadTXT;
-				if(Sys.state & SysState_SetOK)	{
-					Sys.state &= ~SysState_SetOK;
-					iPara = temp_data.StageNum;
-					temp_data.stage[iPara].StepNum = 1;//加一步
-					temp_data.StageNum++;
+				if(Sys.state & SysState_ReadTXTOK)	{
+					Sys.state &= ~SysState_ReadTXTOK;
+					if(Sys.state & SysState_AddStep)	{
+						iPara = temp_data.StageNum;
+						temp_data.stage[iPara].StepNum = 1;//加一步
+						temp_data.StageNum++;
+						Sys.state &= ~SysState_AddStep;
+					}
 				}
 			}
 			appdis.pUI->screen_id = Temp_UIID;
 		}
 		else if(appdis.pUI->ctrl_id == 1)	{
 			if(status == DEF_Release)	{
-				iPara = temp_data.StageNum;
-				temp_data.stage[iPara].step[temp_data.stage[iPara].StepNum].CollEnable = DEF_False;
+//				iPara = temp_data.StageNum;
+				temp_data.stage[modify_stageid].step[modify_stepid].CollEnable = DEF_False;
 			}
 			else if(status == DEF_Press)	{
-				iPara = temp_data.StageNum;
-				temp_data.stage[iPara].step[temp_data.stage[iPara].StepNum].CollEnable = DEF_True;
+//				iPara = temp_data.StageNum;
+				temp_data.stage[modify_stageid].step[modify_stepid].CollEnable = DEF_True;
 			}
 		}		
 	}

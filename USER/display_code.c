@@ -159,7 +159,7 @@ void DisplayQiTingLab(void)
 	DaCai_UpdateTXT(appdis.pUI);
 }
 
-void DisplayStepUI(void)
+void DisplayStepUI(s8 stageid, s8 stepid)
 {
 	s8 m,n,i;
 
@@ -168,10 +168,12 @@ void DisplayStepUI(void)
 	DaCai_SwitchUI(appdis.pUI);
 //	if(temp_data.StageNum>0)
 	{
-		m = temp_data.StageNum-1;
-		if(m<0)	m = 0;
-		n = temp_data.stage[m].StepNum-1;
-		if(n<0) n = 0;
+//		m = stageid-1;
+//		if(m<0)	m = 0;
+//		n = stageid-1;
+//		if(n<0) n = 0;
+		m = stageid;
+		n = stepid;
 		i=0;
 	//	pMultiTXT_t->data[i].id = 26;
 	//	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "Step", temp_data.stage[m].StepNum);
@@ -252,7 +254,7 @@ void ClearTempProgramIdx(void)
 }
 
 //按照按钮id 查找当前是那个stage step
-static u8 CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid)
+u8 CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid)
 {
 	s8 i,j;
 	u8 flag;
@@ -321,13 +323,15 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 {
 	u8 i,j,k,stepcnt;
 	u8 stage_id,repeat_id;
-	u16 rec_x,rec_y,height;
+	u16 rec_x,rec_y,height,rec_y_last;
 	u16 xie_w,xie_h;
 	u16 temp,templast;
 	u8 flag;
 	
 	appdis.pUI->screen_id = Temp_UIID;
 	DaCai_SwitchUI(appdis.pUI);
+	
+//	DaCai_DisplayUpdateOnOff(DEF_Disable);
 	DisplayHeatCoverIcon();	
 
 	ClearTempProgramUI(clear_flag);
@@ -391,11 +395,11 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 			}
 			else	if(temp<templast)	{
 				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
-				height = templast*(TEMP_RECTANGLE_H/100);
-				rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
+//				height = templast*(TEMP_RECTANGLE_H/100);
+				rec_y_last = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H - templast*(TEMP_RECTANGLE_H/100);
 				xie_h = (templast-temp)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y, 56, 0, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y_last, 56, 0, 0, xie_w, xie_h);
 			}
 			else	{
 				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
@@ -411,6 +415,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 		}
 		k=0;
 	}
+//	DaCai_DisplayUpdateOnOff(DEF_Enable);
 	if(flag)	{
 		g_templast = temp;
 		LastIdx.StageIdx = j;
