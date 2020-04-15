@@ -52,34 +52,23 @@ const struct touch_area_t	touch_area[T_BUTTON_NUM]	=	{
 u32 LaseClickTim[T_BUTTON_NUM]={0};
 u8 TempButtonClick(u16 touch_x, u16 touch_y)
 {
-//	static u8 touchcnt[T_BUTTON_NUM];
 	u8 i;
 	s32 time_diff;
 	
 	for(i=0;i<T_BUTTON_NUM;i++)	{
 		if(touch_x>touch_area[i].x1 && touch_x<touch_area[i].x2 && touch_y>touch_area[i].y1 && touch_y<touch_area[i].y2)	{
-//			touchcnt[i] ++;
-//			if(touchcnt[i]>=2)	
-//			{
-//				touchcnt[i] = 0;
-				time_diff = OSTimeGet() - LaseClickTim[i];
-				if(time_diff<0)	{
-					time_diff += 0xffffffff;
-				}
-				if(time_diff<=200)
-					return 0xff;
-				else if(time_diff<1000&&time_diff>200)	{//双击间隔要求小于1s
-					i |= 0x80;//双击
-				}
-//				else	{
-//					i |= 0x80;//双击
-//				}
-				LaseClickTim[i] = OSTimeGet();
-				return i;//单击
-//			}	
-		}
-//		else
-//			touchcnt[i] = 0;		
+			time_diff = OSTimeGet() - LaseClickTim[i];
+			if(time_diff<0)	{
+				time_diff += 0xffffffff;
+			}
+			if(time_diff<=300)
+				return 0xff;
+//			else if(time_diff<1000&&time_diff>200)	{//双击间隔要求小于1s
+//				i |= 0x80;//双击
+//			}
+			LaseClickTim[i] = OSTimeGet();
+			return i;//单击
+		}	
 	}
 	return 0xff;
 }

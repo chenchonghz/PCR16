@@ -22,6 +22,13 @@ const char Code_Message[][12] = {
 	{"参数错误!"},
 };
 
+const char Code_Choose[][5] = {	
+	{"取消"},
+	{"确认"},
+	{"删除"},
+	{"编辑"},
+};
+
 void SaveUIEditInfor(void)
 {
 	appdis.pUI->editinfo.screen_id = appdis.pUI->screen_id;
@@ -58,6 +65,9 @@ void DisplayBackupUIID(void)
 			DaCai_ButtonCtrl(appdis.pUI, DEF_Release);
 		}
 	}
+	else if(appdis.pUI->screen_id==Temp_UIID)	{
+		DisplayTempProgramUI(0,0);
+	}
 }
 
 void DisplayEditUI(void)
@@ -86,15 +96,25 @@ void DisplayMessageUI(char *pbuf)
 	DaCai_UpdateTXT(appdis.pUI);
 }
 
-void DisplayWarningUI(const char *pbuf)
+void DisplayWarningUI(char *pbuf, char *buf1, char *buf2)
 {	
-//	DisplayUIIDAndBackup(Confirm_UIID);
-	UUIDBackup();
-	appdis.pUI->sub_screen_id = Confirm_UIID;
-	DaCai_SwitchSubUI(appdis.pUI);
+	DisplayUIIDAndBackup(Confirm_UIID);
+//	UUIDBackup();
+//	appdis.pUI->screen_id = Confirm_UIID;
+//	DaCai_SwitchUI(appdis.pUI);
 	appdis.pUI->ctrl_id  = 4;	
 	appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", pbuf);
 	DaCai_UpdateTXT(appdis.pUI);
+//	if(buf1!=NULL)	{	
+		appdis.pUI->ctrl_id  = 1;	
+		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", buf1);
+		DaCai_UpdateTXT(appdis.pUI);
+//	}
+//	if(buf2!=NULL)	{
+		appdis.pUI->ctrl_id  = 5;	
+		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", buf2);
+		DaCai_UpdateTXT(appdis.pUI);
+//	}
 }
 
 void DisplayLogUI(void)
@@ -145,18 +165,17 @@ void DisplayHeatCoverIcon(void)
 
 void DisplayQiTingLab(void)
 {	
-	DisplayUIIDAndBackup(Confirm_UIID);//备份当前界面 切换到下一个界面
-	appdis.pUI->ctrl_id = 4;
+//	DisplayUIIDAndBackup(Confirm_UIID);//备份当前界面 切换到下一个界面
 	if(Sys.devstate == DevState_Running)	{
-//		DisplayMessageUI((char *)&Code_Message[5][0]);
-		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[2][0]);//显示 是否停止
+		DisplayWarningUI((char *)&Code_Warning[2][0], (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
+//		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[2][0]);//显示 是否停止
 		Sys.state |= SysState_StopTB;
 	}
 	else if(Sys.devstate == DevState_IDLE)		{		
-		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[1][0]);//显示 是否启动		
+//		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[1][0]);//显示 是否启动
+		DisplayWarningUI((char *)&Code_Warning[1][0], (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);		
 		Sys.state |= SysState_RunningTB;
 	}
-	DaCai_UpdateTXT(appdis.pUI);
 }
 
 void DisplayStepUI(s8 stageid, s8 stepid)
@@ -231,13 +250,13 @@ static void ClearTempProgramUI(u8 clear_flag)
 		appdis.pUI->ctrl_id = 24+j;
 		DaCai_ClearTXT(appdis.pUI);
 	}
-	for(j=0;j<TEMP_UI_MAXSTEP;j++)	{//清文字 图片
+//	for(j=0;j<TEMP_UI_MAXSTEP;j++)	{//清文字 图片
 //		rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*j;	
 //		DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 59, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);
-		TempButtonState[j] = 0;
-		appdis.pUI->ctrl_id = 10 + j;
-		DaCai_IconCtrl(appdis.pUI, TempButtonState[j]);
-	}
+//		TempButtonState[j] = 0;
+//		appdis.pUI->ctrl_id = 10 + j;
+//		DaCai_IconCtrl(appdis.pUI, TempButtonState[j]);
+//	}
 }
 struct _dis_idx_t	{
 	u8 StageIdx;
@@ -388,22 +407,23 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 			height = temp*(TEMP_RECTANGLE_H/100);
 			rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
 			if(temp>templast)	{		
-				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 60, 0, 0, TEMP_RECTANGLE_W, height);
 				xie_h = (temp - templast)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y, 57, 50-xie_w, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y, 59, 50-xie_w, 0, xie_w, xie_h);
 			}
 			else	if(temp<templast)	{
-				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 60, 0, 0, TEMP_RECTANGLE_W, height);
 //				height = templast*(TEMP_RECTANGLE_H/100);
 				rec_y_last = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H - templast*(TEMP_RECTANGLE_H/100);
 				xie_h = (templast-temp)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y_last, 56, 0, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y_last, 58, 0, 0, xie_w, xie_h);
 			}
 			else	{
-				DaCai_DisplayCutPic(rec_x, rec_y, 58, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 60, 0, 0, TEMP_RECTANGLE_W, height);
 			}
+			DaCai_SetFontColor(65504);
 			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%d.%d℃", temp, temp_data.stage[j].step[k].temp%10);
 			DaCai_DisplayTXT(appdis.pUI, rec_x+60, rec_y-18, 6);
 			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%d:%d", temp_data.stage[j].step[k].tim/60, temp_data.stage[j].step[k].tim%60);

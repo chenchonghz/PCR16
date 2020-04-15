@@ -122,7 +122,7 @@ void ClearAllSysStateTB(void)
 	Sys.state &= ~SysState_RunningTB;
 	Sys.state &= ~SysState_StopTB;
 	Sys.state &= ~SysState_DeleteLabTB;
-	Sys.state &= ~SysState_DelStageTB;
-	Sys.state &= ~SysState_DelStepTB;
+	Sys.state &= ~SysState_StageTB;
+	Sys.state &= ~SysState_StepTB;
 }
 

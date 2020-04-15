@@ -509,6 +509,20 @@ void DaCai_DisplayTXT(_UI_t *pUI, u16 x, u16 y, u8 font)
 	len += pUI->datlen;
 	DaCai_SendData(ptxbuf, len);
 }
+//ÉèÖÃÇ°¾°É« EE 41 FF E0 FF FC FF FF 
+void DaCai_SetFontColor(u16 color)
+{
+	u16 len;	
+
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0x41;
+	ptxbuf[len++] = color>>8;;
+	ptxbuf[len++] = color&0xff;
+	DaCai_SendData(ptxbuf, len);
+}
+
 //EE B3 00 FF FC FF FF 
 void DaCai_DisplayUpdateOnOff(u8 flag)
 {

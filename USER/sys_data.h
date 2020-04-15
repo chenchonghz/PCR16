@@ -21,8 +21,8 @@
 #define SysState_ReadTXTOK					DEF_BIT03_MASK
 #define SysState_RunningTB				DEF_BIT04_MASK
 #define SysState_StopTB					DEF_BIT05_MASK
-#define SysState_DelStageTB					DEF_BIT06_MASK
-#define SysState_DelStepTB					DEF_BIT07_MASK
+#define SysState_StageTB					DEF_BIT06_MASK
+#define SysState_StepTB					DEF_BIT07_MASK
 #define SysState_AddStep					DEF_BIT08_MASK
 
 //设备运行模式
@@ -124,4 +124,5 @@ void ResetTempDataDefault(void);
 void ResetStage(u8 id);
 void DelStage(u8 del_id);
 void ResetStep(u8 stageid, u8 stepid);
+void ClearAllSysStateTB(void);
 #endif

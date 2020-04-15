@@ -50,13 +50,17 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			appdis.pUI->screen_id = Invalid_UIID;
 			break;
 		case 0x01:
-			if(appdis.pUI->screen_id == Temp_UIID)	{
+			if(appdis.pUI->screen_id == Menu_UIID)	{
+				DisplayMenuUI();
+			}
+			else if(appdis.pUI->screen_id == Temp_UIID)	{
 				u16 x,y;
 				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				touchid = TempButtonClick(x,y);
 				ButtonClickProcess(touchid);
 			}
+			break;
 		case 0xb1:	{//画面相关指令
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0x01)	{//回读screen id
@@ -98,17 +102,11 @@ static void ButtonClickProcess(u8 button)
 			}
 			DisplayHeatCoverIcon();		
 		}
-		else 	{
-			TempButtonCheckOn(button);		
+		TempButtonPressID = button;
+		if(CheckIdFromButton(TempButtonPressID, (u8 *)&modify_stageid, (u8 *)&modify_stepid)==1)	{
+			DisplayWarningUI("请选择操作方式", (char *)&Code_Choose[2][0], (char *)&Code_Choose[3][0]);
+			Sys.state |= SysState_StepTB;
 		}
-		OSTimeDly(10);
-		DisplayTempProgramUI(0,0);
-	}
-	else if(button>=0x80&&button<=0x84)	{//双击
-		TempButtonPressID = button&0x7f;
-		CheckIdFromButton(TempButtonPressID, &modify_stageid,&modify_stepid);
-		DisplayStepUI(modify_stageid, modify_stepid);
-		Sys.state &= ~SysState_AddStep;
 	}
 }
 //u8 ctrl_type,subtype,status;
@@ -149,7 +147,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DaCai_SwitchUI(appdis.pUI);
 			}
 			else if(appdis.pUI->ctrl_id == 7)	{//删除
-				DisplayWarningUI(&Code_Warning[0][0]);
+				DisplayWarningUI((char *)&Code_Warning[0][0], (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
 				Sys.state |= SysState_DeleteLabTB;
 			}
 			else if(appdis.pUI->ctrl_id == 19)	{//启动实验
@@ -161,9 +159,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		if(appdis.pUI->ctrl_id == 2)	{//进入温度程序		
 			ClearTempProgramIdx();		
 			DisplayTempProgramUI(0,1);	//刷新温度界面	清屏
-//			if(Sys.devstate != DevState_Running)	{
-//				ResetTempDataDefault();
-//			}
 		}
 		else if(appdis.pUI->ctrl_id == 19)	{//启动实验
 			DisplayQiTingLab();
@@ -179,10 +174,10 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DisplayStageUI();
 				Sys.state &= ~SysState_ReadTXT;
 			}
-			else if(appdis.pUI->ctrl_id == 3)	{//删阶
-				DeleTempProgam(TempButtonPressID, 0);
-				TempButtonPressID = 0xff;
-			}
+//			else if(appdis.pUI->ctrl_id == 3)	{//删阶
+//				DeleTempProgam(TempButtonPressID, 0);
+//				TempButtonPressID = 0xff;
+//			}
 			else if(appdis.pUI->ctrl_id == 4)	{//加步
 				s8 m,n;
 				m = temp_data.StageNum-1;
@@ -195,10 +190,10 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				Sys.state |= SysState_AddStep;
 				Sys.state &= ~SysState_ReadTXT;
 			}
-			else if(appdis.pUI->ctrl_id == 5)	{//删步
-				DeleTempProgam(TempButtonPressID, 1);
-				TempButtonPressID = 0xff;
-			}
+//			else if(appdis.pUI->ctrl_id == 5)	{//删步
+//				DeleTempProgam(TempButtonPressID, 1);
+//				TempButtonPressID = 0xff;
+//			}
 			else if(appdis.pUI->ctrl_id == 33)	{//上一页
 				ClearTempProgramIdx();
 				DisplayTempProgramUI(0,1);
@@ -206,6 +201,12 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			else if(appdis.pUI->ctrl_id == 34)	{//下一页
 				DisplayTempProgramUI(1,1);
 			}
+//			else if(appdis.pUI->ctrl_id>=10&&appdis.pUI->ctrl_id<=14)	{
+//				TempButtonPressID = appdis.pUI->ctrl_id - 10;
+//				CheckIdFromButton(TempButtonPressID, &modify_stageid,&modify_stepid);
+//				DisplayWarningUI("请选择操作方式", "删除", "编辑");
+//				Sys.state |= SysState_StepTB;
+//			}
 		}
 //		if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
 //			if(status == DEF_Release)	{
@@ -356,33 +357,42 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 	else if(appdis.pUI->screen_id == Confirm_UIID&&status == DEF_Release)	{//确认界面
 		if(appdis.pUI->ctrl_id == 2)	{//取消键
 			appdis.pUI->button_id = 0xff;
+			if(Sys.state & SysState_StepTB)	{//删除步
+				DeleTempProgam(TempButtonPressID, 1);
+				TempButtonPressID = 0xff;
+			}
+			else if(Sys.state & SysState_StageTB)	{//删除阶段
+				DeleTempProgam(TempButtonPressID, 0);
+				TempButtonPressID = 0xff;
+			}
 		}
 		else	if(appdis.pUI->ctrl_id == 3)	{//确认键
 			if(Sys.state & SysState_RunningTB)	{//启动实验
-				//if(Sys.devstate == DevState_IDLE)	
-				{					
-					iPara = StartAPPTempCtrl();
-					DisplayBackupUIID();	
-					if(iPara==0)	{//启动温控					
-						DisplayMessageUI((char *)&Code_Message[6][0]);//参数错误 无法启动
-					}	
-					return;
-				}
+				Sys.state &= ~SysState_RunningTB;				
+				iPara = StartAPPTempCtrl();
+				DisplayBackupUIID();	
+				if(iPara==0)	{//启动温控					
+					DisplayMessageUI((char *)&Code_Message[6][0]);//参数错误 无法启动
+				}	
+				return;
 			}
-			else if(Sys.state & SysState_StopTB)	{//启动实验
+			else if(Sys.state & SysState_StopTB)	{//停止实验
 				StopAPPTempCtrl();
 			}
 			else if(Sys.state & SysState_DeleteLabTB)	{//删除实验记录
 				
 			}
-//			else if(Sys.state & SysState_DelStageTB)	{//删除阶段
-//				DeleTempProgam(TempButtonPressID, 0);
-//				TempButtonPressID = 0xff;
-//			}
-//			else if(Sys.state & SysState_DelStepTB)	{//删除步
-//				DeleTempProgam(TempButtonPressID, 1);
-//				TempButtonPressID = 0xff;
-//			}
+			else if(Sys.state & SysState_StepTB)	{//修改步
+				Sys.state &= ~SysState_StepTB;
+				DisplayStepUI(modify_stageid, modify_stepid);
+				Sys.state &= ~SysState_AddStep;
+				return;
+			}
+			else if(Sys.state & SysState_StageTB)	{
+			}
+		}
+		else	if(appdis.pUI->ctrl_id == 6)	{//退出键
+			
 		}
 		ClearAllSysStateTB();
 		DisplayBackupUIID();		
@@ -424,6 +434,7 @@ static void TaskDisplay(void * ppdata)
 					OSTimeDly(2000);
 					appdis.pUI->screen_id = Main_UIID;							
 					DaCai_SwitchUI(appdis.pUI);//显示主界面
+//					DaCai_ClearScreenAuto(DEF_Disable);
 //					OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_3, OS_FLAG_SET, &err);
 				}
 				else {

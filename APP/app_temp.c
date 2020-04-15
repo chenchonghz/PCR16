@@ -54,7 +54,7 @@ void StartTECPWM(pid_ctrl_t *pTempPid, u8 duty)
 }
 
 //停止温度控制
-static u32 StopTempCtrl(pid_ctrl_t *pTempPid)
+static void StopTempCtrl(pid_ctrl_t *pTempPid)
 {
 	StopPWM(pTempPid->pTECPWM, pTempPid->TimCH);
 	pTempPid->PIDParam = 0.0;
@@ -109,7 +109,7 @@ u8 hengwenflag;
 //恒温时间达到 调用该函数
 void ConstantTempReadCallback(void)
 {
-	u8 m,n;
+	u8 m;
 	
 	m = temp_data.CurStage;
 	temp_data.stage[m].CurStep++;
