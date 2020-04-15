@@ -217,22 +217,12 @@
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>TempButtonPressID</ItemText>
+          <ItemText>CurIdx</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>modify_stageid</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>modify_stepid</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>SoftTimer1,0x0A</ItemText>
+          <ItemText>LastIdx</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

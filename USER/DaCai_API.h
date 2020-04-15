@@ -68,4 +68,5 @@ u8  DaCai_ClearBasicGraph(_UI_t *pUI);
 void DaCai_IconCtrl(_UI_t *pUI, u8 icon);
 void DaCai_PaintHollowRectangle(u16 x, u16 y, u16 w, u16 h);
 void DaCai_DisplayUpdateOnOff(u8 flag);
+void DaCai_SetFontColor(u16 color);
 #endif

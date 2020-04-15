@@ -5,7 +5,7 @@
 //堆栈
 __align(4) OS_STK  TASK_DISPLAY_STK[STK_SIZE_DISPLAY]; //任务堆栈声?
 #define N_MESSAGES		5
-//LIFOBUFF_T ScreenIDLIFO;
+static u8 databuf[64];
 _appdisplay_t appdis;
 
 void    *AppDisMSG_Q[N_MESSAGES];//消息队列数组
@@ -104,13 +104,13 @@ static void ButtonClickProcess(u8 button)
 		}
 		TempButtonPressID = button;
 		if(CheckIdFromButton(TempButtonPressID, (u8 *)&modify_stageid, (u8 *)&modify_stepid)==1)	{
-			DisplayWarningUI("请选择操作方式", (char *)&Code_Choose[2][0], (char *)&Code_Choose[3][0]);
+			sprintf((char *)databuf,"选择对Stage%d/Step%d 操作方式", modify_stageid+1, modify_stepid+1);
+			DisplayWarningUI((char *)databuf, (char *)&Code_Choose[2][0], (char *)&Code_Choose[3][0]);
 			Sys.state |= SysState_StepTB;
 		}
 	}
 }
-//u8 ctrl_type,subtype,status;
-//s32 g_tempdata;
+
 //屏幕相关数据处理
 static void ScreenDataProcess(_dacai_usart_t *pUsart)
 {
@@ -174,10 +174,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DisplayStageUI();
 				Sys.state &= ~SysState_ReadTXT;
 			}
-//			else if(appdis.pUI->ctrl_id == 3)	{//删阶
-//				DeleTempProgam(TempButtonPressID, 0);
-//				TempButtonPressID = 0xff;
-//			}
 			else if(appdis.pUI->ctrl_id == 4)	{//加步
 				s8 m,n;
 				m = temp_data.StageNum-1;
@@ -190,10 +186,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				Sys.state |= SysState_AddStep;
 				Sys.state &= ~SysState_ReadTXT;
 			}
-//			else if(appdis.pUI->ctrl_id == 5)	{//删步
-//				DeleTempProgam(TempButtonPressID, 1);
-//				TempButtonPressID = 0xff;
-//			}
 			else if(appdis.pUI->ctrl_id == 33)	{//上一页
 				ClearTempProgramIdx();
 				DisplayTempProgramUI(0,1);
@@ -201,12 +193,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			else if(appdis.pUI->ctrl_id == 34)	{//下一页
 				DisplayTempProgramUI(1,1);
 			}
-//			else if(appdis.pUI->ctrl_id>=10&&appdis.pUI->ctrl_id<=14)	{
-//				TempButtonPressID = appdis.pUI->ctrl_id - 10;
-//				CheckIdFromButton(TempButtonPressID, &modify_stageid,&modify_stepid);
-//				DisplayWarningUI("请选择操作方式", "删除", "编辑");
-//				Sys.state |= SysState_StepTB;
-//			}
 		}
 //		if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
 //			if(status == DEF_Release)	{
@@ -267,7 +253,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				if(temp > HOLE_TEMP_MAX||temp < HOLE_TEMP_MIN)
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
-//					iPara = temp_data.StageNum;
 					temp_data.stage[modify_stageid].step[modify_stepid].temp = temp;
 					appdis.pUI->ctrl_id = 9;
 					DaCai_ReadTXT(appdis.pUI);
@@ -278,7 +263,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				if(temp > 10||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
-//					iPara = temp_data.StageNum;
 					temp_data.stage[modify_stageid].step[modify_stepid].tim = temp*60;
 					appdis.pUI->ctrl_id = 10;
 					DaCai_ReadTXT(appdis.pUI);
@@ -289,7 +273,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				if(temp > 60||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				else	{
-//					iPara = temp_data.StageNum;
 					temp_data.stage[modify_stageid].step[modify_stepid].tim += temp;
 					Sys.state &= ~SysState_ReadTXT;
 					DisplayMessageUI((char *)&Code_Message[4][0]);					
@@ -320,11 +303,9 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		}
 		else if(appdis.pUI->ctrl_id == 1)	{
 			if(status == DEF_Release)	{
-//				iPara = temp_data.StageNum;
 				temp_data.stage[modify_stageid].step[modify_stepid].CollEnable = DEF_False;
 			}
 			else if(status == DEF_Press)	{
-//				iPara = temp_data.StageNum;
 				temp_data.stage[modify_stageid].step[modify_stepid].CollEnable = DEF_True;
 			}
 		}		

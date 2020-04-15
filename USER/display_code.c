@@ -165,7 +165,6 @@ void DisplayHeatCoverIcon(void)
 
 void DisplayQiTingLab(void)
 {	
-//	DisplayUIIDAndBackup(Confirm_UIID);//备份当前界面 切换到下一个界面
 	if(Sys.devstate == DevState_Running)	{
 		DisplayWarningUI((char *)&Code_Warning[2][0], (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
 //		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[2][0]);//显示 是否停止
@@ -194,8 +193,6 @@ void DisplayStepUI(s8 stageid, s8 stepid)
 		m = stageid;
 		n = stepid;
 		i=0;
-	//	pMultiTXT_t->data[i].id = 26;
-	//	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "Step", temp_data.stage[m].StepNum);
 		pMultiTXT_t->data[++i].id = 8;
 		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d.%d", temp_data.stage[m].step[n].temp/10,temp_data.stage[m].step[n].temp%10);
 		pMultiTXT_t->data[++i].id = 9;
@@ -221,8 +218,6 @@ void DisplayStageUI(void)
 		j = 0;
 	i=0;
 	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
-//	pMultiTXT_t->data[i].id = 26;
-//	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "Stage%d", temp_data.StageNum);
 	pMultiTXT_t->data[++i].id = 8;
 	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[j].StepNum);
 	pMultiTXT_t->data[++i].id = 4;
@@ -263,6 +258,7 @@ struct _dis_idx_t	{
 	u8 StepIdx;
  }CurIdx,LastIdx;
 static u16 g_templast;
+//请温度界面阶段和步标志
 void ClearTempProgramIdx(void)
 {
 	CurIdx.StageIdx = 0;
@@ -350,13 +346,14 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	appdis.pUI->screen_id = Temp_UIID;
 	DaCai_SwitchUI(appdis.pUI);
 	
-//	DaCai_DisplayUpdateOnOff(DEF_Disable);
 	DisplayHeatCoverIcon();	
 
 	ClearTempProgramUI(clear_flag);
 	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
 	i=0;
-	if(page_flag)	{
+	if(page_flag)	{//翻页处理
+		if(LastIdx.StageIdx>=temp_data.StageNum)
+			LastIdx.StageIdx = 0;
 		CurIdx.StageIdx = LastIdx.StageIdx;
 		CurIdx.StepIdx = LastIdx.StepIdx;
 	}
@@ -423,7 +420,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 			else	{
 				DaCai_DisplayCutPic(rec_x, rec_y, 60, 0, 0, TEMP_RECTANGLE_W, height);
 			}
-			DaCai_SetFontColor(65504);
+			DaCai_SetFontColor(65504);//设置文字颜色 黄色
 			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%d.%d℃", temp, temp_data.stage[j].step[k].temp%10);
 			DaCai_DisplayTXT(appdis.pUI, rec_x+60, rec_y-18, 6);
 			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%d:%d", temp_data.stage[j].step[k].tim/60, temp_data.stage[j].step[k].tim%60);
@@ -435,7 +432,6 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 		}
 		k=0;
 	}
-//	DaCai_DisplayUpdateOnOff(DEF_Enable);
 	if(flag)	{
 		g_templast = temp;
 		LastIdx.StageIdx = j;
