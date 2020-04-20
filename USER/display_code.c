@@ -144,6 +144,44 @@ void DisplayLabUI(void)
 	}
 }
 
+void DisplayLabAttrUI(void)
+{
+	u8 button_id[3],value[3];
+	
+	appdis.pUI->screen_id = LabAttr_UIID;
+	DaCai_SwitchUI(appdis.pUI);
+	appdis.pUI->ctrl_id  = 5;	
+	appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", lab_data.name);
+	DaCai_UpdateTXT(appdis.pUI);
+	button_id[0] = 6;
+	if(lab_data.type==LabTypeNegativeOrPositive) 
+		value[0] = BUTTON_PRESS;
+	else
+		value[0] = BUTTON_RELEASE;
+	button_id[1] = 7;
+	if(lab_data.type==LabTypeQuantify) 
+		value[1] = BUTTON_PRESS;
+	else
+		value[1] = BUTTON_RELEASE;
+	button_id[2] = 8;
+	if(lab_data.type==LabTypeGeneticTyping) 
+		value[2] = BUTTON_PRESS;
+	else
+		value[2] = BUTTON_RELEASE;
+	DaCai_UpdateMultiButton(appdis.pUI, button_id, value, 3);//更新多个控件
+	button_id[0] = 9;
+	if(lab_data.method==LabMethodStandard) 
+		value[0] = BUTTON_PRESS;
+	else
+		value[0] = BUTTON_RELEASE;
+	button_id[1] = 10;
+	if(lab_data.method==LabMethodCompare) 
+		value[1] = BUTTON_PRESS;
+	else
+		value[1] = BUTTON_RELEASE;
+	DaCai_UpdateMultiButton(appdis.pUI, button_id, value, 2);//更新多个控件
+}
+
 void DisplayMenuUI(void)
 {
 	appdis.pUI->screen_id = Menu_UIID;

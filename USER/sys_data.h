@@ -33,6 +33,19 @@ enum	{
 	DevState_Test,
 };
 
+enum lab_type	{
+	LabTypeNone=0,//无
+	LabTypeNegativeOrPositive=0x01,//阴性/阳性
+	LabTypeQuantify=0x02,//定量
+	LabTypeGeneticTyping=0x03,//基因分型
+};
+
+enum lab_method	{
+	LabMethodNone=0,//无
+	LabMethodStandard=0x01,//标准曲线
+	LabMethodCompare=0x02,//比较CT
+};
+
 typedef struct _syserror	{
 	BIT8 Y1;
 	BIT8 Y2;
@@ -91,11 +104,12 @@ typedef struct _temp_data	{//温度信息
 typedef struct _lab_data	{//实验数据
 	char id[LAB_ID_LEN];
 	char name[LAB_NAME_LEN];
-	char type;//实验类型。0-阴性/阳性；1-定量；2-基因分型
-	char method;//实验方法。0-标准曲线；1-比较CT
+	char type;//实验类型。0-无；0x01-阴性/阳性；0x02-定量；0x04-基因分型
+	char method;//实验方法。0-无；0x01-标准曲线；0x02-比较CT
 }_lab_data_t;
 
 typedef struct _hole_data	{//孔信息
+//	u8 enable;
 	char name[LAB_NAME_LEN];
 	char prj[LAB_NAME_LEN];
 	char sample_t;//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0x20-空
@@ -103,7 +117,7 @@ typedef struct _hole_data	{//孔信息
 }_hole_data_t;
 
 typedef struct _sample_data	{//样本数据
-//	u8 id;
+	u32 enable;
 	_hole_data_t hole[HOLE_NUM];
 }_sample_data_t;
 

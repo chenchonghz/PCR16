@@ -49,9 +49,9 @@ void ResetSampleDataDefault(void)
 
 void ResetLabDataDefault(void)
 {
-	memset(lab_data.name,0x20,LAB_NAME_LEN);
-	lab_data.type = 0xff;
-	lab_data.method = 0xff;
+	memset(lab_data.name,0,LAB_NAME_LEN);
+	lab_data.type = LabTypeNone;
+	lab_data.method = LabMethodNone;
 }
 
 void ResetStep(u8 stageid, u8 stepid)

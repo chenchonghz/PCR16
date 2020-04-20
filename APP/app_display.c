@@ -65,7 +65,10 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0x01)	{//回读screen id
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-				if(appdis.pUI->screen_id == Temp_UIID)	{//温度程序界面 刷新温度图形
+				if(appdis.pUI->screen_id == Main_UIID)	{
+					if(Sys.devstate != DevState_Running)	ResetLabDataDefault();
+				}
+				else if(appdis.pUI->screen_id == Temp_UIID)	{//温度程序界面 刷新温度图形
 					DisplayTempProgramUI(1,1);//刷新温度界面
 				}
 			}
@@ -160,6 +163,9 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			ClearTempProgramIdx();		
 			DisplayTempProgramUI(0,1);	//刷新温度界面	清屏
 		}
+		if(appdis.pUI->ctrl_id == 3)	{//进入实验属性			
+			DisplayLabAttrUI();
+		}			
 		else if(appdis.pUI->ctrl_id == 19)	{//启动实验
 			DisplayQiTingLab();
 		}
@@ -201,6 +207,27 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 //			else if(status == DEF_Press)
 //				HeatCoverOnOff(DEF_True);
 //		}		
+	}
+	else if(appdis.pUI->screen_id==LabAttr_UIID&&status == DEF_Press)	{//实验属性
+		if(appdis.pUI->ctrl_id == 12)	{//用户输入值
+			SaveUIEditInfor();//保存编辑信息
+			DisplayKeyboardUI();//切换到全键盘界面
+		}
+		else if(appdis.pUI->ctrl_id == 6)	{
+			lab_data.type = LabTypeNegativeOrPositive;
+		}
+		else if(appdis.pUI->ctrl_id == 7)	{
+			lab_data.type = LabTypeQuantify;
+		}
+		else if(appdis.pUI->ctrl_id == 8)	{
+			lab_data.type = LabTypeGeneticTyping;
+		}
+		else if(appdis.pUI->ctrl_id == 9)	{
+			lab_data.method = LabMethodStandard;
+		}
+		else if(appdis.pUI->ctrl_id == 10)	{
+			lab_data.method = LabMethodCompare;
+		}
 	}
 	else if(appdis.pUI->screen_id==Stage_UIID)	{//阶段设置
 		if(Sys.state&SysState_ReadTXT)	{
@@ -327,6 +354,13 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 						temp_data.HeatCoverEnable = temp;//保存用户输入值
 					}
 				}
+			}
+			else if(appdis.pUI->editinfo.screen_id == LabAttr_UIID)	{
+				DisplayEditUI();//显示上次编辑界面
+				appdis.pUI->ctrl_id = 5;
+				appdis.pUI->datlen = strlen(appdis.pUI->pdata);//显示用户输入值
+				DaCai_UpdateTXT(appdis.pUI);
+				strcpy(lab_data.name, appdis.pUI->pdata);//保存用户输入值
 			}
 		}
 		else if(appdis.pUI->ctrl_id == 44&&status == DEF_Release)	{//关闭 

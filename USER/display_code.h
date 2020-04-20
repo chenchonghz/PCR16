@@ -21,6 +21,7 @@ void DisplayStageUI(void);
 void DisplayTempProgramUI(u8 page_flag, u8 clear_flag);
 void DisplayMenuUI(void);
 void DisplayLabUI(void);
+void DisplayLabAttrUI(void);
 void DisplayQiTingLab(void);
 void PaintTriangle(u16 x, u16 y, u16 w, u16 h);
 void PaintTriangleInBasicGraph(_UI_t *pUI,  u16 x, u16 y, u16 w, u16 h);
