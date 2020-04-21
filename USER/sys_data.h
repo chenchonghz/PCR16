@@ -24,6 +24,7 @@
 #define SysState_StageTB					DEF_BIT06_MASK
 #define SysState_StepTB					DEF_BIT07_MASK
 #define SysState_AddStep					DEF_BIT08_MASK
+#define SysState_AddStage				DEF_BIT09_MASK
 
 //设备运行模式
 enum	{

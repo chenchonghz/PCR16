@@ -17,7 +17,7 @@ void DisplayWarningUI(char *pbuf, char *buf1, char *buf2);
 void DisplayEditUI(void);
 void DisplayKeyboardUI(void);
 void DisplayStepUI(s8 stageid, s8 stepid);
-void DisplayStageUI(void);
+void DisplayStageUI(s8 stageid);
 void DisplayTempProgramUI(u8 page_flag, u8 clear_flag);
 void DisplayMenuUI(void);
 void DisplayLabUI(void);

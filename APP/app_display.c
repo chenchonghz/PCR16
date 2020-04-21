@@ -94,23 +94,30 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 s8 modify_stageid,modify_stepid;
 static void ButtonClickProcess(u8 button)
 {
-	if(button>=0&&button<=5)	//单击
-	{
-		if(button==5)	{
-			if(temp_data.HeatCoverEnable == DEF_False)	{									
-				temp_data.HeatCoverEnable = DEF_True;
-			}
-			else if(temp_data.HeatCoverEnable == DEF_True)	{
-				temp_data.HeatCoverEnable = DEF_False;
-			}
-			DisplayHeatCoverIcon();		
-		}
+	if(button>=0&&button<=4)	{//单击	步编辑
 		TempButtonPressID = button;
 		if(CheckIdFromButton(TempButtonPressID, (u8 *)&modify_stageid, (u8 *)&modify_stepid)==1)	{
 			sprintf((char *)databuf,"选择对Stage%d/Step%d 操作方式", modify_stageid+1, modify_stepid+1);
 			DisplayWarningUI((char *)databuf, (char *)&Code_Choose[2][0], (char *)&Code_Choose[3][0]);
 			Sys.state |= SysState_StepTB;
 		}
+	}
+	else if(button>=5&&button<=9)	{//单击	阶段编辑
+		TempButtonPressID = button - 5;
+		if(CheckIdFromButton(TempButtonPressID, (u8 *)&modify_stageid, (u8 *)&modify_stepid)==1)	{
+			sprintf((char *)databuf,"选择对Stage%d 操作方式", modify_stageid+1);
+			DisplayWarningUI((char *)databuf, (char *)&Code_Choose[2][0], (char *)&Code_Choose[3][0]);
+			Sys.state |= SysState_StageTB;
+		}
+	}
+	else if(button==11)	{
+		if(temp_data.HeatCoverEnable == DEF_False)	{									
+			temp_data.HeatCoverEnable = DEF_True;
+		}
+		else if(temp_data.HeatCoverEnable == DEF_True)	{
+			temp_data.HeatCoverEnable = DEF_False;
+		}
+		DisplayHeatCoverIcon();		
 	}
 }
 
@@ -154,7 +161,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				Sys.state |= SysState_DeleteLabTB;
 			}
 			else if(appdis.pUI->ctrl_id == 19)	{//启动实验
-				DisplayQiTingLab();
+				DisplayQiTingLab();//根据当前实验状态，提示停止实验还是启动实验
 			}
 		}
 	}
@@ -170,7 +177,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			DisplayLabAttrUI();
 		}			
 		else if(appdis.pUI->ctrl_id == 19)	{//启动实验
-			DisplayQiTingLab();
+			DisplayQiTingLab();//根据当前实验状态，提示停止实验还是启动实验
 		}
 	}
 	else if(appdis.pUI->screen_id==SampleInfor_UIID)	{//样本信息	
@@ -234,8 +241,13 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				SaveUIEditInfor();//保存编辑信息
 				DisplayKeyboardUI();//切换到全键盘界面					
 			}
-			else if(appdis.pUI->ctrl_id == 1)	{//加阶				
-				DisplayStageUI();
+			else if(appdis.pUI->ctrl_id == 1)	{//加阶	
+				s8 m;
+				m = temp_data.StageNum-1;
+				if(m<0)	m=0;				
+				DisplayStageUI(m);
+				modify_stageid = temp_data.StageNum;
+				Sys.state |= SysState_AddStage;
 				Sys.state &= ~SysState_ReadTXT;
 			}
 			else if(appdis.pUI->ctrl_id == 4)	{//加步
@@ -296,7 +308,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				}
 				else	{
-					temp_data.stage[temp_data.StageNum].RepeatNum = temp;
+					temp_data.stage[modify_stageid].RepeatNum = temp;
 					appdis.pUI->ctrl_id = 8;
 					DaCai_ReadTXT(appdis.pUI);
 				}
@@ -306,7 +318,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					DisplayMessageUI((char *)&Code_Message[3][0]);
 				}
 				else	{
-					temp_data.stage[temp_data.StageNum].StepNum = temp;
+					temp_data.stage[modify_stageid].StepNum = temp;
 					Sys.state &= ~SysState_ReadTXT;
 					DisplayMessageUI((char *)&Code_Message[4][0]);	
 					Sys.state |= SysState_ReadTXTOK;				
@@ -319,19 +331,22 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			Sys.state |= SysState_ReadTXT;
 			Sys.state &= ~SysState_ReadTXTOK;
 		}
-		else if(appdis.pUI->ctrl_id == 25)	{//关闭 
+		else if(appdis.pUI->ctrl_id == 25)	{//关闭窗口
 			if(status == DEF_Press)	{
-				Sys.state &= ~SysState_ReadTXT;
+//				Sys.state &= ~SysState_ReadTXT;
 				if(Sys.state & SysState_ReadTXTOK)	{
 					Sys.state &= ~SysState_ReadTXTOK;
-					temp_data.StageNum++;
+					if(Sys.state & SysState_AddStage)	{
+						temp_data.StageNum++;
+						Sys.state &= ~SysState_AddStage;
+					}
 				}
 			}
 			appdis.pUI->screen_id = Temp_UIID;
 		}
 	}
 	else if(appdis.pUI->screen_id==Step_UIID)	{//步设置
-		if(Sys.state&SysState_ReadTXT)	{
+		if(Sys.state&SysState_ReadTXT)	{//回读文本控件内容
 			strcpy(appdis.pUI->pdata, (const char *)(pUsart->rx_buf+pUsart->rx_idx));
 			temp = (int)(atof(appdis.pUI->pdata)*10);
 			if(appdis.pUI->ctrl_id == 8)	{//温度值设置
@@ -371,10 +386,10 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			Sys.state |= SysState_ReadTXT;//回读所有文本内容
 			Sys.state &= ~SysState_ReadTXTOK;
 		}
-		if(appdis.pUI->ctrl_id == 25)	{//关闭 	
+		if(appdis.pUI->ctrl_id == 25)	{//关闭窗口 	
 			if(status == DEF_Press)	{
-				Sys.state &= ~SysState_ReadTXT;
-				if(Sys.state & SysState_ReadTXTOK)	{
+//				Sys.state &= ~SysState_ReadTXT;
+				if(Sys.state & SysState_ReadTXTOK)	{//读取文本控件数据ok
 					Sys.state &= ~SysState_ReadTXTOK;
 					if(Sys.state & SysState_AddStep)	{
 						iPara = temp_data.StageNum;
@@ -435,7 +450,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				TempButtonPressID = 0xff;
 			}
 			else if(Sys.state & SysState_StageTB)	{//删除阶段
-				DeleTempProgam(TempButtonPressID, 0);
+				DeleTempProgam(TempButtonPressID, 0);////删除操作 type=0 删阶段，type=1 删除步
 				TempButtonPressID = 0xff;
 			}
 		}
@@ -461,7 +476,11 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				Sys.state &= ~SysState_AddStep;
 				return;
 			}
-			else if(Sys.state & SysState_StageTB)	{
+			else if(Sys.state & SysState_StageTB)	{//修改阶段
+				Sys.state &= ~SysState_StageTB;
+				DisplayStageUI(modify_stageid);
+				Sys.state &= ~SysState_AddStage;
+				return;
 			}
 		}
 		else	if(appdis.pUI->ctrl_id == 6)	{//退出键
@@ -507,7 +526,7 @@ static void TaskDisplay(void * ppdata)
 					OSTimeDly(2000);
 					appdis.pUI->screen_id = Main_UIID;							
 					DaCai_SwitchUI(appdis.pUI);//显示主界面
-					DaCai_ConfigTouch(0x31);//关闭触摸坐标上传
+//					DaCai_ConfigTouch(0x31);//关闭触摸坐标上传
 //					DaCai_ClearScreenAuto(DEF_Disable);
 //					OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_3, OS_FLAG_SET, &err);
 				}

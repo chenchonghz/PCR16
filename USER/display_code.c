@@ -278,7 +278,7 @@ void DisplayHeatCoverIcon(void)
 	appdis.pUI->ctrl_id = 8;
 	DaCai_IconCtrl(appdis.pUI,temp_data.HeatCoverEnable);
 }
-
+//根据当前实验状态，提示停止实验还是启动实验
 void DisplayQiTingLab(void)
 {	
 	if(Sys.devstate == DevState_Running)	{
@@ -322,22 +322,23 @@ void DisplayStepUI(s8 stageid, s8 stepid)
 	tlsf_free(UserMem, pMultiTXT_t);
 }
 
-void DisplayStageUI(void)
+void DisplayStageUI(s8 stageid)
 {
-	u8 i,j;
+	u8 i,m;
 	
 	appdis.pUI->screen_id = Stage_UIID;//stage界面					
 	DaCai_SwitchUI(appdis.pUI);
-	if(temp_data.StageNum>0)
-		j = temp_data.StageNum-1;
-	else
-		j = 0;
+//	if(temp_data.StageNum>0)
+//		j = temp_data.StageNum-1;
+//	else
+//		j = 0;
+	m = stageid;
 	i=0;
 	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
 	pMultiTXT_t->data[++i].id = 8;
-	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[j].StepNum);
+	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].StepNum);
 	pMultiTXT_t->data[++i].id = 4;
-	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[j].RepeatNum);
+	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].RepeatNum);
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);
 	tlsf_free(UserMem, pMultiTXT_t);
 }
@@ -479,7 +480,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	stage_id = 14;repeat_id = 23;
 	j = CurIdx.StageIdx;
 	flag = temp_data.stage[j].StepNum - CurIdx.StepIdx;
-	for(;temp_data.StageNum>0;)	{
+	for(;temp_data.StageNum>0;)	{//显示标题
 		stage_id += flag;
 		pMultiTXT_t->data[++i].id = stage_id;
 		stage_id += flag;
@@ -520,21 +521,21 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 			height = temp*(TEMP_RECTANGLE_H/100);
 			rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
 			if(temp>templast)	{		
-				DaCai_DisplayCutPic(rec_x, rec_y, 60, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 61, 0, 0, TEMP_RECTANGLE_W, height);
 				xie_h = (temp - templast)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y, 59, 50-xie_w, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y, 60, 50-xie_w, 0, xie_w, xie_h);
 			}
 			else	if(temp<templast)	{
-				DaCai_DisplayCutPic(rec_x, rec_y, 60, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 61, 0, 0, TEMP_RECTANGLE_W, height);
 //				height = templast*(TEMP_RECTANGLE_H/100);
 				rec_y_last = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H - templast*(TEMP_RECTANGLE_H/100);
 				xie_h = (templast-temp)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y_last, 58, 0, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y_last, 59, 0, 0, xie_w, xie_h);
 			}
 			else	{
-				DaCai_DisplayCutPic(rec_x, rec_y, 60, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 61, 0, 0, TEMP_RECTANGLE_W, height);
 			}
 			DaCai_SetFontColor(65504);//设置文字颜色 黄色
 			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%d.%d℃", temp, temp_data.stage[j].step[k].temp%10);
