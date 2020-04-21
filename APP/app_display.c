@@ -50,10 +50,10 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			appdis.pUI->screen_id = Invalid_UIID;
 			break;
 		case 0x01:
-			if(appdis.pUI->screen_id == Menu_UIID)	{
+			/*if(appdis.pUI->screen_id == Menu_UIID)	{
 				DisplayMenuUI();
 			}
-			else if(appdis.pUI->screen_id == Temp_UIID)	{
+			else */if(appdis.pUI->screen_id == Temp_UIID)	{
 				u16 x,y;
 				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
@@ -72,7 +72,7 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 					DisplayTempProgramUI(1,1);//刷新温度界面
 				}
 			}
-			else if(iPara==0x11)	{//按钮状态
+			else if(iPara==0x11||iPara==0x14)	{//按钮状态
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				appdis.pUI->ctrl_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				ScreenDataProcess(pUsart);
@@ -121,8 +121,8 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 	s32 temp;
 	u8 iPara;
 	
-	ctrl_type = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//0x10-表示按钮 0x11-表示文本	
-	if(ctrl_type==0x10)	{		
+	ctrl_type = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//0x10-表示按钮 0x11-表示文本 0x1a-表示下拉框
+	if(ctrl_type==0x10||ctrl_type==0x1a)	{		
 		subtype = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 		status = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//获取按钮状态 按下/弹起
 	}
@@ -159,15 +159,73 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		}
 	}
 	else if(appdis.pUI->screen_id==Menu_UIID&&status == DEF_Release)	{//菜单界面
-		if(appdis.pUI->ctrl_id == 2)	{//进入温度程序		
+		if(appdis.pUI->ctrl_id == 1)	{//进入样本信息
+			DisplaySampleInforUI();
+		}
+		else if(appdis.pUI->ctrl_id == 2)	{//进入温度程序		
 			ClearTempProgramIdx();		
 			DisplayTempProgramUI(0,1);	//刷新温度界面	清屏
 		}
-		if(appdis.pUI->ctrl_id == 3)	{//进入实验属性			
+		else if(appdis.pUI->ctrl_id == 3)	{//进入实验属性			
 			DisplayLabAttrUI();
 		}			
 		else if(appdis.pUI->ctrl_id == 19)	{//启动实验
 			DisplayQiTingLab();
+		}
+	}
+	else if(appdis.pUI->screen_id==SampleInfor_UIID)	{//样本信息	
+		if(appdis.pUI->ctrl_id > 0&&appdis.pUI->ctrl_id <= HOLE_NUM)	{//孔是否选中处理
+			iPara = appdis.pUI->ctrl_id - 1;
+			if(status == DEF_Release)
+				appdis.pUI->button_id &= ~(DEF_BIT00_MASK << iPara);
+			else
+				appdis.pUI->button_id |= DEF_BIT00_MASK << iPara;
+		}
+		else if(appdis.pUI->ctrl_id==17&&status == DEF_Release)	{//样本类型设置
+			if(subtype==0)	{//取消选中
+				DisableSampleData(appdis.pUI->button_id);
+				ClearButtonInSampleInfor();
+				UpdateSampleInfor();
+			}
+			else	{
+				SetSampleDataSampleT(appdis.pUI->button_id, subtype);
+				appdis.pUI->button_id |= DEF_BIT31_MASK;
+				if(appdis.pUI->button_id & DEF_BIT30_MASK)	{					
+					ClearButtonInSampleInfor();
+				}
+				UpdateSampleInfor();
+			}
+		}
+		else if(appdis.pUI->ctrl_id==21&&status == DEF_Release)	{//通道设置
+			SetSampleDataChannel(appdis.pUI->button_id, subtype+1);
+			appdis.pUI->button_id |= DEF_BIT30_MASK;
+			if(appdis.pUI->button_id & DEF_BIT31_MASK)	{				
+				ClearButtonInSampleInfor();
+			}
+			UpdateSampleInfor();
+		}
+		else if(appdis.pUI->ctrl_id==44&&status == DEF_Release)	{//显示样本信息 列表
+			DisplaySampleInforUIByList();
+		}
+	}
+	else if(appdis.pUI->screen_id==SampleList_UIID)	{//样本信息	列表
+		if(appdis.pUI->ctrl_id > 0&&appdis.pUI->ctrl_id <= 5)	{//
+			iPara = appdis.pUI->ctrl_id - 1 + appdis.pUI->index;
+//			DisableHole(iPara);
+//			if(status == DEF_Release)
+//				sample_data.enable &= ~(DEF_BIT00_MASK << iPara);
+//			else
+//				sample_data.enable |= DEF_BIT00_MASK << iPara;
+		}
+		else if(appdis.pUI->ctrl_id==66&&status == DEF_Release)	{//上页
+			appdis.pUI->index -= 5;
+			if(appdis.pUI->index<0)	appdis.pUI->index = 0;
+			UpdateSampleInforList(appdis.pUI->index);
+		}
+		else if(appdis.pUI->ctrl_id==67&&status == DEF_Release)	{//下页
+			appdis.pUI->index += 5;
+			if(appdis.pUI->index>HOLE_NUM)	appdis.pUI->index = HOLE_NUM;
+			UpdateSampleInforList(appdis.pUI->index);
 		}
 	}
 	else if(appdis.pUI->screen_id==Temp_UIID)	{//温度程序	
@@ -449,6 +507,7 @@ static void TaskDisplay(void * ppdata)
 					OSTimeDly(2000);
 					appdis.pUI->screen_id = Main_UIID;							
 					DaCai_SwitchUI(appdis.pUI);//显示主界面
+					DaCai_ConfigTouch(0x31);//关闭触摸坐标上传
 //					DaCai_ClearScreenAuto(DEF_Disable);
 //					OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_3, OS_FLAG_SET, &err);
 				}

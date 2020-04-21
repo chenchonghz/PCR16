@@ -9,6 +9,14 @@ _sample_data_t sample_data;
 _lab_data_t	lab_data;
 _temp_data_t temp_data;
 
+const char SampleType[][1] = {
+	{0},{'S'},{'U'},{'N'},{'P'},
+};//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0-空
+
+const char SampleChannel[][4] = {
+	{0},{"FAM"},{"HEX"}
+};//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0-空
+
 void SysDataInit(void)
 {
 	UserMem = tlsf_create_with_pool((void *)0x20015000, 0x3000);//内存0x15000 - 0x18000 区域12KB内存使用tlsf管理
@@ -35,15 +43,59 @@ void SysDataInit(void)
 	ResetTempDataDefault();
 }
 
+void SetSampleDataSampleT(u32 enable, char typeidx)
+{
+	u8 i;
+	u32 tmp;
+	
+	for(i=0;i<HOLE_NUM;i++)	{
+		tmp = enable&(DEF_BIT00_MASK<<i);
+		if(tmp)	{
+			sample_data.hole[i].sample_t = SampleType[typeidx][0];
+//			sample_data.enable |= tmp;
+		}
+	}
+}
+
+void SetSampleDataChannel(u32 enable, char typeidx)
+{
+	u8 i;
+	u32 tmp;
+	
+	for(i=0;i<HOLE_NUM;i++)	{
+		tmp = enable&(DEF_BIT00_MASK<<i);
+		if(tmp)	{
+			strcpy(sample_data.hole[i].channel, &SampleChannel[typeidx][0]);
+//			sample_data.enable |= tmp;
+		}
+	}
+}
+
+void DisableSampleData(u32 enable)
+{
+	u8 i;
+	u32 tmp;
+	
+	for(i=0;i<HOLE_NUM;i++)	{
+		tmp = enable&(DEF_BIT00_MASK<<i);
+		if(tmp)	{
+			sample_data.hole[i].sample_t = SampleType[0][0];
+			strcpy(sample_data.hole[i].channel, &SampleChannel[0][0]);
+//			sample_data.enable &= ~tmp;
+		}
+	}
+}
+
 void ResetSampleDataDefault(void)
 {
 	u8 i;
 	
+//	sample_data.enable = 0;
 	for(i=0;i<HOLE_NUM;i++)	{
-		memset((void *)sample_data.hole[i].name, 0x20, LAB_NAME_LEN);
-		memset(sample_data.hole[i].prj, 0x20, LAB_NAME_LEN);
-		sample_data.hole[i].channel = 1;
-		sample_data.hole[i].sample_t = 0x20;
+		memset((void *)sample_data.hole[i].name, 0, LAB_NAME_LEN);
+		memset(sample_data.hole[i].prj, 0, LAB_NAME_LEN);
+		strcpy(sample_data.hole[i].channel, &SampleChannel[0][0]);
+		sample_data.hole[i].sample_t = SampleType[0][0];
 	}
 }
 

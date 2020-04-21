@@ -2,7 +2,7 @@
 #include "rw_spiflash.h"
 
 typedef struct 	{
-	_MultiDat data[8];
+	_MultiDat data[16];
 }_MultiTXT_;
 _MultiTXT_ *pMultiTXT_t;
 
@@ -130,7 +130,7 @@ void DisplayLogUI(void)
 		DaCai_UpdateTXT(appdis.pUI);
 	}
 }
-
+//显示实验界面
 void DisplayLabUI(void)
 {
 	appdis.pUI->screen_id = Lab_UIID;
@@ -143,7 +143,7 @@ void DisplayLabUI(void)
 		DaCai_ButtonCtrl(appdis.pUI, DEF_Release);
 	}
 }
-
+//显示实验属性界面
 void DisplayLabAttrUI(void)
 {
 	u8 button_id[3],value[3];
@@ -180,6 +180,84 @@ void DisplayLabAttrUI(void)
 	else
 		value[1] = BUTTON_RELEASE;
 	DaCai_UpdateMultiButton(appdis.pUI, button_id, value, 2);//更新多个控件
+}
+//清除样本信息界面的按钮选中状态
+void ClearButtonInSampleInfor(void)
+{
+	u8 i;
+	u8 button_id[HOLE_NUM],value[HOLE_NUM];
+	
+	for(i=0;i<HOLE_NUM;i++)	{//Release按钮状态
+		value[i] = BUTTON_RELEASE;
+		button_id[i] = i+1;
+	}
+	DaCai_UpdateMultiButton(appdis.pUI, button_id, value, i);
+	appdis.pUI->button_id = 0;
+}
+//更新样本类型数据显示
+void UpdateSampleInfor(void)
+{
+	u8 i,j,ctrl_id;
+	
+	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
+	ctrl_id = 46;
+	j = 0;
+	for(i=0;i<HOLE_NUM;i++)	{			
+		pMultiTXT_t->data[j].id = ctrl_id++;
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%c\r\n\r\n%s", sample_data.hole[i].sample_t,sample_data.hole[i].channel);
+		j++;
+	}
+	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, j);
+	tlsf_free(UserMem, pMultiTXT_t);
+}
+//显示样本信息界面
+void DisplaySampleInforUI(void)
+{
+	appdis.pUI->screen_id = SampleInfor_UIID;
+	DaCai_SwitchUI(appdis.pUI);
+//	appdis.pUI->button_id = sample_data.enable;
+	ClearButtonInSampleInfor();
+	UpdateSampleInfor();
+}
+//更新样本信息 列表界面
+void UpdateSampleInforList(u8 index)
+{
+	u8 i,j,ctrl_id;
+	u8 button_id[5],value[5];
+	u8 hole_idx;
+	
+	ctrl_id = 26;
+	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
+	for(i=0;i<5;i++)	{
+		hole_idx = index + i;
+		if(sample_data.hole[hole_idx].sample_t != 0)
+			value[i] = DEF_Press;
+		else
+			value[i] = DEF_Release;
+		button_id[i] = 1+i;
+		j=0;
+		pMultiTXT_t->data[j].id = ctrl_id++;
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "A%d", hole_idx+1);
+		pMultiTXT_t->data[++j].id = ctrl_id++;
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].name);
+		pMultiTXT_t->data[++j].id = ctrl_id++;
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].prj);
+		pMultiTXT_t->data[++j].id = ctrl_id++;
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%c", sample_data.hole[hole_idx].sample_t);
+		pMultiTXT_t->data[++j].id = ctrl_id++;
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "None");//实验结果
+		DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, j+1);
+	}
+	tlsf_free(UserMem, pMultiTXT_t);
+	DaCai_UpdateMultiButton(appdis.pUI, button_id, value, 5);
+}
+//显示样本信息 列表界面	
+void DisplaySampleInforUIByList(void)
+{
+	appdis.pUI->screen_id = SampleList_UIID;
+	DaCai_SwitchUI(appdis.pUI);
+	appdis.pUI->index=0;
+	UpdateSampleInforList(appdis.pUI->index);	
 }
 
 void DisplayMenuUI(void)

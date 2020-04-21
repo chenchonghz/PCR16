@@ -112,12 +112,12 @@ typedef struct _hole_data	{//孔信息
 //	u8 enable;
 	char name[LAB_NAME_LEN];
 	char prj[LAB_NAME_LEN];
-	char sample_t;//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0x20-空
-	char channel;//通道	
+	char sample_t;//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0-空
+	char channel[4];//通道	
 }_hole_data_t;
 
 typedef struct _sample_data	{//样本数据
-	u32 enable;
+//	u32 enable;
 	_hole_data_t hole[HOLE_NUM];
 }_sample_data_t;
 
@@ -132,6 +132,9 @@ extern _temp_data_t temp_data;
 void SysDataInit(void);
 void HeatCoverOnOff(u8 flag);
 void CollDataOnOff_InStep(u8 flag);
+void DisableSampleData(u32 enable);
+void SetSampleDataChannel(u32 enable, char typeidx);
+void SetSampleDataSampleT(u32 enable, char typeidx);
 void ResetSampleDataDefault(void);
 void ResetLabDataDefault(void);
 void ResetTempDataDefault(void);

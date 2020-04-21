@@ -16,9 +16,9 @@ typedef struct _UI	{
 	s8 sub_screen_id;
 	u8 ctrl_id;
 	u8 ctrl_idbk;
-	s8 button_id;
-	s8 index;
 	_UI_EDIT_T editinfo;
+	s32 button_id;
+	s8 index;	
 	char *pdata;
 	u16 datlen;
 }_UI_t;

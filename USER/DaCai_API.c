@@ -671,3 +671,13 @@ void DaCai_PaintLineInBasicGraph(_UI_t *pUI, u16 color, _coordinate_t *pCoo, u8 
 	DaCai_SendData(ptxbuf, len);
 }
 
+void DaCai_ConfigTouch(u8 flag)
+{
+	u8 len;
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0x70;
+	ptxbuf[len++] = flag;
+}
+
+
