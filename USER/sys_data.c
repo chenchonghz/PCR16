@@ -1,4 +1,5 @@
 #include "sys_data.h"
+#include "json.h"
 
 _sys_t Sys;
 _syserror_t SysError;
@@ -19,13 +20,10 @@ const char SampleChannel[][4] = {
 
 void SysDataInit(void)
 {
-	UserMem = tlsf_create_with_pool((void *)0x20015000, 0x3000);//内存0x15000 - 0x18000 区域12KB内存使用tlsf管理
-	
+	UserMem = tlsf_create_with_pool((void *)0x20014000, 0x4000);//内存0x14000 - 0x18000 区域16KB内存使用tlsf管理
+	jansson_init();
 	SysError.Y1.ubyte = 0x0;//来自传感器板的故障 
 	SysError.Y2.ubyte = 0;//主板故障
-//	SysData.HeatCoverTemp = 0;
-//	SysData.PD_1 = 0;
-//	SysData.PD_2 = 0;
 	
 	Sys.state = SysState_None;
 	Sys.devstate = DevState_IDLE;
@@ -41,6 +39,8 @@ void SysDataInit(void)
 	ResetLabDataDefault();
 	ResetSampleDataDefault();
 	ResetTempDataDefault();
+		jsonfile_temp();
+	jsonfile_lab();
 }
 
 void SetSampleDataSampleT(u32 enable, char typeidx)
@@ -121,7 +121,10 @@ void ResetStage(u8 id)
 	temp_data.stage[id].StepNum = 0;
 	temp_data.stage[id].CurStep = 0;
 	temp_data.stage[id].CurRepeat = 0;
-	temp_data.stage[id].Type = 0;
+	temp_data.stage[id].Type = 0;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
+	temp_data.stage[id].T_Rate = 0;//升温速率
+	temp_data.stage[id].T_Inter = 0;//温度间隔
+	temp_data.stage[id].Const_Tim = 0;//恒温时间 s
 	for(j=0;j<STEP_MAX;j++)	{
 		ResetStep(id,j);
 	}
@@ -178,3 +181,14 @@ void ClearAllSysStateTB(void)
 	Sys.state &= ~SysState_StepTB;
 }
 
+void *user_malloc(size_t size)
+{
+	void *ret;
+	ret = tlsf_malloc(UserMem, size);
+	return ret;
+}
+
+void user_free(void* ptr)
+{
+	tlsf_free(UserMem, ptr);
+}

@@ -47,6 +47,12 @@ enum lab_method	{
 	LabMethodCompare=0x02,//比较CT
 };
 
+enum stage_type	{//0-repeat模式;1-continue 模式;2-step 模式
+	StageByRepeat=0,//
+	StageByContinue=0x01,//
+	StageByStep=0x02,
+};
+
 typedef struct _syserror	{
 	BIT8 Y1;
 	BIT8 Y2;
@@ -85,8 +91,8 @@ typedef struct _step	{
 typedef struct _stage	{	
 	u16 T_Rate;//升温速率
 	u16 T_Inter;//温度间隔
-	u16 T_Tim;//恒温时间 s
-	u8 Type;//0-repeat模式;1-continue 模式;2-step 模式
+	u16 Const_Tim;//恒温时间 s
+	u8 Type;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
 	u8 RepeatNum;//
 	u8 StepNum;//总步 
 	u8 CurStep;//当前步 不写入json文件
@@ -130,6 +136,8 @@ extern _sample_data_t sample_data;
 extern _lab_data_t	lab_data;
 extern _temp_data_t temp_data;
 
+void *user_malloc(size_t size);
+void user_free(void* ptr);	
 void SysDataInit(void);
 void HeatCoverOnOff(u8 flag);
 void CollDataOnOff_InStep(u8 flag);
