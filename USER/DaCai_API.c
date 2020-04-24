@@ -20,7 +20,7 @@ void DaCaiAPI_Init(void)
 	UI.button_id = 0XFF;
 	UI.ctrl_id = 0;
 	UI.datlen=0;
-	UI.pdata = (char *)tlsf_malloc(UserMem,DACAITXTBUF_SIZE);//用于向串口屏发送大数据缓存
+	UI.pdata = (char *)user_malloc(DACAITXTBUF_SIZE);//用于向串口屏发送大数据缓存
 }
 //检测屏是否在线
 void DaCai_CheckDevice(void)

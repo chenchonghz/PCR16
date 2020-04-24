@@ -268,9 +268,9 @@
 /* define the ff_malloc ff_free macros as standard malloc free */
 #if !defined(ff_malloc) && !defined(ff_free)
 #include <stdlib.h>
-#include "tlsf.h"
-#define ff_malloc  tlsf_malloc//malloc
-#define ff_free  tlsf_free//free
+#include "sys_data.h"
+#define ff_malloc  user_malloc//malloc
+#define ff_free  user_free//free
 #endif
 
 #endif /* _FFCONF */

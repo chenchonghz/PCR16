@@ -199,7 +199,7 @@ void UpdateSampleInfor(void)
 {
 	u8 i,j,ctrl_id;
 	
-	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
+	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	ctrl_id = 46;
 	j = 0;
 	for(i=0;i<HOLE_NUM;i++)	{			
@@ -208,7 +208,7 @@ void UpdateSampleInfor(void)
 		j++;
 	}
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, j);
-	tlsf_free(UserMem, pMultiTXT_t);
+	user_free(pMultiTXT_t);
 }
 //显示样本信息界面
 void DisplaySampleInforUI(void)
@@ -227,7 +227,7 @@ void UpdateSampleInforList(u8 index)
 	u8 hole_idx;
 	
 	ctrl_id = 26;
-	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
+	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	for(i=0;i<5;i++)	{
 		hole_idx = index + i;
 		if(sample_data.hole[hole_idx].sample_t != 0)
@@ -248,7 +248,7 @@ void UpdateSampleInforList(u8 index)
 		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "None");//实验结果
 		DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, j+1);
 	}
-	tlsf_free(UserMem, pMultiTXT_t);
+	user_free(pMultiTXT_t);
 	DaCai_UpdateMultiButton(appdis.pUI, button_id, value, 5);
 }
 //显示样本信息 列表界面	
@@ -297,7 +297,7 @@ void DisplayStepUI(s8 stageid, s8 stepid)
 {
 	s8 m,n,i;
 
-	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
+	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	appdis.pUI->screen_id = Step_UIID;//step界面					
 	DaCai_SwitchUI(appdis.pUI);
 //	if(temp_data.StageNum>0)
@@ -319,7 +319,7 @@ void DisplayStepUI(s8 stageid, s8 stepid)
 	}
 	appdis.pUI->button_id = 1;
 	DaCai_ButtonCtrl(appdis.pUI, temp_data.stage[m].step[n].CollEnable);
-	tlsf_free(UserMem, pMultiTXT_t);
+	user_free(pMultiTXT_t);
 }
 
 void DisplayStageUI(s8 stageid)
@@ -334,13 +334,13 @@ void DisplayStageUI(s8 stageid)
 //		j = 0;
 	m = stageid;
 	i=0;
-	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
+	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	pMultiTXT_t->data[++i].id = 8;
 	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].StepNum);
 	pMultiTXT_t->data[++i].id = 4;
 	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].RepeatNum);
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);
-	tlsf_free(UserMem, pMultiTXT_t);
+	user_free(pMultiTXT_t);
 }
 #define TEMP_RECTANGLE_X	17
 #define TEMP_RECTANGLE_X_INTER	154
@@ -466,7 +466,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	DisplayHeatCoverIcon();	
 
 	ClearTempProgramUI(clear_flag);
-	pMultiTXT_t = (_MultiTXT_ *)tlsf_malloc(UserMem, sizeof(_MultiTXT_));
+	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	i=0;
 	if(page_flag)	{//翻页处理
 		if(LastIdx.StageIdx>=temp_data.StageNum)
@@ -497,7 +497,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 		flag = temp_data.stage[j].StepNum;
 	}
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);
-	tlsf_free(UserMem, pMultiTXT_t);
+	user_free(pMultiTXT_t);
 	templast = g_templast;
 	stepcnt = 0;
 	flag = 0;

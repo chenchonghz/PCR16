@@ -66,7 +66,7 @@ u8 CopyFile(char *psrc_path, char *pdest_path)
 		f_close(&srcfile);//当打开目标文件出错时，原始文件已经打开了，这里会直接结束程序，所以应该结束原始文件
 		return 0;
 	}
-	pbuf = (char *)tlsf_malloc(UserMem, UDISK_COPY_SIZE);
+	pbuf = (char *)user_malloc(UDISK_COPY_SIZE);
 	for(;;) {
 		res =  f_read(&srcfile, pbuf, UDISK_COPY_SIZE, &rsize);//一次存储100字节整数倍，导致原目大小不一致，所以在存的时候用size	
 		if(res != FR_OK||rsize==0)	break;

@@ -24,7 +24,7 @@ void DaCaiProto_init(void)
 	dacai.puart_t->rx_idx = 0;
 	dacai.puart_t->rx_cnt = 0;
 	
-	dacai.puart_t->tx_buf = (u8 *)tlsf_malloc(UserMem,DACAIUSART_TXSIZE);//usart_tx_buf;
+	dacai.puart_t->tx_buf = (u8 *)user_malloc(DACAIUSART_TXSIZE);//usart_tx_buf;
 	dacai.puart_t->tx_bufsize = DACAIUSART_TXSIZE;
 	dacai.state = DEF_OFFLINE;
 	dacai.puart_t->rx_indicate = &uart_message_rx_handler;

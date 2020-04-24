@@ -180,14 +180,14 @@ void ClearAllSysStateTB(void)
 	Sys.state &= ~SysState_StageTB;
 	Sys.state &= ~SysState_StepTB;
 }
-
+//重定向tlsf_malloc
 void *user_malloc(size_t size)
 {
 	void *ret;
 	ret = tlsf_malloc(UserMem, size);
 	return ret;
 }
-
+//重定向user_free
 void user_free(void* ptr)
 {
 	tlsf_free(UserMem, ptr);

@@ -19,7 +19,7 @@ static void DataInit(void)
 {
 	spiflash.lock         =  OSSemCreate(1);
 	spiflash.MSG_Q 			 = OSQCreate(&SpiFlashMSG_Q[0],N_MESSAGES);//
-	LogInfor.pbuf = (char *)tlsf_malloc(UserMem, LOG_BUF);//日志缓存
+	LogInfor.pbuf = (char *)user_malloc(LOG_BUF);//日志缓存
 }
 //u8 devid[2];
 void CheckSPIFlash(void)

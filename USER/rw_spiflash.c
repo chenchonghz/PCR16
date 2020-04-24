@@ -57,7 +57,7 @@ int FlashFSInit(void)
 	}else if(res == FR_NO_FILESYSTEM)	{
 #endif
 		u8 *work;		
-		work = (u8 *)tlsf_malloc(UserMem,_MAX_SS);
+		work = (u8 *)user_malloc(_MAX_SS);
 		/* Create FAT volume */
 		BSP_PRINTF("mount flash failed, format flash...");
 		BSP_W25Qx_Erase_Chip();//先格式化
@@ -115,12 +115,12 @@ void CreateLogFile(void)
 					break;
 				}
 			}
-			pLogBufer = (char *)tlsf_malloc(UserMem, RLOG_BUFSIZE);
+			pLogBufer = (char *)user_malloc(RLOG_BUFSIZE);
 			f_read(&flashfs.fil, pLogBufer, LOG_FILE_TRUNCATION_SIZE, &rsize);//读出需要保留的内容
 			f_close(&flashfs.fil);
 			f_open(&flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//重新创建文件
 			f_write(&flashfs.fil, pLogBufer, rsize, NULL);//重新写入保留的内容
-			tlsf_free(UserMem, pLogBufer);
+			user_free(pLogBufer);
 		}
 	}
 	else if(res == FR_NO_FILE)	
