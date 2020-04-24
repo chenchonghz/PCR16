@@ -10,6 +10,7 @@
 
 #define	FILE_NAME_LEN		50
 #define	LOG_FILE_NAME		"Pcr16Log.txt"//"PerfusionLog.txt"
+#define	TEMPJSON_FILE_NAME		"Temp.json"
 
 #define	HEATCOVER_TEMPMAX		110
 #define	HEATCOVER_TEMPMIN		30

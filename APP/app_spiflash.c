@@ -77,7 +77,9 @@ static void TaskSPIFLASH(void * ppdata)
 		}
 	}
 	OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_2, OS_FLAG_SET, &err);
-
+	
+//		WriteTempJsonFile();
+//	ReadTempJsonFile();
 	for(;;)
 	{
 		msg = (message_pkt_t *)OSQPend(spiflash.MSG_Q, 0, &err);//

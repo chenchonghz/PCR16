@@ -20,7 +20,7 @@ const char SampleChannel[][4] = {
 
 void SysDataInit(void)
 {
-	UserMem = tlsf_create_with_pool((void *)0x20014000, 0x4000);//内存0x14000 - 0x18000 区域16KB内存使用tlsf管理
+	UserMem = tlsf_create_with_pool((void *)0x20013000, 0x5000);//内存0x13000 - 0x18000 区域20KB内存使用tlsf管理
 	jansson_init();
 	SysError.Y1.ubyte = 0x0;//来自传感器板的故障 
 	SysError.Y2.ubyte = 0;//主板故障
@@ -39,8 +39,8 @@ void SysDataInit(void)
 	ResetLabDataDefault();
 	ResetSampleDataDefault();
 	ResetTempDataDefault();
-		jsonfile_temp();
-	jsonfile_lab();
+//	CreateTemp_Jsonfile();
+//	CreateLab_Jsonfile();
 }
 
 void SetSampleDataSampleT(u32 enable, char typeidx)
