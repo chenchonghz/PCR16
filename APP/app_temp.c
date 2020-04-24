@@ -132,7 +132,7 @@ void ConstantTempReadCallback(void)
 //按照设置好的温度程序巡视 设置的温度曲线控温
 void TempProgramLookOver(s16 c_temp)
 {
-	u8 i,j,m,n;
+	u8 m,n;
 	s16 target;
 	
 	m = temp_data.CurStage;

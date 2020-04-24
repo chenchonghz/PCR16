@@ -617,11 +617,6 @@
               <FileType>1</FileType>
               <FilePath>..\USER\json.c</FilePath>
             </File>
-            <File>
-              <FileName>lab_file.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\lab_file.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

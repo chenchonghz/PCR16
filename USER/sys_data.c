@@ -10,8 +10,8 @@ _sample_data_t sample_data;
 _lab_data_t	lab_data;
 _temp_data_t temp_data;
 
-const char SampleType[][1] = {
-	{0},{'S'},{'U'},{'N'},{'P'},
+const char SampleType[][2] = {
+	{0},{"S"},{"U"},{"N"},{"P"},
 };//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0-空
 
 const char SampleChannel[][4] = {
@@ -51,7 +51,7 @@ void SetSampleDataSampleT(u32 enable, char typeidx)
 	for(i=0;i<HOLE_NUM;i++)	{
 		tmp = enable&(DEF_BIT00_MASK<<i);
 		if(tmp)	{
-			sample_data.hole[i].sample_t = SampleType[typeidx][0];
+			strcpy(sample_data.hole[i].sample_t, &SampleType[typeidx][0]);
 //			sample_data.enable |= tmp;
 		}
 	}
@@ -79,7 +79,7 @@ void DisableSampleData(u32 enable)
 	for(i=0;i<HOLE_NUM;i++)	{
 		tmp = enable&(DEF_BIT00_MASK<<i);
 		if(tmp)	{
-			sample_data.hole[i].sample_t = SampleType[0][0];
+			strcpy(sample_data.hole[i].sample_t, &SampleType[0][0]);
 			strcpy(sample_data.hole[i].channel, &SampleChannel[0][0]);
 //			sample_data.enable &= ~tmp;
 		}
@@ -95,7 +95,7 @@ void ResetSampleDataDefault(void)
 		memset((void *)sample_data.hole[i].name, 0, LAB_NAME_LEN);
 		memset(sample_data.hole[i].prj, 0, LAB_NAME_LEN);
 		strcpy(sample_data.hole[i].channel, &SampleChannel[0][0]);
-		sample_data.hole[i].sample_t = SampleType[0][0];
+		strcpy(sample_data.hole[i].sample_t, &SampleType[0][0]);
 	}
 }
 
@@ -118,7 +118,7 @@ void ResetStage(u8 id)
 	u8 j;
 	
 	temp_data.stage[id].RepeatNum = 1;
-	temp_data.stage[id].StepNum = 0;
+	temp_data.stage[id].StepNum = 2;
 	temp_data.stage[id].CurStep = 0;
 	temp_data.stage[id].CurRepeat = 0;
 	temp_data.stage[id].Type = 0;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
@@ -149,7 +149,7 @@ void ResetTempDataDefault(void)
 	u8 i;
 	temp_data.HeatCoverEnable = DEF_True;
 	temp_data.HeatCoverTemp = 105;
-	temp_data.StageNum = 0;
+	temp_data.StageNum = 2;
 	temp_data.CurStage = 0;
 	for(i=0;i<STAGE_MAX;i++)	{
 		ResetStage(i);

@@ -11,6 +11,7 @@
 #define	FILE_NAME_LEN		50
 #define	LOG_FILE_NAME		"Pcr16Log.txt"//"PerfusionLog.txt"
 #define	TEMPJSON_FILE_NAME		"Temp.json"
+#define	LabJSON_FILE_NAME		"Lab.json"
 
 #define	HEATCOVER_TEMPMAX		110
 #define	HEATCOVER_TEMPMIN		30
@@ -120,7 +121,7 @@ typedef struct _hole_data	{//孔信息
 //	u8 enable;
 	char name[LAB_NAME_LEN];
 	char prj[LAB_NAME_LEN];
-	char sample_t;//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0-空
+	char sample_t[2];//样本类型：S-标准品;U-待测;N-阴性对照;P-阳性对照;0-空
 	char channel[4];//通道	
 }_hole_data_t;
 

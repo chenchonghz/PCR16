@@ -204,7 +204,7 @@ void UpdateSampleInfor(void)
 	j = 0;
 	for(i=0;i<HOLE_NUM;i++)	{			
 		pMultiTXT_t->data[j].id = ctrl_id++;
-		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%c\r\n\r\n%s", sample_data.hole[i].sample_t,sample_data.hole[i].channel);
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s\r\n\r\n%s", sample_data.hole[i].sample_t,sample_data.hole[i].channel);
 		j++;
 	}
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, j);
@@ -230,7 +230,7 @@ void UpdateSampleInforList(u8 index)
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	for(i=0;i<5;i++)	{
 		hole_idx = index + i;
-		if(sample_data.hole[hole_idx].sample_t != 0)
+		if(sample_data.hole[hole_idx].sample_t[0] != 0)
 			value[i] = DEF_Press;
 		else
 			value[i] = DEF_Release;
@@ -243,7 +243,7 @@ void UpdateSampleInforList(u8 index)
 		pMultiTXT_t->data[++j].id = ctrl_id++;
 		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].prj);
 		pMultiTXT_t->data[++j].id = ctrl_id++;
-		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%c", sample_data.hole[hole_idx].sample_t);
+		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].sample_t);
 		pMultiTXT_t->data[++j].id = ctrl_id++;
 		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "None");//实验结果
 		DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, j+1);

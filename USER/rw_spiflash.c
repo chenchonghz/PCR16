@@ -1,5 +1,5 @@
 #include "rw_spiflash.h"
-#include "tlsf.h"
+#include "json.h"
 #include "app_spiflash.h"
 
 #define FORMAT_DISK			0
@@ -213,25 +213,37 @@ void WriteTempJsonFile(void)
 	char filepath[FILE_NAME_LEN];
 	
 	sprintf(filepath, "%s%s", USERPath, TEMPJSON_FILE_NAME);
-//	res = f_open(&flashfs.fil, filename,  FA_CREATE_ALWAYS | FA_WRITE);//create new file and rw mode
-//	if(res != FR_OK)
-//		goto _exit;
 	if(CreateTemp_Jsonfile(filepath)==0)	{
-		SYS_PRINTF("write labjsonfile ok");
+		SYS_PRINTF("write temp jsonfile ok");
 	}
 }
 
 void ReadTempJsonFile(void)
 {
-	FRESULT res;
 	char filepath[FILE_NAME_LEN];
 	
 	sprintf(filepath, "%s%s", USERPath, TEMPJSON_FILE_NAME);
 	AnalysisTemp_Jsonfile(filepath);
-	
 }
 
+void WriteLabJsonFile(void)
+{
+	FRESULT res;
+	char filepath[FILE_NAME_LEN];
+	
+	sprintf(filepath, "%s%s", USERPath, LabJSON_FILE_NAME);
+	if(CreateLab_Jsonfile(filepath)==0)	{
+		SYS_PRINTF("write lab jsonfile ok");
+	}
+}
 
+void ReadLabJsonFile(void)
+{
+	char filepath[FILE_NAME_LEN];
+	
+	sprintf(filepath, "%s%s", USERPath, LabJSON_FILE_NAME);
+	AnalysisLab_Jsonfile(filepath);
+}
 
 
 
