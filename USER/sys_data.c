@@ -118,7 +118,7 @@ void ResetStage(u8 id)
 	u8 j;
 	
 	temp_data.stage[id].RepeatNum = 1;
-	temp_data.stage[id].StepNum = 2;
+	temp_data.stage[id].StepNum = 0;
 	temp_data.stage[id].CurStep = 0;
 	temp_data.stage[id].CurRepeat = 0;
 	temp_data.stage[id].Type = 0;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
@@ -149,7 +149,7 @@ void ResetTempDataDefault(void)
 	u8 i;
 	temp_data.HeatCoverEnable = DEF_True;
 	temp_data.HeatCoverTemp = 105;
-	temp_data.StageNum = 2;
+	temp_data.StageNum = 0;
 	temp_data.CurStage = 0;
 	for(i=0;i<STAGE_MAX;i++)	{
 		ResetStage(i);
@@ -191,4 +191,5 @@ void *user_malloc(size_t size)
 void user_free(void* ptr)
 {
 	tlsf_free(UserMem, ptr);
+	ptr = NULL;
 }

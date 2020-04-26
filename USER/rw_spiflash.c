@@ -5,9 +5,9 @@
 #define FORMAT_DISK			0
 
 struct _flashfs	{
-	DIR dir;
-	FATFS fs;
-	FIL	fil;
+//	DIR dir;
+	FATFS *fs;
+	FIL	*fil;
 } flashfs;
 
 _loginfor_t LogInfor;
@@ -37,10 +37,13 @@ u8 GetFlashSpace(u32 *ptotal, u32 *pfree)
 int FlashFSInit(void)
 {
 	FRESULT res;
-	
 	u32 disk_tot, disk_free;
+	
+	flashfs.fs = (FATFS *)user_malloc(sizeof(FATFS));
+	flashfs.fil = (FIL *)user_malloc(sizeof(FIL));
 #if FORMAT_DISK == 0	
-	res = f_mount(&flashfs.fs, USERPath, 1);
+	
+	res = f_mount(flashfs.fs, USERPath, 1);
 	if(res == FR_OK)	{
 		DIR dir;
 		FILINFO fn;
@@ -57,21 +60,19 @@ int FlashFSInit(void)
 	}else if(res == FR_NO_FILESYSTEM)	{
 #endif
 		u8 *work;		
-		work = (u8 *)user_malloc(_MAX_SS);
-		/* Create FAT volume */
+		work = (u8 *)user_malloc(_MAX_SS);		
 		BSP_PRINTF("mount flash failed, format flash...");
 		BSP_W25Qx_Erase_Chip();//先格式化
 		//OSTimeDly(5000);
-		res = f_mkfs(USERPath, FM_ANY, 0, work, _MAX_SS);
-		tlsf_free(UserMem,work);
-		work = NULL;
+		res = f_mkfs(USERPath, FM_ANY, 0, work, _MAX_SS);/* Create FAT volume */
+		user_free(work);
 		if(res == FR_OK)	{
 			BSP_PRINTF("format flash ok");
 		}else	{
 			BSP_PRINTF("format flash failed");
 			return res;
 		}
-		res = f_mount(&flashfs.fs, USERPath, 1);
+		res = f_mount(flashfs.fs, USERPath, 1);
 		if(res == FR_OK)			
 			BSP_PRINTF("mount flash ok");
 		else	
@@ -79,7 +80,6 @@ int FlashFSInit(void)
 #if FORMAT_DISK == 0
 	}
 #endif
-	
 //	GetPerfuseDataFilename(NULL);
 	GetFlashSpace(&disk_tot, &disk_free);
 	BSP_PRINTF("SPI Flash Space:");
@@ -88,54 +88,70 @@ int FlashFSInit(void)
 }
 
 //创建系统所需文件 若文件已存在，检测大小，超过指定大小，删除旧数据
-void CreateLogFile(void)
+void CreateSysFile(void)
 {
 	FILINFO fn;
+	DIR dir;
 	FRESULT res;     /* FatFs return code */
 	u32 fil_size,rsize;
 	char filename[FILE_NAME_LEN];
 	char *pLogBufer;
 	
+	sprintf(filename, "%s%s", USERPath, LabFolderName);
+	res = f_opendir(&dir,filename);
+	if(res != FR_OK)	{
+		f_mkdir(filename);
+	}
+	f_closedir(&dir);
+	sprintf(filename, "%s%s", USERPath, DataFolderName);
+	res = f_opendir(&dir,filename);
+	if(res != FR_OK)	{
+		f_mkdir(filename);
+	}
+	f_closedir(&dir);
+	sprintf(filename, "%s%s", USERPath, TmpFolderName);
+	res = f_opendir(&dir,filename);
+	if(res != FR_OK)	{
+		f_mkdir(filename);
+	}
+	f_closedir(&dir);
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);
-	res = f_stat(filename, &fn);
+	res = f_stat(filename, &fn);//若文件已存在，检测大小，超过指定大小，删除旧数据
 	if(res == FR_OK)	{//If exist, the function returns with FR_OK
-		BSP_PRINTF("Time: %u/%02u/%02u, %02u:%02u\n",
-               (fn.fdate >> 9)+1980, (fn.fdate >> 5) & 0x0f, fn.fdate & 0x1f,
-               fn.ftime >> 11, (fn.ftime >> 5) & 0x3f);
-		res = f_open(&flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);
-		fil_size = f_size(&flashfs.fil);//获取log文件大小
+//		BSP_PRINTF("Time: %u/%02u/%02u, %02u:%02u\n",
+//               (fn.fdate >> 9)+1980, (fn.fdate >> 5) & 0x0f, fn.fdate & 0x1f,
+//               fn.ftime >> 11, (fn.ftime >> 5) & 0x3f);
+		res = f_open(flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);
+		fil_size = f_size(flashfs.fil);//获取log文件大小
 		if(fil_size>LOG_FILE_MAXSIZE)	{//文件大于10k 删除旧数据
 			char data;
 			fil_size -= LOG_FILE_TRUNCATION_SIZE;
-			f_lseek(&flashfs.fil, fil_size);//将文件指针指向文件末尾1k的位置
+			f_lseek(flashfs.fil, fil_size);//将文件指针指向文件末尾1k的位置
 			for(;;)		{//找到换行位置 目的是在截取文件时 保留完整的行
-				f_read(&flashfs.fil, &data, 1, &rsize);
+				f_read(flashfs.fil, &data, 1, &rsize);
 				if(rsize==0)	goto _exit;
 				if(data == '\n')	{
 					break;
 				}
 			}
 			pLogBufer = (char *)user_malloc(RLOG_BUFSIZE);
-			f_read(&flashfs.fil, pLogBufer, LOG_FILE_TRUNCATION_SIZE, &rsize);//读出需要保留的内容
-			f_close(&flashfs.fil);
-			f_open(&flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//重新创建文件
-			f_write(&flashfs.fil, pLogBufer, rsize, NULL);//重新写入保留的内容
+			f_read(flashfs.fil, pLogBufer, LOG_FILE_TRUNCATION_SIZE, &rsize);//读出需要保留的内容
+			f_close(flashfs.fil);
+			f_open(flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//重新创建文件
+			f_write(flashfs.fil, pLogBufer, rsize, NULL);//重新写入保留的内容
 			user_free(pLogBufer);
 		}
 	}
 	else if(res == FR_NO_FILE)	
 	{//文件不存在 or 强制创建标志有效 创建文件
-		res = f_open(&flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and w mode
+		res = f_open(flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and w mode
 		if(res != FR_OK)	{
 			return;
 		}
-		f_close(&flashfs.fil);
-//		write_log("Create file.");
+//		f_close(flashfs.fil);
 	}
 _exit:
-	f_close(&flashfs.fil);
-	pLogBufer = NULL;
-//	return 1;
+	f_close(flashfs.fil);
 }
 
 //将日志从缓存写入flash
@@ -150,14 +166,14 @@ u8 write_log(void)
 	}
 	mutex_lock(spiflash.lock);
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);//log文件名
-	res = f_open(&flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);//create new file and rw mode
+	res = f_open(flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);//create new file and rw mode
 	if(res != FR_OK)
 		goto _exit;
-	f_write(&flashfs.fil, LogInfor.pbuf, LogInfor.len, &len);	//写入log文件
+	f_write(flashfs.fil, LogInfor.pbuf, LogInfor.len, &len);	//写入log文件
 	LogInfor.len -= len;	
 //	BSP_PRINTF("Write Log OK");
 _exit:
-	f_close(&flashfs.fil);
+	f_close(flashfs.fil);
 	mutex_unlock(spiflash.lock);
 	return 1;
 }
@@ -173,11 +189,11 @@ u32 read_log(char *pbuf)
 	
 	rsize = 0;	
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);
-	res = f_open(&flashfs.fil, filename, FA_READ);
+	res = f_open(flashfs.fil, filename, FA_READ);
 	if(res != FR_OK)
 		return 0;
 	logPosition = 0;
-	dissize = f_size(&flashfs.fil);
+	dissize = f_size(flashfs.fil);
 	if(dissize>=25)
 		logPosition = dissize - 25;
 	dissize = 0;
@@ -186,8 +202,8 @@ u32 read_log(char *pbuf)
 		if(logPosition==0)	{
 			break;
 		}
-		f_lseek(&flashfs.fil, logPosition--);
-		f_read(&flashfs.fil, &data, 1, &rsize);
+		f_lseek(flashfs.fil, logPosition--);
+		f_read(flashfs.fil, &data, 1, &rsize);
 		if(rsize==0)	goto _exit;
 		dissize += 1;
 		if(dissize >= (LOG_DISPLAY_SIZE-25))	{//达到 最大显示内容
@@ -200,10 +216,10 @@ u32 read_log(char *pbuf)
 			}
 		}
 	}
-	res =  f_read(&flashfs.fil, pbuf, LOG_DISPLAY_SIZE, &rsize);//一次存储100字节整数倍，导致原目大小不一致，所以在存的时候用size	
+	res =  f_read(flashfs.fil, pbuf, LOG_DISPLAY_SIZE, &rsize);//一次存储100字节整数倍，导致原目大小不一致，所以在存的时候用size	
 	if(res != FR_OK) goto _exit;
 _exit:
-	f_close(&flashfs.fil);
+	f_close(flashfs.fil);
 	return rsize;
 }
 

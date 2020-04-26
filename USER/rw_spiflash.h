@@ -24,7 +24,7 @@ extern _loginfor_t LogInfor;
 int FlashFSInit(void);
 u8 write_log(void);
 u32 read_log(char *pbuf);
-void CreateLogFile(void);
+void CreateSysFile(void);
 void WriteTempJsonFile(void);
 void ReadTempJsonFile(void);
 u8 GetFlashSpace(u32 *ptotal, u32 *pfree);

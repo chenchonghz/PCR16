@@ -73,13 +73,13 @@ static void TaskSPIFLASH(void * ppdata)
 	if(SysError.Y2.bits.b7 == DEF_Active)	{
 		if(FlashFSInit()==FR_OK)	{
 			BSP_PRINTF("filesys init ok");		
-			CreateLogFile();//创建系统文件
+			CreateSysFile();//创建系统文件
 		}
 	}
 	OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_2, OS_FLAG_SET, &err);
 	
 //		WriteTempJsonFile();
-	ReadTempJsonFile();
+//	ReadTempJsonFile();
 	for(;;)
 	{
 		msg = (message_pkt_t *)OSQPend(spiflash.MSG_Q, 0, &err);//

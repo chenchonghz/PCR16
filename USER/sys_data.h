@@ -13,6 +13,10 @@
 #define	TEMPJSON_FILE_NAME		"Temp.json"
 #define	LabJSON_FILE_NAME		"Lab.json"
 
+#define	LabFolderName		"Lab"
+#define	DataFolderName		"Data"
+#define	TmpFolderName		"tmp"
+
 #define	HEATCOVER_TEMPMAX		110
 #define	HEATCOVER_TEMPMIN		30
 

@@ -135,7 +135,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 	}
 	if(appdis.pUI->screen_id==Main_UIID)	{//主界面按钮响应		
 		if(status == DEF_Release)	{
-			if(appdis.pUI->ctrl_id == 1)	{
+			if(appdis.pUI->ctrl_id == 1)	{//实验
 				DisplayLabUI();
 			}
 			else if(appdis.pUI->ctrl_id == 3||appdis.pUI->ctrl_id == 4)	{//DNA RNA
