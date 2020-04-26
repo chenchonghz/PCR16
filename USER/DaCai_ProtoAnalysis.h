@@ -82,7 +82,7 @@ typedef struct _DACAI	{
 typedef struct _Multi_	{
 	u8 id;
 	u8 len;
-	char buf[32];	
+	char buf[64];	
 }_MultiDat;
 
 //extern const u8 CMD_END[4];

@@ -3,6 +3,7 @@
 #include "app_spiflash.h"
 
 #define FORMAT_DISK			0
+_labtemplatelist_t gLabTemplatelist;
 
 struct _flashfs	{
 //	DIR dir;
@@ -80,7 +81,6 @@ int FlashFSInit(void)
 #if FORMAT_DISK == 0
 	}
 #endif
-//	GetPerfuseDataFilename(NULL);
 	GetFlashSpace(&disk_tot, &disk_free);
 	BSP_PRINTF("SPI Flash Space:");
 	BSP_PRINTF("    %u KiB total drive space.\n    %u KiB available.\n", disk_tot, disk_free);
@@ -223,45 +223,130 @@ _exit:
 	return rsize;
 }
 
-void WriteTempJsonFile(void)
+//void WriteTempJsonFile(void)
+//{
+//	FRESULT res;
+//	char filepath[FILE_NAME_LEN];
+//	
+//	sprintf(filepath, "%s%s", USERPath, TEMPJSON_FILE_NAME);
+//	if(CreateTemp_Jsonfile(filepath)==0)	{
+//		SYS_PRINTF("write temp jsonfile ok");
+//	}
+//}
+
+//void ReadTempJsonFile(void)
+//{
+//	char filepath[FILE_NAME_LEN];
+//	
+//	sprintf(filepath, "%s%s", USERPath, TEMPJSON_FILE_NAME);
+//	AnalysisTemp_Jsonfile(filepath);
+//}
+
+//void WriteLabJsonFile(void)
+//{
+//	FRESULT res;
+//	char filepath[FILE_NAME_LEN];
+//	
+//	sprintf(filepath, "%s%s", USERPath, LabJSON_FILE_NAME);
+//	if(CreateLab_Jsonfile(filepath)==0)	{
+//		SYS_PRINTF("write lab jsonfile ok");
+//	}
+//}
+
+//void ReadLabJsonFile(void)
+//{
+//	char filepath[FILE_NAME_LEN];
+//	
+//	sprintf(filepath, "%s%s", USERPath, LabJSON_FILE_NAME);
+//	AnalysisLab_Jsonfile(filepath);
+//}
+//文件写入实验模板
+void WriteLabTemplate(void)
 {
 	FRESULT res;
+	char filename[FILE_NAME_LEN];
 	char filepath[FILE_NAME_LEN];
 	
-	sprintf(filepath, "%s%s", USERPath, TEMPJSON_FILE_NAME);
-	if(CreateTemp_Jsonfile(filepath)==0)	{
-		SYS_PRINTF("write temp jsonfile ok");
+	sprintf(filename, "%s%s/%s", USERPath, LabFolderName, lab_data.name);
+	res = f_mkdir(filename);
+	if(res == FR_OK)	{
+		sprintf(filepath, "%s/%s", filename, LabJSON_FILE_NAME);
+		if(CreateLab_Jsonfile(filepath)==0)	{
+			SYS_PRINTF("write %s",filepath);
+		}
+		sprintf(filepath, "%s/%s", filename, TEMPJSON_FILE_NAME);
+		if(CreateTemp_Jsonfile(filepath)==0)	{
+			SYS_PRINTF("write %s",filepath);
+		}
 	}
 }
-
-void ReadTempJsonFile(void)
-{
-	char filepath[FILE_NAME_LEN];
-	
-	sprintf(filepath, "%s%s", USERPath, TEMPJSON_FILE_NAME);
-	AnalysisTemp_Jsonfile(filepath);
-}
-
-void WriteLabJsonFile(void)
+//读取实验模板列表
+void ReadLabTemplateList(void)
 {
 	FRESULT res;
-	char filepath[FILE_NAME_LEN];
+	FILINFO fn;
+	DIR dir;
+	char filename[FILE_NAME_LEN];
+	_labtemplatelist_t *pTemplateList;
+	_labtemplate_t *plist[LabTemplateMax];
+	_labtemplate_t *pTemp;
+	u8 num;
 	
-	sprintf(filepath, "%s%s", USERPath, LabJSON_FILE_NAME);
-	if(CreateLab_Jsonfile(filepath)==0)	{
-		SYS_PRINTF("write lab jsonfile ok");
+	pTemplateList = (_labtemplatelist_t *)user_malloc(sizeof(_labtemplate_t));
+	num=0;	
+	sprintf(filename, "%s%s", USERPath, LabFolderName);
+	res = f_opendir(&dir,filename);
+	if(res==FR_OK)	{
+		for(;;)	{
+			res=f_readdir(&dir,&fn);
+			if(res!=FR_OK||fn.fname[0]==0)	break;
+			if(num<LabTemplateMax)	{
+				strcpy(pTemplateList->list[num].name, fn.fname);
+				sprintf(pTemplateList->list[num].time, "%d/%02d/%02d %02d:%02d", (fn.fdate >> 9)+1980, (fn.fdate >> 5) & 0x0f, fn.fdate & 0x1f, \
+						fn.ftime >> 11, (fn.ftime >> 5) & 0x3f);
+				num++;
+			}
+		}
+		f_closedir(&dir);
 	}
-}
-
-void ReadLabJsonFile(void)
-{
-	char filepath[FILE_NAME_LEN];
+	else	{
+		return;
+	}
 	
-	sprintf(filepath, "%s%s", USERPath, LabJSON_FILE_NAME);
-	AnalysisLab_Jsonfile(filepath);
+	/////////////////////////将灌注文件 按照修改时间由小到大排序 确保最新的文件在最前面///////////////////////////////
+	u8 i,j,flag;
+	for(i=0;i<num;i++)	{
+		plist[i] = (_labtemplate_t *)&pTemplateList->list[i];
+	}
+	i=0;
+	/*---------------- 冒泡排序,由小到大排序 -----------------*/
+	do{
+		flag=0;
+		for (j=0;j<num-i-1;j++)
+		{
+			if (strcmp(plist[j]->time, plist[j+1]->time)>0)	{
+				pTemp = plist[j];
+				plist[j] = plist[j+1];
+				plist[j+1] = pTemp;
+				flag = 1;
+			}
+			if (strcmp(plist[j]->time, plist[j+1]->time)>0)	{
+				pTemp = plist[j];
+				plist[j] = plist[j+1];
+				plist[j+1] = pTemp;
+				flag = 1;
+			}
+		}
+		i++;
+	}while((i<num) && flag);
+	///////////////////////////////////////////////////////////
+	for(i=0;i<num;i++)	{
+		strcpy(gLabTemplatelist.list[i].name, plist[i]->name);
+		strcpy(gLabTemplatelist.list[i].time, plist[i]->time);
+	}
+	gLabTemplatelist.num = num;
+	user_free(pTemplateList);
 }
-
-
 
 #if 0	//spi flash 挂载文件系统测试函数
 FRESULT res;        /* API result code */

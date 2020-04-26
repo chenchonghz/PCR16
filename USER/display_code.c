@@ -8,8 +8,8 @@ _MultiTXT_ *pMultiTXT_t;
 
 const char Code_Warning[][12] = {	
 	{"是否删除？"},
-	{"是否启动？"},
-	{"是否停止？"},
+	{"是否启动"},
+	{"是否停止"},
 };
 
 const char Code_Message[][12] = {	
@@ -19,7 +19,7 @@ const char Code_Message[][12] = {
 	{"无效输入"},
 	{"设置成功"},
 	{"运行中"},
-	{"参数错误!"},
+	{"启动失败:"},
 };
 
 const char Code_Choose[][5] = {	
@@ -99,9 +99,6 @@ void DisplayMessageUI(char *pbuf)
 void DisplayWarningUI(char *pbuf, char *buf1, char *buf2)
 {	
 	DisplayUIIDAndBackup(Confirm_UIID);
-//	UUIDBackup();
-//	appdis.pUI->screen_id = Confirm_UIID;
-//	DaCai_SwitchUI(appdis.pUI);
 	appdis.pUI->ctrl_id  = 4;	
 	appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", pbuf);
 	DaCai_UpdateTXT(appdis.pUI);
@@ -130,9 +127,12 @@ void DisplayLogUI(void)
 		DaCai_UpdateTXT(appdis.pUI);
 	}
 }
+
 //显示实验界面
 void DisplayLabUI(void)
 {
+	u8 i;
+	
 	appdis.pUI->screen_id = Lab_UIID;
 	DaCai_SwitchUI(appdis.pUI);
 	appdis.pUI->button_id = 19;
@@ -142,6 +142,16 @@ void DisplayLabUI(void)
 	else	{
 		DaCai_ButtonCtrl(appdis.pUI, DEF_Release);
 	}
+	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
+	ReadLabTemplateList();
+	appdis.pUI->ctrl_id = 6;
+	for(i=0;i<gLabTemplatelist.num;i++)	{			
+		pMultiTXT_t->data[i].id = appdis.pUI->ctrl_id++;
+		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%s		%s", gLabTemplatelist.list[i].name, gLabTemplatelist.list[i].time);
+		i++;
+	}
+	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i);
+	user_free(pMultiTXT_t);
 }
 //显示实验属性界面
 void DisplayLabAttrUI(void)
@@ -281,15 +291,26 @@ void DisplayHeatCoverIcon(void)
 //根据当前实验状态，提示停止实验还是启动实验
 void DisplayQiTingLab(void)
 {	
-	if(Sys.devstate == DevState_Running)	{
-		DisplayWarningUI((char *)&Code_Warning[2][0], (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
-//		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[2][0]);//显示 是否停止
-		Sys.state |= SysState_StopTB;
+	if(Sys.devstate == DevState_Running)	{//停止实验
+			sprintf((char *)appdis.pUI->pdata,"%s %s ?", &Code_Warning[2][0],lab_data.name);//显示 是否停止
+			DisplayWarningUI((char *)appdis.pUI->pdata, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
+//			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[2][0]);//显示 是否停止
+			Sys.state |= SysState_StopTB;
 	}
-	else if(Sys.devstate == DevState_IDLE)		{		
-//		appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[1][0]);//显示 是否启动
-		DisplayWarningUI((char *)&Code_Warning[1][0], (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);		
-		Sys.state |= SysState_RunningTB;
+	else if(Sys.devstate == DevState_IDLE)		{	//启动实验
+		if(lab_data.name[0] == 0)	{//启动前 检查
+			sprintf((char *)appdis.pUI->pdata,"%s %s", &Code_Message[6][0],"无效实验名称");
+			DisplayMessageUI((char *)appdis.pUI->pdata);
+		}
+		else	if(temp_data.StageNum==0)	{
+			sprintf((char *)appdis.pUI->pdata,"%s %s", &Code_Message[6][0],"无效温度程序");
+			DisplayMessageUI((char *)appdis.pUI->pdata);
+		}
+		else	{		
+			sprintf((char *)appdis.pUI->pdata,"%s %s ?", &Code_Warning[1][0], lab_data.name);//显示 是否启动 
+			DisplayWarningUI((char *)appdis.pUI->pdata, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);		
+			Sys.state |= SysState_RunningTB;
+		}
 	}
 }
 

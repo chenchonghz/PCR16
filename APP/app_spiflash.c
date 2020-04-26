@@ -74,6 +74,7 @@ static void TaskSPIFLASH(void * ppdata)
 		if(FlashFSInit()==FR_OK)	{
 			BSP_PRINTF("filesys init ok");		
 			CreateSysFile();//创建系统文件
+			ReadLabTemplateList();
 		}
 	}
 	OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_2, OS_FLAG_SET, &err);
@@ -88,8 +89,8 @@ static void TaskSPIFLASH(void * ppdata)
 				if(msg->Src == MSG_WRITELOG)	{//写日志
 					write_log();
 				}
-				else if(msg->Src == MSG_SAVE_PERFUSE_DATA)	{//保存灌注数据
-//					WritePerfuseData(PerfuseData.pdata);
+				else if(msg->Src == MSG_WriteLabTemplate)	{//保存灌注数据
+					WriteLabTemplate();
 				}
 			}
 		}else if(err==OS_ERR_TIMEOUT)	{

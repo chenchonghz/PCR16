@@ -2,6 +2,7 @@
 #include "ad7124.h"
 #include "PID.h"
 #include "timer.h"
+#include "app_spiflash.h"
 //堆栈
 __align(4) OS_STK  TASK_TEMP_STK[STK_SIZE_TEMP]; //任务堆栈声?
 
@@ -91,11 +92,11 @@ static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
 //
 u8 StartAPPTempCtrl(void)
 {
-	if(temp_data.StageNum==0)//无效参数
-		return 0;
-//	temp_data.CurStage = 0;
-//	temp_data.stage[0].CurStep = 0;
-//	temp_data.stage[m].CurRepeat = 0;
+//	if(temp_data.StageNum==0)//无效参数
+//		return 0;
+	msg_pkt_temp.Src = MSG_WriteLabTemplate;//保存实验模板, 路径./lab/Temp.json; ./lab/Lab.json
+	OSQPost(spiflash.MSG_Q, &msg_pkt_temp);	
+//	OSTimeDly(1000);
 	ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
 	Sys.devstate = DevState_Running;
 	return 1;

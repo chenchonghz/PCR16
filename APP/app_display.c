@@ -457,12 +457,12 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		else	if(appdis.pUI->ctrl_id == 3)	{//确认键
 			if(Sys.state & SysState_RunningTB)	{//启动实验
 				Sys.state &= ~SysState_RunningTB;				
-				iPara = StartAPPTempCtrl();
+				StartAPPTempCtrl();//参数正常 启动实验 
 				DisplayBackupUIID();	
-				if(iPara==0)	{//启动温控					
-					DisplayMessageUI((char *)&Code_Message[6][0]);//参数错误 无法启动
-				}	
-				return;
+//				if(iPara==0)	{//参数错误 				
+//					DisplayMessageUI((char *)&Code_Message[6][0]);//参数错误 无法启动
+//				}	
+//				return;
 			}
 			else if(Sys.state & SysState_StopTB)	{//停止实验
 				StopAPPTempCtrl();
