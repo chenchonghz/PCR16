@@ -143,11 +143,11 @@ void DisplayLabUI(void)
 		DaCai_ButtonCtrl(appdis.pUI, DEF_Release);
 	}
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
-	ReadLabTemplateList();
+	ReadLabTemplateList();//读取实验列表
 	appdis.pUI->ctrl_id = 6;
 	for(i=0;i<gLabTemplatelist.num;i++)	{			
 		pMultiTXT_t->data[i].id = appdis.pUI->ctrl_id++;
-		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%s		%s", gLabTemplatelist.list[i].name, gLabTemplatelist.list[i].time);
+		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%-25s%s", gLabTemplatelist.list[i].name, gLabTemplatelist.list[i].time);
 		i++;
 	}
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i);
@@ -292,22 +292,22 @@ void DisplayHeatCoverIcon(void)
 void DisplayQiTingLab(void)
 {	
 	if(Sys.devstate == DevState_Running)	{//停止实验
-			sprintf((char *)appdis.pUI->pdata,"%s %s ?", &Code_Warning[2][0],lab_data.name);//显示 是否停止
+			sprintf((char *)appdis.pUI->pdata,"%s实验 %s ?", &Code_Warning[2][0],lab_data.name);//显示 是否停止
 			DisplayWarningUI((char *)appdis.pUI->pdata, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
 //			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", &Code_Warning[2][0]);//显示 是否停止
 			Sys.state |= SysState_StopTB;
 	}
 	else if(Sys.devstate == DevState_IDLE)		{	//启动实验
 		if(lab_data.name[0] == 0)	{//启动前 检查
-			sprintf((char *)appdis.pUI->pdata,"%s %s", &Code_Message[6][0],"无效实验名称");
+			sprintf((char *)appdis.pUI->pdata,"%s","无效实验名称");
 			DisplayMessageUI((char *)appdis.pUI->pdata);
 		}
 		else	if(temp_data.StageNum==0)	{
-			sprintf((char *)appdis.pUI->pdata,"%s %s", &Code_Message[6][0],"无效温度程序");
+			sprintf((char *)appdis.pUI->pdata,"%s","无效温度程序");
 			DisplayMessageUI((char *)appdis.pUI->pdata);
 		}
 		else	{		
-			sprintf((char *)appdis.pUI->pdata,"%s %s ?", &Code_Warning[1][0], lab_data.name);//显示 是否启动 
+			sprintf((char *)appdis.pUI->pdata,"%s实验 %s ?", &Code_Warning[1][0], lab_data.name);//显示 是否启动 
 			DisplayWarningUI((char *)appdis.pUI->pdata, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);		
 			Sys.state |= SysState_RunningTB;
 		}
@@ -321,23 +321,18 @@ void DisplayStepUI(s8 stageid, s8 stepid)
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	appdis.pUI->screen_id = Step_UIID;//step界面					
 	DaCai_SwitchUI(appdis.pUI);
-//	if(temp_data.StageNum>0)
-	{
-//		m = stageid-1;
-//		if(m<0)	m = 0;
-//		n = stageid-1;
-//		if(n<0) n = 0;
-		m = stageid;
-		n = stepid;
-		i=0;
-		pMultiTXT_t->data[++i].id = 8;
-		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d.%d", temp_data.stage[m].step[n].temp/10,temp_data.stage[m].step[n].temp%10);
-		pMultiTXT_t->data[++i].id = 9;
-		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].step[n].tim/60);
-		pMultiTXT_t->data[++i].id = 10;
-		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].step[n].tim%60);
-		DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);
-	}
+
+	m = stageid;
+	n = stepid;
+	i=0;
+	pMultiTXT_t->data[++i].id = 8;
+	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d.%d", temp_data.stage[m].step[n].temp/100,(temp_data.stage[m].step[n].temp%100)/10);
+	pMultiTXT_t->data[++i].id = 9;
+	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].step[n].tim/60);
+	pMultiTXT_t->data[++i].id = 10;
+	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.stage[m].step[n].tim%60);
+	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);
+
 	appdis.pUI->button_id = 1;
 	DaCai_ButtonCtrl(appdis.pUI, temp_data.stage[m].step[n].CollEnable);
 	user_free(pMultiTXT_t);
@@ -349,10 +344,6 @@ void DisplayStageUI(s8 stageid)
 	
 	appdis.pUI->screen_id = Stage_UIID;//stage界面					
 	DaCai_SwitchUI(appdis.pUI);
-//	if(temp_data.StageNum>0)
-//		j = temp_data.StageNum-1;
-//	else
-//		j = 0;
 	m = stageid;
 	i=0;
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
@@ -383,13 +374,6 @@ static void ClearTempProgramUI(u8 clear_flag)
 		appdis.pUI->ctrl_id = 24+j;
 		DaCai_ClearTXT(appdis.pUI);
 	}
-//	for(j=0;j<TEMP_UI_MAXSTEP;j++)	{//清文字 图片
-//		rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*j;	
-//		DaCai_DisplayCutPic(rec_x, TEMP_RECTANGLE_Y, 59, 0, 0, TEMP_RECTANGLE_W, TEMP_RECTANGLE_H);
-//		TempButtonState[j] = 0;
-//		appdis.pUI->ctrl_id = 10 + j;
-//		DaCai_IconCtrl(appdis.pUI, TempButtonState[j]);
-//	}
 }
 struct _dis_idx_t	{
 	u8 StageIdx;

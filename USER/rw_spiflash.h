@@ -11,7 +11,7 @@
 #define LOG_DISPLAY_LINE	13//最多显示13行
 #define	LOG_DISPLAY_SIZE	500//255//(WLOG_BUFSIZE*LOG_DISPLAY_LINE)//log文本框显示最大文本字节
 
-#define	LabTemplateMax		5
+#define	LabTemplateMax		6
 
 typedef struct _loginfor	{
 	char *pbuf;
@@ -42,4 +42,5 @@ void ReadTempJsonFile(void);
 u8 GetFlashSpace(u32 *ptotal, u32 *pfree);
 void WriteLabTemplate(void);
 void ReadLabTemplateList(void);
+void DeleteLabTemplate(u8 item);
 #endif

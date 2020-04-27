@@ -348,7 +348,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 	else if(appdis.pUI->screen_id==Step_UIID)	{//步设置
 		if(Sys.state&SysState_ReadTXT)	{//回读文本控件内容
 			strcpy(appdis.pUI->pdata, (const char *)(pUsart->rx_buf+pUsart->rx_idx));
-			temp = (int)(atof(appdis.pUI->pdata)*10);
+			temp = (int)(atof(appdis.pUI->pdata)*100);
 			if(appdis.pUI->ctrl_id == 8)	{//温度值设置
 				if(temp > HOLE_TEMP_MAX||temp < HOLE_TEMP_MIN)
 					DisplayMessageUI((char *)&Code_Message[3][0]);

@@ -96,15 +96,17 @@ u8 StartAPPTempCtrl(void)
 //		return 0;
 	msg_pkt_temp.Src = MSG_WriteLabTemplate;//保存实验模板, 路径./lab/Temp.json; ./lab/Lab.json
 	OSQPost(spiflash.MSG_Q, &msg_pkt_temp);	
-//	OSTimeDly(1000);
+	OSTimeDly(500);
 	ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
 	Sys.devstate = DevState_Running;
+	StartAppADTask();
 	return 1;
 }
 
 void StopAPPTempCtrl(void)
 {
 	Sys.devstate = DevState_IDLE;
+	StopAppADTask();
 }
 u8 hengwenflag;
 //恒温时间达到 调用该函数
@@ -138,7 +140,7 @@ void TempProgramLookOver(s16 c_temp)
 	
 	m = temp_data.CurStage;
 	n = temp_data.stage[m].CurStep;
-	target = temp_data.stage[m].step[n].temp*10;
+	target = temp_data.stage[m].step[n].temp;
 	if(abs(c_temp-target)>100)	{//温度差大于1度 当前处于升降温阶段
 //		ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
 		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, target);

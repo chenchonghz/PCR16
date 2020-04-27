@@ -109,7 +109,7 @@ void ResetLabDataDefault(void)
 void ResetStep(u8 stageid, u8 stepid)
 {
 	temp_data.stage[stageid].step[stepid].CollEnable = DEF_False;
-	temp_data.stage[stageid].step[stepid].temp = 950;
+	temp_data.stage[stageid].step[stepid].temp = HOLE_TEMP_MAX;
 	temp_data.stage[stageid].step[stepid].tim = 60;
 }
 

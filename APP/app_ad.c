@@ -6,6 +6,7 @@ __align(4) OS_STK  TASK_AD_STK[STK_SIZE_AD]; //ÈÎÎñ¶ÑÕ»Éù?
 
 static  message_pkt_t    msg_pkt_motor;
 static void AppADTask (void *parg);
+_app_ad_t app_ad;
 
 void AppADInit (void)
 {
@@ -14,7 +15,17 @@ void AppADInit (void)
 
 static void ADDatInit(void)
 {
-	
+	app_ad.wait_t = 2;
+}
+
+void StartAppADTask(void)
+{
+	app_ad.wait_t = 2;
+}
+
+void StopAppADTask(void)
+{
+	app_ad.wait_t = 2;
 }
 //u16 timecnt=0;
 //u32 advol;
@@ -27,7 +38,7 @@ static void AppADTask (void *parg)
 	for(;;)
     {
 		StartADDataCollect();
-		OSTimeDly(2);
+		OSTimeDly(app_ad.wait_t);
 //		timecnt++;
 //		if(timecnt>300)	{
 //			timecnt = 0;

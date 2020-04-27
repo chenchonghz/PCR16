@@ -295,7 +295,7 @@ void ReadLabTemplateList(void)
 	pTemplateList = (_labtemplatelist_t *)user_malloc(sizeof(_labtemplate_t));
 	num=0;	
 	sprintf(filename, "%s%s", USERPath, LabFolderName);
-	res = f_opendir(&dir,filename);
+	res = f_opendir(&dir, filename);
 	if(res==FR_OK)	{
 		for(;;)	{
 			res=f_readdir(&dir,&fn);
@@ -346,7 +346,31 @@ void ReadLabTemplateList(void)
 	}
 	gLabTemplatelist.num = num;
 	user_free(pTemplateList);
+	if(gLabTemplatelist.num>=LabTemplateMax-1)	{
+		DeleteLabTemplate(0);
+		gLabTemplatelist.num -= 1;
+	}
 }
+
+void DeleteLabTemplate(u8 item)
+{
+	FRESULT res;
+	char filedir[FILE_NAME_LEN];
+	
+	if(item>=LabTemplateMax)
+		return;
+	sprintf(filedir, "%s%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name);
+	res = f_unlink(filedir);//Remove a file or sub-directory
+	if(res==FR_OK)
+		BSP_PRINTF("delete file: %s",filedir);
+}
+
+
+
+
+
+
+
 
 #if 0	//spi flash 挂载文件系统测试函数
 FRESULT res;        /* API result code */

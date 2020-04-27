@@ -86,8 +86,8 @@ typedef struct _sys	{
 #define	LAB_NAME_LEN		15
 #define	HOLE_NUM		16
 #define	STAGE_REPEAT_MAX		100
-#define	HOLE_TEMP_MAX		950//0.1
-#define	HOLE_TEMP_MIN		10
+#define	HOLE_TEMP_MAX		9500//95度 0.01
+#define	HOLE_TEMP_MIN		100//1度 
 typedef struct _step	{
 	u8 CollEnable;//采集使能
 	s16 temp;
