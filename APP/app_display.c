@@ -150,18 +150,46 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			}
 		}
 	}
-	else if(appdis.pUI->screen_id==Lab_UIID)	{//实验界面
-		if(status == DEF_Release)	{
-			if(appdis.pUI->ctrl_id == 6)	{//新建
-				appdis.pUI->screen_id = Menu_UIID;
-				DaCai_SwitchUI(appdis.pUI);
+	else if(appdis.pUI->screen_id==Lab_UIID)	{//实验界面		
+		if(appdis.pUI->ctrl_id >= 1&&appdis.pUI->ctrl_id <= 5)	{
+			if(status == DEF_Press)	
+				appdis.pUI->index = appdis.pUI->ctrl_id-1;
+			else
+				appdis.pUI->index = 0x0f;
+		}		
+		else if(status == DEF_Release)	{
+			if(appdis.pUI->ctrl_id == 11)	{//新建
+				if(Sys.devstate == DevState_Running)	{
+					DisplayMessageUI((char *)&Code_Message[5][0],1);
+				}
+				else	{
+					ResetLabDataDefault();//新建实验 恢复默认数据
+					ResetSampleDataDefault();
+					ResetTempDataDefault();
+					DisplayMenuUI();
+				}
 			}
-			else if(appdis.pUI->ctrl_id == 7)	{//删除
-				DisplayWarningUI((char *)&Code_Warning[0][0], (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
-				Sys.state |= SysState_DeleteLabTB;
+			else if(appdis.pUI->ctrl_id == 12)	{//删除
+				if(Sys.devstate == DevState_Running)
+					DisplayMessageUI((char *)&Code_Message[5][0],1);//运行中 拒绝删除
+				else if(appdis.pUI->index >= gLabTemplatelist.num)	
+					DisplayMessageUI((char *)&Code_Message[3][0],1);//无效操作
+				else {
+					sprintf((char *)appdis.pUI->pdata,"%s实验 %s ?", &Code_Warning[0][0], gLabTemplatelist.list[appdis.pUI->index].name);//显示 是否删除实验xxx
+					DisplayWarningUI((char *)appdis.pUI->pdata, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
+					Sys.state |= SysState_DeleteLabTB;
+				}
 			}
 			else if(appdis.pUI->ctrl_id == 19)	{//启动实验
-				DisplayQiTingLab();//根据当前实验状态，提示停止实验还是启动实验
+				if(Sys.devstate == DevState_Running)
+					DisplayQiTingLab();
+				else if(appdis.pUI->index >= gLabTemplatelist.num)	
+					DisplayMessageUI((char *)&Code_Message[3][0],1);//无效操作
+				else	{				
+					AnalysisLabTemplate(appdis.pUI->index);//解析实验模板	
+					appdis.pUI->index = 0x0f;					
+					DisplayQiTingLab();//根据当前实验状态，提示停止实验还是启动实验	
+				}					
 			}
 		}
 	}
@@ -305,7 +333,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			temp = atoi(appdis.pUI->pdata);	
 			if(appdis.pUI->ctrl_id == 4)	{//循环数设置			
 				if(temp > STAGE_REPEAT_MAX||temp <= 0)	{
-					DisplayMessageUI((char *)&Code_Message[3][0]);
+					DisplayMessageUI((char *)&Code_Message[3][0],1);
 				}
 				else	{
 					temp_data.stage[modify_stageid].RepeatNum = temp;
@@ -315,12 +343,12 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			}
 			else if(appdis.pUI->ctrl_id == 8)	{//总步数设置				
 				if(temp > STEP_MAX||temp <= 0)	{
-					DisplayMessageUI((char *)&Code_Message[3][0]);
+					DisplayMessageUI((char *)&Code_Message[3][0],1);
 				}
 				else	{
 					temp_data.stage[modify_stageid].StepNum = temp;
 					Sys.state &= ~SysState_ReadTXT;
-					DisplayMessageUI((char *)&Code_Message[4][0]);	
+					DisplayMessageUI((char *)&Code_Message[4][0],1);	
 					Sys.state |= SysState_ReadTXTOK;				
 				}
 			}
@@ -351,7 +379,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			temp = (int)(atof(appdis.pUI->pdata)*100);
 			if(appdis.pUI->ctrl_id == 8)	{//温度值设置
 				if(temp > HOLE_TEMP_MAX||temp < HOLE_TEMP_MIN)
-					DisplayMessageUI((char *)&Code_Message[3][0]);
+					DisplayMessageUI((char *)&Code_Message[3][0],1);
 				else	{
 					temp_data.stage[modify_stageid].step[modify_stepid].temp = temp;
 					appdis.pUI->ctrl_id = 9;
@@ -361,7 +389,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			else if(appdis.pUI->ctrl_id == 9)	{//恒温时间 min	
 				temp /= 10;
 				if(temp > 10||temp < 0)	
-					DisplayMessageUI((char *)&Code_Message[3][0]);
+					DisplayMessageUI((char *)&Code_Message[3][0],1);
 				else	{
 					temp_data.stage[modify_stageid].step[modify_stepid].tim = temp*60;
 					appdis.pUI->ctrl_id = 10;
@@ -371,11 +399,11 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			else if(appdis.pUI->ctrl_id == 10)	{//恒温时间 sec	
 				temp /= 10;
 				if(temp > 60||temp < 0)	
-					DisplayMessageUI((char *)&Code_Message[3][0]);
+					DisplayMessageUI((char *)&Code_Message[3][0],1);
 				else	{
 					temp_data.stage[modify_stageid].step[modify_stepid].tim += temp;
 					Sys.state &= ~SysState_ReadTXT;
-					DisplayMessageUI((char *)&Code_Message[4][0]);					
+					DisplayMessageUI((char *)&Code_Message[4][0],1);					
 					Sys.state |= SysState_ReadTXTOK;
 				}
 			}
@@ -418,7 +446,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				if(appdis.pUI->editinfo.ctrl_id == 9)	{//编辑热盖温度
 					temp = atoi(appdis.pUI->pdata);
 					if(temp > HEATCOVER_TEMPMAX || temp < HEATCOVER_TEMPMIN)	{
-						DisplayMessageUI((char *)&Code_Message[3][0]);
+						DisplayMessageUI((char *)&Code_Message[3][0], 1);
 					}else	{
 						DisplayEditUI();//显示上次编辑界面
 						appdis.pUI->ctrl_id = 6;
@@ -459,16 +487,14 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				Sys.state &= ~SysState_RunningTB;				
 				StartAPPTempCtrl();//参数正常 启动实验 
 				DisplayBackupUIID();	
-//				if(iPara==0)	{//参数错误 				
-//					DisplayMessageUI((char *)&Code_Message[6][0]);//参数错误 无法启动
-//				}	
-//				return;
 			}
 			else if(Sys.state & SysState_StopTB)	{//停止实验
 				StopAPPTempCtrl();
 			}
 			else if(Sys.state & SysState_DeleteLabTB)	{//删除实验记录
-				
+				DisplayMessageUI((char *)&Code_Message[6][0], 0);//提示 删除中
+				DeleteLabTemplate(appdis.pUI->index);
+				appdis.pUI->index = 0x0f;
 			}
 			else if(Sys.state & SysState_StepTB)	{//修改步
 				Sys.state &= ~SysState_StepTB;
@@ -493,6 +519,16 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		if(appdis.pUI->ctrl_id == 3)	{//确认键
 			DisplayBackupUIID();
 		}
+	}
+}
+
+static void time_event(void)
+{
+	static u8 event_cnt;
+	
+	event_cnt++;
+	if((event_cnt%2)==0)	{
+		DaCai_TimeGet();
 	}
 }
 
@@ -531,7 +567,7 @@ static void TaskDisplay(void * ppdata)
 //					OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_3, OS_FLAG_SET, &err);
 				}
 				else {
-//					DaCai_TimeGet();
+					time_event();
 				}
 			}
 		}

@@ -12,7 +12,7 @@ void SaveUIEditInfor(void);
 void UUIDBackup(void);
 void DisplayUIIDAndBackup(u8 id);
 void DisplayBackupUIID(void);
-void DisplayMessageUI(char *pbuf);
+void DisplayMessageUI(char *pbuf, u8 backup);
 void DisplayWarningUI(char *pbuf, char *buf1, char *buf2);
 void DisplayEditUI(void);
 void DisplayKeyboardUI(void);

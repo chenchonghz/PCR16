@@ -83,7 +83,7 @@ typedef struct _sys	{
 #define	STAGE_MAX		9
 #define	STEP_MAX		9
 #define	LAB_ID_LEN		22
-#define	LAB_NAME_LEN		15
+#define	LAB_NAME_LEN		16
 #define	HOLE_NUM		16
 #define	STAGE_REPEAT_MAX		100
 #define	HOLE_TEMP_MAX		9500//95¶È 0.01

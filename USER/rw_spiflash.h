@@ -25,7 +25,7 @@ typedef struct _labtemplate	{
 
 typedef struct _labtemplatelist	{
 	u8 num;
-	_labtemplate_t list[LabTemplateMax+1];
+	_labtemplate_t list[LabTemplateMax];
 }_labtemplatelist_t;
 
 extern _labtemplatelist_t gLabTemplatelist;
@@ -43,4 +43,6 @@ u8 GetFlashSpace(u32 *ptotal, u32 *pfree);
 void WriteLabTemplate(void);
 void ReadLabTemplateList(void);
 void DeleteLabTemplate(u8 item);
+int AnalysisLabTemplate(u8 item);
+FRESULT f_deldir(const TCHAR *path);
 #endif

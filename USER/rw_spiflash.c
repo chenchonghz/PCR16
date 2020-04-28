@@ -148,7 +148,7 @@ void CreateSysFile(void)
 		if(res != FR_OK)	{
 			return;
 		}
-//		f_close(flashfs.fil);
+		f_close(flashfs.fil);
 	}
 _exit:
 	f_close(flashfs.fil);
@@ -267,6 +267,10 @@ void WriteLabTemplate(void)
 	char filename[FILE_NAME_LEN];
 	char filepath[FILE_NAME_LEN];
 	
+	if(gLabTemplatelist.num>=LabTemplateMax-1)	{
+		DeleteLabTemplate(0);
+		gLabTemplatelist.num -= 1;
+	}
 	sprintf(filename, "%s%s/%s", USERPath, LabFolderName, lab_data.name);
 	res = f_mkdir(filename);
 	if(res == FR_OK)	{
@@ -292,7 +296,7 @@ void ReadLabTemplateList(void)
 	_labtemplate_t *pTemp;
 	u8 num;
 	
-	pTemplateList = (_labtemplatelist_t *)user_malloc(sizeof(_labtemplate_t));
+	pTemplateList = (_labtemplatelist_t *)user_malloc(sizeof(_labtemplatelist_t));
 	num=0;	
 	sprintf(filename, "%s%s", USERPath, LabFolderName);
 	res = f_opendir(&dir, filename);
@@ -310,6 +314,7 @@ void ReadLabTemplateList(void)
 		f_closedir(&dir);
 	}
 	else	{
+		user_free(pTemplateList);
 		return;
 	}
 	
@@ -346,9 +351,8 @@ void ReadLabTemplateList(void)
 	}
 	gLabTemplatelist.num = num;
 	user_free(pTemplateList);
-	if(gLabTemplatelist.num>=LabTemplateMax-1)	{
-		DeleteLabTemplate(0);
-		gLabTemplatelist.num -= 1;
+	if(gLabTemplatelist.num>=LabTemplateMax)	{
+		DeleteLabTemplate(0);		
 	}
 }
 
@@ -357,12 +361,28 @@ void DeleteLabTemplate(u8 item)
 	FRESULT res;
 	char filedir[FILE_NAME_LEN];
 	
-	if(item>=LabTemplateMax)
+	if(item>=gLabTemplatelist.num)
 		return;
 	sprintf(filedir, "%s%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name);
-	res = f_unlink(filedir);//Remove a file or sub-directory
+	res = f_deldir(filedir);
 	if(res==FR_OK)
 		BSP_PRINTF("delete file: %s",filedir);
+	gLabTemplatelist.num -= 1;
+}
+
+//解析实验模板 
+int AnalysisLabTemplate(u8 item)
+{
+	FRESULT res;
+	char filepath[FILE_NAME_LEN];
+	
+	if(item>=gLabTemplatelist.num)
+		return -1;
+	sprintf(filepath, "%s%s/%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name, LabJSON_FILE_NAME);
+	res = AnalysisLab_Jsonfile(filepath);
+	sprintf(filepath, "%s%s/%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name, TEMPJSON_FILE_NAME);
+	res = AnalysisTemp_Jsonfile(filepath);
+	return res;
 }
 
 
@@ -371,6 +391,36 @@ void DeleteLabTemplate(u8 item)
 
 
 
+
+
+//删除文件or文件夹
+FRESULT f_deldir(const TCHAR *path)  
+{ 
+	FRESULT res;  
+    DIR   dir;  
+    FILINFO fn;  
+	char filedir[FILE_NAME_LEN];
+	
+	res = f_opendir(&dir, path);
+	if(res==FR_OK)	{
+		for(;;)	{
+			res=f_readdir(&dir,&fn);
+			if(res!=FR_OK||fn.fname[0]==0)	break;
+			sprintf(filedir, "%s/%s",path, fn.fname);
+			if (fn.fattrib & AM_DIR)  
+			{//若是文件夹，递归删除  
+				res = f_deldir(filedir);  
+			}  
+			else  
+			{//若是文件，直接删除  
+				res = f_unlink(filedir);  
+			}  
+		}
+		//删除本身  
+		if(res == FR_OK)    res = f_unlink(path); 
+	}
+	return res;
+}
 
 #if 0	//spi flash 挂载文件系统测试函数
 FRESULT res;        /* API result code */

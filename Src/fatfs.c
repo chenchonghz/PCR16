@@ -52,12 +52,8 @@ DWORD get_fattime(void)
 {
   /* USER CODE BEGIN get_fattime */
 	DWORD time=0;
-////	RTC_TimeTypeDef sTime = {0};
-//	RTC_DateTypeDef sDate = {0};
 	int temp;
 	
-//	HAL_RTC_GetTime(&hrtc, &sTime ,RTC_FORMAT_BIN);
-//	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 //	temp = sDate.Year+2000-1980;
 
 //	time |= ((temp)<<25); //
@@ -67,7 +63,15 @@ DWORD get_fattime(void)
 //	time |= ((sTime.Hours)<<11); //
 //	time |= ((sTime.Minutes)<<5); //
 //	time |= ((sTime.Seconds)/2); //
+	temp = SysTime.tm_year-1980;
 
+	time |= ((temp)<<25); //
+	time |= ((SysTime.tm_mon)<<21); //
+	time |= ((SysTime.tm_mday)<<16); //
+
+	time |= ((SysTime.tm_hour)<<11); //
+	time |= ((SysTime.tm_min)<<5); //
+	time |= ((SysTime.tm_sec)/2); //
 	return time;
   /* USER CODE END get_fattime */  
 }

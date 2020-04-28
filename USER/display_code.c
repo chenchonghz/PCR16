@@ -7,7 +7,7 @@ typedef struct 	{
 _MultiTXT_ *pMultiTXT_t;
 
 const char Code_Warning[][12] = {	
-	{"是否删除？"},
+	{"是否删除"},
 	{"是否启动"},
 	{"是否停止"},
 };
@@ -16,10 +16,10 @@ const char Code_Message[][12] = {
 	{"复制完成!"},
 	{"U盘未连接!"},
 	{"复制中..."},
-	{"无效输入"},
+	{"无效操作"},
 	{"设置成功"},
-	{"运行中"},
-	{"启动失败:"},
+	{"运行中..."},
+	{"删除中...:"},
 };
 
 const char Code_Choose[][5] = {	
@@ -51,12 +51,12 @@ void DisplayUIIDAndBackup(u8 id)
 void DisplayBackupUIID(void)
 {
 	appdis.pUI->screen_id = appdis.pUI->screen_idbk;
-//	if(LIFOBuffer_Pop(&ScreenIDLIFO, (INT8U *)&appdis.pUI->screen_id)==1)	
-	{//获取
-		appdis.pUI->ctrl_id = appdis.pUI->ctrl_idbk;
-		DaCai_SwitchUI(appdis.pUI);
+	appdis.pUI->ctrl_id = appdis.pUI->ctrl_idbk;
+	DaCai_SwitchUI(appdis.pUI);
+	if(appdis.pUI->screen_id==Lab_UIID)	{
+		DisplayLabUI();
 	}
-	if(appdis.pUI->screen_id==Lab_UIID||appdis.pUI->screen_id==Menu_UIID)	{
+	else if(appdis.pUI->screen_id==Menu_UIID)	{
 		appdis.pUI->button_id = 19;
 		if(Sys.devstate == DevState_Running)	{		
 			DaCai_ButtonCtrl(appdis.pUI, DEF_Press);
@@ -86,11 +86,12 @@ void DisplayKeyboardUI(void)
 	DaCai_ClearTXT(appdis.pUI);
 }
 
-void DisplayMessageUI(char *pbuf)
+void DisplayMessageUI(char *pbuf, u8 backup)
 {	
-	DisplayUIIDAndBackup(Message_UIID);
-//	appdis.pUI->sub_screen_id = Message_UIID;
-//	DaCai_SwitchSubUI(appdis.pUI);
+	if(backup)	
+		UUIDBackup();
+	appdis.pUI->screen_id = Message_UIID;
+	DaCai_SwitchUI(appdis.pUI);
 	appdis.pUI->ctrl_id  = 4;	
 	appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%s", pbuf);
 	DaCai_UpdateTXT(appdis.pUI);
@@ -132,26 +133,39 @@ void DisplayLogUI(void)
 void DisplayLabUI(void)
 {
 	u8 i;
-	
+	u8 button_id[6],value[6];
+
 	appdis.pUI->screen_id = Lab_UIID;
 	DaCai_SwitchUI(appdis.pUI);
-	appdis.pUI->button_id = 19;
+
+	appdis.pUI->button_id = 1;
+	for(i=0;i<5;i++)	{
+		button_id[i] = appdis.pUI->button_id ++;
+		value[i] = BUTTON_RELEASE;
+	}
+	button_id[i] = 19;
 	if(Sys.devstate == DevState_Running)	{		
-		DaCai_ButtonCtrl(appdis.pUI, DEF_Press);
+		value[i] = BUTTON_PRESS;
 	}
 	else	{
-		DaCai_ButtonCtrl(appdis.pUI, DEF_Release);
+		value[i] = BUTTON_RELEASE;
 	}
+	DaCai_UpdateMultiButton(appdis.pUI, button_id, value, i+1);
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	ReadLabTemplateList();//读取实验列表
 	appdis.pUI->ctrl_id = 6;
 	for(i=0;i<gLabTemplatelist.num;i++)	{			
 		pMultiTXT_t->data[i].id = appdis.pUI->ctrl_id++;
-		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%-25s%s", gLabTemplatelist.list[i].name, gLabTemplatelist.list[i].time);
-		i++;
+		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%-25.20s%s",gLabTemplatelist.list[i].time, gLabTemplatelist.list[i].name);				
+	}
+	for(;i<5;i++)	{
+		pMultiTXT_t->data[i].id = appdis.pUI->ctrl_id++;
+		pMultiTXT_t->data[i].buf[0] = 0;
+		pMultiTXT_t->data[i].len = 1;
 	}
 	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i);
 	user_free(pMultiTXT_t);
+	appdis.pUI->index = 0x0f;
 }
 //显示实验属性界面
 void DisplayLabAttrUI(void)
@@ -300,11 +314,11 @@ void DisplayQiTingLab(void)
 	else if(Sys.devstate == DevState_IDLE)		{	//启动实验
 		if(lab_data.name[0] == 0)	{//启动前 检查
 			sprintf((char *)appdis.pUI->pdata,"%s","无效实验名称");
-			DisplayMessageUI((char *)appdis.pUI->pdata);
+			DisplayMessageUI((char *)appdis.pUI->pdata,1);
 		}
 		else	if(temp_data.StageNum==0)	{
 			sprintf((char *)appdis.pUI->pdata,"%s","无效温度程序");
-			DisplayMessageUI((char *)appdis.pUI->pdata);
+			DisplayMessageUI((char *)appdis.pUI->pdata,1);
 		}
 		else	{		
 			sprintf((char *)appdis.pUI->pdata,"%s实验 %s ?", &Code_Warning[1][0], lab_data.name);//显示 是否启动 
