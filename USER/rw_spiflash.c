@@ -267,21 +267,21 @@ void WriteLabTemplate(void)
 	char filename[FILE_NAME_LEN];
 	char filepath[FILE_NAME_LEN];
 	
-	if(gLabTemplatelist.num>=LabTemplateMax-1)	{
-		DeleteLabTemplate(0);
-		gLabTemplatelist.num -= 1;
-	}
 	sprintf(filename, "%s%s/%s", USERPath, LabFolderName, lab_data.name);
 	res = f_mkdir(filename);
 	if(res==FR_OK || res==FR_EXIST)	{
-//		sprintf(filepath, "%s/%s", filename, LabJSON_FILE_NAME);
-//		if(CreateLab_Jsonfile(filepath)==0)	{
-//			SYS_PRINTF("write %s",filepath);
-//		}
+		sprintf(filepath, "%s/%s", filename, LabJSON_FILE_NAME);
+		if(CreateLab_Jsonfile(filepath)==0)	{
+			SYS_PRINTF("write %s",filepath);
+		}
 		sprintf(filepath, "%s/%s", filename, TEMPJSON_FILE_NAME);
 		if(CreateTemp_Jsonfile(filepath)==0)	{
 			SYS_PRINTF("write %s",filepath);
 		}
+	}
+	if(gLabTemplatelist.num>=LabTemplateMax)	{
+		DeleteLabTemplate(0);
+		gLabTemplatelist.num -= 1;
 	}
 }
 //读取实验模板列表
@@ -365,9 +365,11 @@ void DeleteLabTemplate(u8 item)
 		return;
 	sprintf(filedir, "%s%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name);
 	res = f_deldir(filedir);
-	if(res==FR_OK)
+	if(res==FR_OK)	{
 		BSP_PRINTF("delete file: %s",filedir);
-	gLabTemplatelist.num -= 1;
+		gLabTemplatelist.num -= 1;
+		
+	}
 }
 
 //解析实验模板 
@@ -413,6 +415,7 @@ FRESULT f_deldir(const TCHAR *path)
 			sprintf(filedir, "%s/%s",path, fn.fname);
 			if (fn.fattrib & AM_DIR)  
 			{//若是文件夹，递归删除  
+				f_closedir(&dir);
 				res = f_deldir(filedir);  
 			}  
 			else  
@@ -422,6 +425,7 @@ FRESULT f_deldir(const TCHAR *path)
 		}
 		//删除本身  
 		if(res == FR_OK)    res = f_unlink(path); 
+		f_closedir(&dir);
 	}
 	return res;
 }

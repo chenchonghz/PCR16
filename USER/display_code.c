@@ -535,26 +535,26 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 					LastIdx.StepIdx = k;
 				return;
 			}
-			temp = temp_data.stage[j].step[k].temp/10;			
+			temp = temp_data.stage[j].step[k].temp/100;	//温度精确到0.01		
 			rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*stepcnt;
 			height = temp*(TEMP_RECTANGLE_H/100);
 			rec_y = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H-height;
 			if(temp>templast)	{		
-				DaCai_DisplayCutPic(rec_x, rec_y, 61, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 57, 0, 0, TEMP_RECTANGLE_W, height);
 				xie_h = (temp - templast)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y, 60, 50-xie_w, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y, 56, 50-xie_w, 0, xie_w, xie_h);
 			}
 			else	if(temp<templast)	{
-				DaCai_DisplayCutPic(rec_x, rec_y, 61, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 57, 0, 0, TEMP_RECTANGLE_W, height);
 //				height = templast*(TEMP_RECTANGLE_H/100);
 				rec_y_last = TEMP_RECTANGLE_Y+TEMP_RECTANGLE_H - templast*(TEMP_RECTANGLE_H/100);
 				xie_h = (templast-temp)*(TEMP_RECTANGLE_H/100);
 				xie_w = xie_h/(TEMP_RECTANGLE_H/50);
-				DaCai_DisplayCutPic(rec_x, rec_y_last, 59, 0, 0, xie_w, xie_h);
+				DaCai_DisplayCutPic(rec_x, rec_y_last, 55, 0, 0, xie_w, xie_h);
 			}
 			else	{
-				DaCai_DisplayCutPic(rec_x, rec_y, 61, 0, 0, TEMP_RECTANGLE_W, height);
+				DaCai_DisplayCutPic(rec_x, rec_y, 57, 0, 0, TEMP_RECTANGLE_W, height);
 			}
 			DaCai_SetFontColor(65504);//设置文字颜色 黄色
 			appdis.pUI->datlen = sprintf((char *)appdis.pUI->pdata,"%d.%d℃", temp, temp_data.stage[j].step[k].temp%10);

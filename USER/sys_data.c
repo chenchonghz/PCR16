@@ -41,6 +41,7 @@ void SysDataInit(void)
 	ResetTempDataDefault();
 //	CreateTemp_Jsonfile();
 //	CreateLab_Jsonfile();
+//	jansson_pack_test();
 }
 
 void SetSampleDataSampleT(u32 enable, char typeidx)

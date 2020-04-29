@@ -36,24 +36,24 @@ int CreateTemp_Jsonfile(const char *path)
 		}
 		json_object_set_new(jsubdata, "Step", jarr2);
 		if(temp_data.stage[i].Type==StageByRepeat)
-			json_object_set_new(jsubdata, "Repeat", json_integer((json_int_t)temp_data.stage[i].RepeatNum));
+			json_object_set_new(jsubdata, "Repeat", json_integer(temp_data.stage[i].RepeatNum));
 		else if(temp_data.stage[i].Type==StageByContinue)//溶解曲线
-			json_object_set_new(jsubdata, "T_Rate", json_integer((json_int_t)temp_data.stage[i].T_Rate));
+			json_object_set_new(jsubdata, "T_Rate", json_integer(temp_data.stage[i].T_Rate));
 		else if(temp_data.stage[i].Type==StageByContinue)	{//溶解曲线
-			json_object_set_new(jsubdata, "T_Inter", json_integer((json_int_t)temp_data.stage[i].T_Inter));
-			json_object_set_new(jsubdata, "Const_Tim", json_integer((json_int_t)temp_data.stage[i].Const_Tim));
+			json_object_set_new(jsubdata, "T_Inter", json_integer(temp_data.stage[i].T_Inter));
+			json_object_set_new(jsubdata, "Const_Tim", json_integer(temp_data.stage[i].Const_Tim));
 		}
 		json_array_append_new( jarr, jsubdata );
 	}
 	json_object_set(jdata,"Stage",jarr);
 		
-	json_out = json_dumps(jdata, JSON_INDENT(1)|JSON_PRESERVE_ORDER|JSON_ENSURE_ASCII);
-	SYS_PRINTF("out:%s", json_out);
-//	ret = json_dump_file(jdata, path, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
+//	json_out = json_dumps(jdata, JSON_INDENT(1)|JSON_PRESERVE_ORDER|JSON_ENSURE_ASCII);
+//	SYS_PRINTF("out:%s", json_out);
+//	user_free(json_out);
+	ret = json_dump_file(jdata, path, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
 	json_decref(jdata);
 	json_decref(jsubdata);
-	user_free(json_out);
-	
+
 	return ret;
 }
 
@@ -85,10 +85,11 @@ int CreateLab_Jsonfile(const char *path)
 	
 //	json_out = json_dumps(jdata, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
 //	SYS_PRINTF("json_out:%s", out);
+//	user_free(json_out);
 	ret = json_dump_file(jdata, path, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
 	json_decref(jdata);
 	json_decref(jsubdata);
-//	user_free(json_out);
+
 	return ret;
 }
 //解析温度曲线json文件
@@ -134,9 +135,6 @@ int AnalysisTemp_Jsonfile(const char *path)
 				temp_data.stage[i].T_Inter = json_integer_value(json_object_get(jtmp2,"T_Inter"));
 				temp_data.stage[i].Const_Tim = json_integer_value(json_object_get(jtmp2,"Const_Tim"));
 			}
-			json_decref(jtmp);
-			json_decref(jtmp2);
-			json_decref(jtmp3);
 		}
 		json_decref(jdata);
 		json_decref(jsubdata);
@@ -149,7 +147,7 @@ int AnalysisTemp_Jsonfile(const char *path)
 int AnalysisLab_Jsonfile(const char *path)
 {
 	json_t *jdata,*jsubdata;
-	json_t *jtmp;
+	json_t *jtmp=NULL;
 	u8 i,j;
 	u16 total;
 
@@ -214,8 +212,8 @@ void add_2array_to_json( json_t* obj, const char* name, const int* arr_adrr, siz
 
 #if 1
 //jansson Test
-//int arr1[2][3] = { {1,2,3}, {4,5,6} };
-//int arr2[4][4] = { {1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16} };
+int arr1[2][3] = { {1,2,3}, {4,5,6} };
+int arr2[4][4] = { {1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16} };
 void jansson_pack_test(void)
 {
 	json_t *root;
@@ -270,12 +268,12 @@ void jansson_pack_test(void)
 	json_decref(root);
 	user_free(json_out);
 //out:{"arr1": [[1, 2, 3], [4, 5, 6]], "arr2": [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]}
-//	root = json_object();
-//	add_2array_to_json( root, "arr1", &arr1[0][0], 2, 3 );
-//	add_2array_to_json( root, "arr2", &arr2[0][0], 4, 4 );
-//	out = json_dumps( root, JSON_ENCODE_ANY );
-//	SYS_PRINTF("out:%s", out);
-//	json_decref(root);
-//	user_free(out);
+	root = json_object();
+	add_2array_to_json( root, "arr1", &arr1[0][0], 2, 3 );
+	add_2array_to_json( root, "arr2", &arr2[0][0], 4, 4 );
+	json_out = json_dumps( root, JSON_ENCODE_ANY );
+	SYS_PRINTF("out:%s", json_out);
+	json_decref(root);
+	user_free(json_out);
 }
 #endif
