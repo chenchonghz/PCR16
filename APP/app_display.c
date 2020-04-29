@@ -110,15 +110,15 @@ static void ButtonClickProcess(u8 button)
 			Sys.state |= SysState_StageTB;
 		}
 	}
-	else if(button==11)	{
-		if(temp_data.HeatCoverEnable == DEF_False)	{									
-			temp_data.HeatCoverEnable = DEF_True;
-		}
-		else if(temp_data.HeatCoverEnable == DEF_True)	{
-			temp_data.HeatCoverEnable = DEF_False;
-		}
-		DisplayHeatCoverIcon();		
-	}
+//	else if(button==11)	{
+//		if(temp_data.HeatCoverEnable == DEF_False)	{									
+//			temp_data.HeatCoverEnable = DEF_True;
+//		}
+//		else if(temp_data.HeatCoverEnable == DEF_True)	{
+//			temp_data.HeatCoverEnable = DEF_False;
+//		}
+//		DisplayHeatCoverIcon();		
+//	}
 }
 
 //屏幕相关数据处理
@@ -185,7 +185,10 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					DisplayQiTingLab();
 				else if(appdis.pUI->index >= gLabTemplatelist.num)	
 					DisplayMessageUI((char *)&Code_Message[3][0],1);//无效操作
-				else	{				
+				else	{
+					ResetLabDataDefault();//新建实验 恢复默认数据
+					ResetSampleDataDefault();
+					ResetTempDataDefault();					
 					AnalysisLabTemplate(appdis.pUI->index);//解析实验模板	
 					appdis.pUI->index = 0x0f;					
 					DisplayQiTingLab();//根据当前实验状态，提示停止实验还是启动实验	
@@ -452,7 +455,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 						appdis.pUI->ctrl_id = 6;
 						appdis.pUI->datlen = strlen(appdis.pUI->pdata);//显示用户输入值
 						DaCai_UpdateTXT(appdis.pUI);
-						temp_data.HeatCoverEnable = temp;//保存用户输入值
+						temp_data.HeatCoverTemp = temp;//保存用户输入值
 					}
 				}
 			}

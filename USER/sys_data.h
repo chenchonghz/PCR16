@@ -109,7 +109,7 @@ typedef struct _stage	{
 typedef struct _temp_data	{//温度信息
 	u8 StageNum;//总阶段 
 	u8 CurStage;//当前阶段 不写入json文件
-	u8 HeatCoverEnable;
+//	u8 HeatCoverEnable;
 	s16 HeatCoverTemp;
 	_stage_t stage[STAGE_MAX];
 }_temp_data_t;

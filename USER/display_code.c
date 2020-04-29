@@ -297,11 +297,11 @@ void DisplayMenuUI(void)
 	}
 }
 
-void DisplayHeatCoverIcon(void)
-{
-	appdis.pUI->ctrl_id = 8;
-	DaCai_IconCtrl(appdis.pUI,temp_data.HeatCoverEnable);
-}
+//void DisplayHeatCoverIcon(void)
+//{
+//	appdis.pUI->ctrl_id = 8;
+//	DaCai_IconCtrl(appdis.pUI,temp_data.HeatCoverEnable);
+//}
 //根据当前实验状态，提示停止实验还是启动实验
 void DisplayQiTingLab(void)
 {	
@@ -482,7 +482,7 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	appdis.pUI->screen_id = Temp_UIID;
 	DaCai_SwitchUI(appdis.pUI);
 	
-	DisplayHeatCoverIcon();	
+//	DisplayHeatCoverIcon();	
 
 	ClearTempProgramUI(clear_flag);
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));

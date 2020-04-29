@@ -1,6 +1,7 @@
 #include "json.h"
 
 json_error_t *jsonerror;
+char *json_out;
 
 void jansson_init(void)
 {
@@ -12,20 +13,17 @@ int CreateTemp_Jsonfile(const char *path)
 {
 	json_t *jdata,*jsubdata;
 	json_t *jarr,*jarr1,*jarr2,*jval;
-//	char *out;
 	u8 i,j;
 	int ret;
 
-	jdata = json_object();
+//	jdata = json_object();
 	jarr = json_array();
-	jsubdata = json_pack_ex(jsonerror,0,"{sisi}", "Enable", temp_data.HeatCoverEnable,"Temp",temp_data.HeatCoverTemp);
-	json_object_set(jdata,"HeatCover",jsubdata);
-//	jval = json_integer(temp_data.StageNum);
-//	json_array_append_new( jarr, jval );
+	jdata = json_pack("{si}", /*"Enable", temp_data.HeatCoverEnable,*/"HeatCoverTemp", temp_data.HeatCoverTemp);
+//	json_object_set(jdata,"HeatCover",jsubdata);
 
 	for(i=0;i<temp_data.StageNum;i++)	{
 		jarr2 = json_array();
-		jsubdata = json_pack_ex(jsonerror,0,"{si}", "Type",temp_data.stage[i].Type);
+		jsubdata = json_pack("{si}", "Type",temp_data.stage[i].Type);
 		for(j=0;j<temp_data.stage[i].StepNum;j++)	{
 			jarr1 = json_array();
 			jval = json_integer( temp_data.stage[i].step[j].temp );
@@ -38,23 +36,24 @@ int CreateTemp_Jsonfile(const char *path)
 		}
 		json_object_set_new(jsubdata, "Step", jarr2);
 		if(temp_data.stage[i].Type==StageByRepeat)
-			json_object_set_new(jsubdata, "Repeat", json_integer(temp_data.stage[i].RepeatNum));
+			json_object_set_new(jsubdata, "Repeat", json_integer((json_int_t)temp_data.stage[i].RepeatNum));
 		else if(temp_data.stage[i].Type==StageByContinue)//溶解曲线
-			json_object_set_new(jsubdata, "T_Rate", json_integer(temp_data.stage[i].T_Rate));
+			json_object_set_new(jsubdata, "T_Rate", json_integer((json_int_t)temp_data.stage[i].T_Rate));
 		else if(temp_data.stage[i].Type==StageByContinue)	{//溶解曲线
-			json_object_set_new(jsubdata, "T_Inter", json_integer(temp_data.stage[i].T_Inter));
-			json_object_set_new(jsubdata, "Const_Tim", json_integer(temp_data.stage[i].Const_Tim));
+			json_object_set_new(jsubdata, "T_Inter", json_integer((json_int_t)temp_data.stage[i].T_Inter));
+			json_object_set_new(jsubdata, "Const_Tim", json_integer((json_int_t)temp_data.stage[i].Const_Tim));
 		}
 		json_array_append_new( jarr, jsubdata );
 	}
 	json_object_set(jdata,"Stage",jarr);
 		
-//	out = json_dumps(jdata, JSON_INDENT(1));
-//	SYS_PRINTF("out:%s", out);
-	ret = json_dump_file(jdata, path, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
+	json_out = json_dumps(jdata, JSON_INDENT(1)|JSON_PRESERVE_ORDER|JSON_ENSURE_ASCII);
+	SYS_PRINTF("out:%s", json_out);
+//	ret = json_dump_file(jdata, path, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
 	json_decref(jdata);
 	json_decref(jsubdata);
-//	user_free(out);
+	user_free(json_out);
+	
 	return ret;
 }
 
@@ -63,7 +62,6 @@ int CreateLab_Jsonfile(const char *path)
 {
 	json_t *jdata,*jsubdata;
 	json_t *jarr;
-//	char *out;
 	u8 i;
 	int ret;
 	
@@ -77,7 +75,7 @@ int CreateLab_Jsonfile(const char *path)
 		{
 //			jsubdata = json_pack_ex(jsonerror,0,"{si,ss,ss,ss,ss}", "ID", i+1,"name",sample_data.hole[i].name,"prj",sample_data.hole[i].prj,\
 //						"sample",&sample_data.hole[i].sample_t,"ch",sample_data.hole[i].channel);
-			jsubdata = json_pack("{si,ss,ss}", "ID", i+1, "name",sample_data.hole[i].name, "prj",sample_data.hole[i].prj);	
+			jsubdata = json_pack_ex(jsonerror,0,"{si,ss,ss}", "ID", i+1, "name",sample_data.hole[i].name, "prj",sample_data.hole[i].prj);	
 			json_object_set_new(jsubdata, "sample", json_string((const char *)sample_data.hole[i].sample_t));
 			json_object_set_new(jsubdata, "ch", json_string(sample_data.hole[i].channel));
 			json_array_append_new( jarr, jsubdata );
@@ -85,12 +83,12 @@ int CreateLab_Jsonfile(const char *path)
 	}
 	json_object_set(jdata,"Hole",jarr);
 	
-//	out = json_dumps(jdata, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
-//	SYS_PRINTF("out:%s", out);
+//	json_out = json_dumps(jdata, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
+//	SYS_PRINTF("json_out:%s", out);
 	ret = json_dump_file(jdata, path, JSON_INDENT(1)|JSON_PRESERVE_ORDER);
 	json_decref(jdata);
 	json_decref(jsubdata);
-//	user_free(out);
+//	user_free(json_out);
 	return ret;
 }
 //解析温度曲线json文件
@@ -101,12 +99,12 @@ int AnalysisTemp_Jsonfile(const char *path)
 	u8 i,j;
 
 	jdata = json_load_file(path, JSON_DECODE_ANY, jsonerror);
-	jsubdata = json_object_get(jdata,"HeatCover");
+	jsubdata = json_object_get(jdata,"HeatCoverTemp");
 	if(jsubdata!=NULL && json_is_object(jsubdata))	{
-		jtmp = json_object_get(jsubdata,"Enable");
-		temp_data.HeatCoverEnable = json_integer_value(jtmp);			
-		jtmp = json_object_get(jsubdata,"Temp");
-		temp_data.HeatCoverTemp = json_integer_value(jtmp);			
+//		jtmp = json_object_get(jsubdata,"Enable");
+//		temp_data.HeatCoverEnable = json_integer_value(jtmp);			
+//		jtmp = json_object_get(jsubdata,"Temp");
+		temp_data.HeatCoverTemp = json_integer_value(jsubdata);			
 	}
 	json_decref(jsubdata);
 	jsubdata = json_object_get(jdata,"Stage");
@@ -214,64 +212,63 @@ void add_2array_to_json( json_t* obj, const char* name, const int* arr_adrr, siz
 
 
 
-#if 0
+#if 1
 //jansson Test
 //int arr1[2][3] = { {1,2,3}, {4,5,6} };
 //int arr2[4][4] = { {1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16} };
 void jansson_pack_test(void)
 {
 	json_t *root;
-	char *out;
 	
 	/* Build an empty JSON object */
 	root = json_pack("{}");
 	
-	out = json_dumps(root, JSON_ENCODE_ANY);
-	SYS_PRINTF("out:%s", out);
+	json_out = json_dumps(root, JSON_ENCODE_ANY);
+	SYS_PRINTF("out:%s", json_out);
 	json_decref(root);
-	user_free(out);
+	user_free(json_out);
 	
 	/* Build the JSON object {"foo": 42, "bar": 7} */
 //	root = json_pack("{sisi}", "foo", 42, "bar", 7);
 	root = json_pack_ex(jsonerror,0,"{sisi}", "foo", 42, "bar", 5);
 
-	out = json_dumps(root, JSON_ENCODE_ANY);
-	SYS_PRINTF("out:%s", out);
+	json_out = json_dumps(root, JSON_ENCODE_ANY);
+	SYS_PRINTF("out:%s", json_out);
 	json_decref(root);
-	user_free(out);
+	user_free(json_out);
 	
 	/* Like above, ':', ',' and whitespace are ignored */
 	root = json_pack("{s:i, s:i}", "foo", 42, "bar", 7);
 
-	out = json_dumps(root, JSON_ENCODE_ANY);
-	SYS_PRINTF("out:%s", out);
+	json_out = json_dumps(root, JSON_ENCODE_ANY);
+	SYS_PRINTF("out:%s", json_out);
 	json_decref(root);
-	user_free(out);
+	user_free(json_out);
 	
 	/* Build the JSON array [[1, 2], {"cool": true}] */
 	root = json_pack("[[i,i],{s:b}]", 1, 2, "cool", 1);
 
-	out = json_dumps(root, JSON_ENCODE_ANY);
-	SYS_PRINTF("out:%s", out);
+	json_out = json_dumps(root, JSON_ENCODE_ANY);
+	SYS_PRINTF("out:%s", json_out);
 	json_decref(root);
-	user_free(out);
+	user_free(json_out);
 	
 	/* Build a string from a non-null terminated buffer */
 	char buffer[4] = {'t', 'e', 's', 't'};
 	root = json_pack("[s#]", buffer, 4);
 
-	out = json_dumps(root, JSON_ENCODE_ANY);
-	SYS_PRINTF("out:%s", out);
+	json_out = json_dumps(root, JSON_ENCODE_ANY);
+	SYS_PRINTF("out:%s", json_out);
 	json_decref(root);
-	user_free(out);
+	user_free(json_out);
 	
 	/* Concatenate strings together to build the JSON string "foobarbaz" */
 	root = json_pack("[s++]", "foo", "bar", "baz");
 	
-	out = json_dumps(root, JSON_ENCODE_ANY);
-	SYS_PRINTF("out:%s", out);
+	json_out = json_dumps(root, JSON_ENCODE_ANY);
+	SYS_PRINTF("out:%s", json_out);
 	json_decref(root);
-	user_free(out);
+	user_free(json_out);
 //out:{"arr1": [[1, 2, 3], [4, 5, 6]], "arr2": [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]}
 //	root = json_object();
 //	add_2array_to_json( root, "arr1", &arr1[0][0], 2, 3 );

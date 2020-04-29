@@ -30,7 +30,7 @@ void DisplaySampleInforUIByList(void);
 void DisplayQiTingLab(void);
 void PaintTriangle(u16 x, u16 y, u16 w, u16 h);
 void PaintTriangleInBasicGraph(_UI_t *pUI,  u16 x, u16 y, u16 w, u16 h);
-void DisplayHeatCoverIcon(void);
+//void DisplayHeatCoverIcon(void);
 u8 CheckIdFromButton(u8 button, u8 *stageid, u8 *stepid);
 void DeleTempProgam(u8 button, u8 type);
 void ClearTempProgramIdx(void);

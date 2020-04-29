@@ -147,7 +147,7 @@ void DelStage(u8 del_id)
 void ResetTempDataDefault(void)
 {
 	u8 i;
-	temp_data.HeatCoverEnable = DEF_True;
+//	temp_data.HeatCoverEnable = DEF_True;
 	temp_data.HeatCoverTemp = 105;
 	temp_data.StageNum = 0;
 	temp_data.CurStage = 0;
@@ -156,10 +156,10 @@ void ResetTempDataDefault(void)
 	}
 }
 
-void HeatCoverOnOff(u8 flag)
-{
-	temp_data.HeatCoverEnable = flag;
-}
+//void HeatCoverOnOff(u8 flag)
+//{
+//	temp_data.HeatCoverEnable = flag;
+//}
 
 //void CollDataOnOff_InStep(u8 flag)
 //{

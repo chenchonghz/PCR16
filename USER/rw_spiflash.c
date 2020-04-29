@@ -273,11 +273,11 @@ void WriteLabTemplate(void)
 	}
 	sprintf(filename, "%s%s/%s", USERPath, LabFolderName, lab_data.name);
 	res = f_mkdir(filename);
-	if(res == FR_OK)	{
-		sprintf(filepath, "%s/%s", filename, LabJSON_FILE_NAME);
-		if(CreateLab_Jsonfile(filepath)==0)	{
-			SYS_PRINTF("write %s",filepath);
-		}
+	if(res==FR_OK || res==FR_EXIST)	{
+//		sprintf(filepath, "%s/%s", filename, LabJSON_FILE_NAME);
+//		if(CreateLab_Jsonfile(filepath)==0)	{
+//			SYS_PRINTF("write %s",filepath);
+//		}
 		sprintf(filepath, "%s/%s", filename, TEMPJSON_FILE_NAME);
 		if(CreateTemp_Jsonfile(filepath)==0)	{
 			SYS_PRINTF("write %s",filepath);
@@ -373,15 +373,19 @@ void DeleteLabTemplate(u8 item)
 //解析实验模板 
 int AnalysisLabTemplate(u8 item)
 {
-	FRESULT res;
+	int res;
 	char filepath[FILE_NAME_LEN];
 	
 	if(item>=gLabTemplatelist.num)
 		return -1;
 	sprintf(filepath, "%s%s/%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name, LabJSON_FILE_NAME);
 	res = AnalysisLab_Jsonfile(filepath);
+	if(res==FR_OK)
+		BSP_PRINTF("analysis file: %s",filepath);
 	sprintf(filepath, "%s%s/%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name, TEMPJSON_FILE_NAME);
 	res = AnalysisTemp_Jsonfile(filepath);
+	if(res==FR_OK)
+		BSP_PRINTF("analysis file: %s",filepath);
 	return res;
 }
 
