@@ -43,8 +43,8 @@ void SysDataInit(void)
 //	CreateLab_Jsonfile();
 //	jansson_pack_test();
 }
-
-void SetSampleDataSampleT(u32 enable, char typeidx)
+//设置样本类型
+void SetSampleType(u32 enable, char typeidx)
 {
 	u8 i;
 	u32 tmp;
@@ -57,8 +57,8 @@ void SetSampleDataSampleT(u32 enable, char typeidx)
 		}
 	}
 }
-
-void SetSampleDataChannel(u32 enable, char typeidx)
+//设置样本通道
+void SetSampleChannel(u32 enable, char typeidx)
 {
 	u8 i;
 	u32 tmp;
@@ -71,7 +71,7 @@ void SetSampleDataChannel(u32 enable, char typeidx)
 		}
 	}
 }
-
+//关闭样本空
 void DisableSampleData(u32 enable)
 {
 	u8 i;
@@ -86,7 +86,7 @@ void DisableSampleData(u32 enable)
 		}
 	}
 }
-
+//设置样本信息默认值
 void ResetSampleDataDefault(void)
 {
 	u8 i;
@@ -99,7 +99,7 @@ void ResetSampleDataDefault(void)
 		strcpy(sample_data.hole[i].sample_t, &SampleType[0][0]);
 	}
 }
-
+//设置实验数据默认值
 void ResetLabDataDefault(void)
 {
 	memset(lab_data.name,0,LAB_NAME_LEN);
@@ -144,7 +144,7 @@ void DelStage(u8 del_id)
 		temp_data.StageNum = j;
 	}
 }
-
+//设置温度程序默认值
 void ResetTempDataDefault(void)
 {
 	u8 i;
@@ -157,21 +157,84 @@ void ResetTempDataDefault(void)
 	}
 }
 
-//void HeatCoverOnOff(u8 flag)
-//{
-//	temp_data.HeatCoverEnable = flag;
-//}
-
-//void CollDataOnOff_InStep(u8 flag)
-//{
-//	u8 m,n;
-//	
-//	m = temp_data.StageNum-1;
-//	if(m<0)	m = 0;
-//	n = temp_data.stage[m].StepNum-1;
-//	if(n<0)	n = 0;
-//	temp_data.stage[m].step[n].CollEnable = flag;
-//}
+//设置温度程序DNA值
+void ResetTempDataDNA(void)
+{
+	temp_data.HeatCoverTemp = 105;
+	temp_data.StageNum = 2;
+	temp_data.CurStage = 0;
+	temp_data.stage[0].RepeatNum = 10;
+	temp_data.stage[0].StepNum = 2;
+	temp_data.stage[0].CurStep = 0;
+	temp_data.stage[0].CurRepeat = 0;
+	temp_data.stage[0].Type = 0;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
+	temp_data.stage[0].T_Rate = 0;//升温速率
+	temp_data.stage[0].T_Inter = 0;//温度间隔
+	temp_data.stage[0].Const_Tim = 0;//恒温时间 s
+	temp_data.stage[0].step[0].CollEnable = DEF_False;
+	temp_data.stage[0].step[0].temp = HOLE_TEMP_MAX;
+	temp_data.stage[0].step[0].tim = 30;
+	temp_data.stage[0].step[1].CollEnable = DEF_True;
+	temp_data.stage[0].step[1].temp = 4500;
+	temp_data.stage[0].step[1].tim = 45;
+	
+	temp_data.stage[1].RepeatNum = 10;
+	temp_data.stage[1].StepNum = 3;
+	temp_data.stage[1].CurStep = 0;
+	temp_data.stage[1].CurRepeat = 0;
+	temp_data.stage[1].Type = 0;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
+	temp_data.stage[1].T_Rate = 0;//升温速率
+	temp_data.stage[1].T_Inter = 0;//温度间隔
+	temp_data.stage[1].Const_Tim = 0;//恒温时间 s
+	temp_data.stage[1].step[0].CollEnable = DEF_False;
+	temp_data.stage[1].step[0].temp = 7500;
+	temp_data.stage[1].step[0].tim = 30;
+	temp_data.stage[1].step[1].CollEnable = DEF_True;
+	temp_data.stage[1].step[1].temp = 5500;
+	temp_data.stage[1].step[1].tim = 45;
+	temp_data.stage[1].step[2].CollEnable = DEF_True;
+	temp_data.stage[1].step[2].temp = 9500;
+	temp_data.stage[1].step[2].tim = 45;
+}
+//设置温度程序RNA值
+void ResetTempDataRNA(void)
+{
+	temp_data.HeatCoverTemp = 105;
+	temp_data.StageNum = 2;
+	temp_data.CurStage = 0;
+	temp_data.stage[0].RepeatNum = 10;
+	temp_data.stage[0].StepNum = 2;
+	temp_data.stage[0].CurStep = 0;
+	temp_data.stage[0].CurRepeat = 0;
+	temp_data.stage[0].Type = 0;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
+	temp_data.stage[0].T_Rate = 0;//升温速率
+	temp_data.stage[0].T_Inter = 0;//温度间隔
+	temp_data.stage[0].Const_Tim = 0;//恒温时间 s
+	temp_data.stage[0].step[0].CollEnable = DEF_False;
+	temp_data.stage[0].step[0].temp = HOLE_TEMP_MAX;
+	temp_data.stage[0].step[0].tim = 30;
+	temp_data.stage[0].step[1].CollEnable = DEF_True;
+	temp_data.stage[0].step[1].temp = 4500;
+	temp_data.stage[0].step[1].tim = 45;
+	
+	temp_data.stage[1].RepeatNum = 10;
+	temp_data.stage[1].StepNum = 3;
+	temp_data.stage[1].CurStep = 0;
+	temp_data.stage[1].CurRepeat = 0;
+	temp_data.stage[1].Type = 0;//0-repeat模式;溶解曲线：1-continue 模式;2-step 模式
+	temp_data.stage[1].T_Rate = 0;//升温速率
+	temp_data.stage[1].T_Inter = 0;//温度间隔
+	temp_data.stage[1].Const_Tim = 0;//恒温时间 s
+	temp_data.stage[1].step[0].CollEnable = DEF_False;
+	temp_data.stage[1].step[0].temp = 7500;
+	temp_data.stage[1].step[0].tim = 30;
+	temp_data.stage[1].step[1].CollEnable = DEF_True;
+	temp_data.stage[1].step[1].temp = 5500;
+	temp_data.stage[1].step[1].tim = 45;
+	temp_data.stage[1].step[2].CollEnable = DEF_True;
+	temp_data.stage[1].step[2].temp = 9500;
+	temp_data.stage[1].step[2].tim = 45;
+}
 
 void ClearAllSysStateTB(void)
 {

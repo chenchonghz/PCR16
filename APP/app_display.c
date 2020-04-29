@@ -66,7 +66,10 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			if(iPara==0x01)	{//回读screen id
 				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				if(appdis.pUI->screen_id == Main_UIID)	{
-					if(Sys.devstate != DevState_Running)	ResetLabDataDefault();
+					if(Sys.devstate != DevState_Running)	{
+						ResetLabDataDefault();
+						ResetTempDataDefault();
+					}
 				}
 				else if(appdis.pUI->screen_id == Temp_UIID)	{//温度程序界面 刷新温度图形
 					DisplayTempProgramUI(1,1);//刷新温度界面
@@ -138,8 +141,13 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			if(appdis.pUI->ctrl_id == 1)	{//实验
 				DisplayLabUI();
 			}
-			else if(appdis.pUI->ctrl_id == 3||appdis.pUI->ctrl_id == 4)	{//DNA RNA
+			else if(appdis.pUI->ctrl_id == 3)	{//DNA RNA
 				DisplayMenuUI();
+				ResetTempDataDNA();
+			}
+			else if(appdis.pUI->ctrl_id == 4)	{
+				DisplayMenuUI();
+				ResetTempDataRNA();
 			}
 			else if(appdis.pUI->ctrl_id == 5)	{//数据
 				appdis.pUI->screen_id = Data_UIID;
@@ -226,7 +234,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				UpdateSampleInfor();
 			}
 			else	{
-				SetSampleDataSampleT(appdis.pUI->button_id, subtype);
+				SetSampleType(appdis.pUI->button_id, subtype);
 				appdis.pUI->button_id |= DEF_BIT31_MASK;
 				if(appdis.pUI->button_id & DEF_BIT30_MASK)	{					
 					ClearButtonInSampleInfor();
@@ -235,7 +243,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			}
 		}
 		else if(appdis.pUI->ctrl_id==21&&status == DEF_Release)	{//通道设置
-			SetSampleDataChannel(appdis.pUI->button_id, subtype+1);
+			SetSampleChannel(appdis.pUI->button_id, subtype+1);
 			appdis.pUI->button_id |= DEF_BIT30_MASK;
 			if(appdis.pUI->button_id & DEF_BIT31_MASK)	{				
 				ClearButtonInSampleInfor();
