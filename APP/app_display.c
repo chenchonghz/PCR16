@@ -32,7 +32,7 @@ static void DisDatInit(void)
 	appdis.pUI = &UI;
 //	LIFOBuffer_Init(&ScreenIDLIFO,(u8 *)appdis.pUI->screen_idlifo, 1 ,SCREEN_BUFSIZE);
 }
-u8 touchid;
+//u8 touchid;
 static void ButtonClickProcess(u8 button);
 static void ScreenDataProcess(_dacai_usart_t *pUsart);
 static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
@@ -50,14 +50,11 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 			appdis.pUI->screen_id = Invalid_UIID;
 			break;
 		case 0x01:
-			/*if(appdis.pUI->screen_id == Menu_UIID)	{
-				DisplayMenuUI();
-			}
-			else */if(appdis.pUI->screen_id == Temp_UIID)	{
+			if(appdis.pUI->screen_id == Temp_UIID&&Sys.devstate != DevState_Running)	{
 				u16 x,y;
 				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-				touchid = TempButtonClick(x,y);
+				u8 touchid = TempButtonClick(x,y);
 				ButtonClickProcess(touchid);
 			}
 			break;
@@ -141,20 +138,20 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			if(appdis.pUI->ctrl_id == 1)	{//实验
 				DisplayLabUI();
 			}
-			else if(appdis.pUI->ctrl_id == 3)	{//DNA RNA
+			else if(appdis.pUI->ctrl_id == 2)	{//系统
+				
+			}
+			else if(appdis.pUI->ctrl_id == 3)	{//DNA 
 				DisplayMenuUI();
 				ResetTempDataDNA();
 			}
-			else if(appdis.pUI->ctrl_id == 4)	{
+			else if(appdis.pUI->ctrl_id == 4)	{//RNA
 				DisplayMenuUI();
 				ResetTempDataRNA();
 			}
 			else if(appdis.pUI->ctrl_id == 5)	{//数据
 				appdis.pUI->screen_id = Data_UIID;
 				DaCai_SwitchUI(appdis.pUI);
-			}
-			else if(appdis.pUI->ctrl_id == 5)	{//数据
-				
 			}
 		}
 	}
@@ -309,13 +306,6 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				DisplayTempProgramUI(1,1);
 			}
 		}
-//		if(appdis.pUI->ctrl_id == 8)	{//关闭热盖温度
-//			if(status == DEF_Release)	{
-//				HeatCoverOnOff(DEF_False);
-//			}
-//			else if(status == DEF_Press)
-//				HeatCoverOnOff(DEF_True);
-//		}		
 	}
 	else if(appdis.pUI->screen_id==LabAttr_UIID&&status == DEF_Press)	{//实验属性
 		if(appdis.pUI->ctrl_id == 12)	{//用户输入值

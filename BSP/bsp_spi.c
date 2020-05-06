@@ -403,6 +403,7 @@ static void spi_mp3wires_write(spi_t *pdev, CPU_INT08U nbits, CPU_INT32U txdat)
         SET_L(SCK);
         /* 左移发送数据 */
         txdat <<= 1;
+		__NOP();
         /* 拉高时钟 */
         SET_H(SCK);
     }
@@ -724,8 +725,9 @@ CPU_INT32U bsp_spi_read(spi_t *pdev, enum _spi_mode mode, CPU_INT08U nbits)
     CPU_INT32U ret = 0;
 
     if (priv->nwire == SPI_3Wires) {
-        iosw_call = priv->pport->_3port.iosw;
-        iosw_call(&priv->pport->_3port.DIO, DEF_IN);
+//        iosw_call = priv->pport->_3port.iosw;
+//        iosw_call(&priv->pport->_3port.DIO, DEF_IN);
+		iosw(&priv->pport->_3port.DIO, DEF_IN);
         if (mode < SPI_MODE_MAX) {
             ret = g_spi_read_call[mode](pdev, nbits);
         }
@@ -741,8 +743,9 @@ void bsp_spi_write(spi_t *pdev, enum _spi_mode mode, CPU_INT08U nbits, CPU_INT32
     iosw_t iosw_call = NULL;
 
     if (priv->nwire == SPI_3Wires) {
-        iosw_call = priv->pport->_3port.iosw;
-        iosw_call(&priv->pport->_3port.DIO, DEF_OUT);
+//        iosw_call = priv->pport->_3port.iosw;
+//        iosw_call(&priv->pport->_3port.DIO, DEF_OUT);
+		iosw(&priv->pport->_3port.DIO, DEF_OUT);
         if (mode < SPI_MODE_MAX) {
             g_spi_write_call[mode](pdev, nbits, txdat);
         }

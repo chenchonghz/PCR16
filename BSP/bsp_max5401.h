@@ -18,7 +18,7 @@ typedef struct _max5401_dev {
 	struct _io_map	cs;
 }max5401_dev_t;
 
-void MAX5401WriteResistor(max5401_dev_t *pdev, u32 res_cell);
-	
+void MAX5401WriteResistor(u8 id, u32 res_cell);
+void MAX5401_init(void);
 #endif
 

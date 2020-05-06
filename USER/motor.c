@@ -60,8 +60,8 @@ static void VelProfile_Init(void)
 	u16 vel_profile[ARRLEN];
 	
 	VelProfile.Vo = 1000;
-	VelProfile.Vmax = 3000;
-	VelProfile.AccStep = 100;//加速步进
+	VelProfile.Vmax = 2000;
+	VelProfile.AccStep = 80;//加速步进
 	VelProfile.SaStep = 40;
 	for(t=0;;t++)	{
 		vel_profile[t] = VelProfile.AccStep*t + VelProfile.Vo;

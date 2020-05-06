@@ -385,22 +385,24 @@ static void ClearTempProgramUI(u8 clear_flag)
 	for(j=0;j<9;j++)	{
 		appdis.pUI->ctrl_id = 15+j;
 		DaCai_ClearTXT(appdis.pUI);
+		DaCai_SetTXTBackgroundNoColor(appdis.pUI);
 		appdis.pUI->ctrl_id = 24+j;
 		DaCai_ClearTXT(appdis.pUI);
+		DaCai_SetTXTBackgroundNoColor(appdis.pUI);
 	}
 }
 struct _dis_idx_t	{
 	u8 StageIdx;
 	u8 StepIdx;
- }CurIdx,LastIdx;
+ }CurIdx,NextIdx;
 static u16 g_templast;
 //请温度界面阶段和步标志
 void ClearTempProgramIdx(void)
 {
 	CurIdx.StageIdx = 0;
 	CurIdx.StepIdx = 0;
-	LastIdx.StageIdx = 0;
-	LastIdx.StepIdx = 0;
+	NextIdx.StageIdx = 0;
+	NextIdx.StepIdx = 0;
 	g_templast = 30;
 }
 
@@ -488,10 +490,12 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	i=0;
 	if(page_flag)	{//翻页处理
-		if(LastIdx.StageIdx>=temp_data.StageNum)
-			LastIdx.StageIdx = 0;
-		CurIdx.StageIdx = LastIdx.StageIdx;
-		CurIdx.StepIdx = LastIdx.StepIdx;
+		if(NextIdx.StageIdx>=temp_data.StageNum)	
+			ClearTempProgramIdx();
+		else	{
+			CurIdx.StageIdx = NextIdx.StageIdx;
+			CurIdx.StepIdx = NextIdx.StepIdx;
+		}
 	}
 	pMultiTXT_t->data[i].id = 6;
 	pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "%d", temp_data.HeatCoverTemp);
@@ -504,10 +508,21 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 		pMultiTXT_t->data[++i].id = stage_id;
 		stage_id += flag;
 		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "Stage%d", j+1);
+//		appdis.pUI->ctrl_id = pMultiTXT_t->data[i].id;
+//		DaCai_SetTXTBackgroundColor(appdis.pUI, 0x0397);
 		repeat_id += flag;
 		pMultiTXT_t->data[++i].id = repeat_id;
 		repeat_id += flag;
 		pMultiTXT_t->data[i].len = sprintf(pMultiTXT_t->data[i].buf, "x%d", temp_data.stage[j].RepeatNum);
+		appdis.pUI->ctrl_id = pMultiTXT_t->data[i].id;
+		if(Sys.devstate != DevState_Running)	{
+			DaCai_SetTXTBackgroundColor(appdis.pUI, 0xffff);
+			DaCai_SetForeColor(appdis.pUI, 0x033F);
+		}
+		else	{
+			DaCai_SetTXTBackgroundColor(appdis.pUI, 0x0397);
+			DaCai_SetForeColor(appdis.pUI, 0xffff);
+		}
 		if(repeat_id>=32)
 			break;		
 		j++;
@@ -515,26 +530,13 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 			break;
 		flag = temp_data.stage[j].StepNum;
 	}
-	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);
+	DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, i+1);		
 	user_free(pMultiTXT_t);
 	templast = g_templast;
 	stepcnt = 0;
-	flag = 0;
 	k=CurIdx.StepIdx;
 	for(j=CurIdx.StageIdx;j<temp_data.StageNum;j++)	{//刷新图形
 		for(;k<temp_data.stage[j].StepNum;k++)	{
-			if(stepcnt==TEMP_UI_MAXSTEP-1)	{//显示已满 
-				flag = 1;//需要翻到第1页
-			}
-			else if(stepcnt>=TEMP_UI_MAXSTEP)	{
-				g_templast = temp;
-				LastIdx.StageIdx = j;
-				if(k>=temp_data.stage[j].StepNum)
-					LastIdx.StepIdx = 0;
-				else
-					LastIdx.StepIdx = k;
-				return;
-			}
 			temp = temp_data.stage[j].step[k].temp/100;	//温度精确到0.01		
 			rec_x = TEMP_RECTANGLE_X + TEMP_RECTANGLE_X_INTER*stepcnt;
 			height = temp*(TEMP_RECTANGLE_H/100);
@@ -565,16 +567,18 @@ void DisplayTempProgramUI(u8 page_flag, u8 clear_flag)
 				PaintTriangle(rec_x+130,rec_y,14,30);
 			templast = temp;
 			stepcnt	++;
+			if(stepcnt>=TEMP_UI_MAXSTEP)	{//显示已满 
+				g_templast = temp;				
+				k++;
+				if(k>=temp_data.stage[j].StepNum)
+					NextIdx.StepIdx = 0;
+				else
+					NextIdx.StepIdx = k;
+				NextIdx.StageIdx = ++j;
+				return;
+			}
 		}
 		k=0;
-	}
-	if(flag)	{
-		g_templast = temp;
-		LastIdx.StageIdx = j;
-		if(k>=temp_data.stage[j].StepNum)
-			LastIdx.StepIdx = 0;
-		else
-			LastIdx.StepIdx = k;
 	}
 }
 //画三角形 (x,y)是顶点坐标 w,h是三角形宽和高

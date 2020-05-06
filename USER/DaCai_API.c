@@ -454,8 +454,42 @@ void DaCai_ClearTXT(_UI_t *pUI)
 	ptxbuf[len++] = pUI->ctrl_id;
 	DaCai_SendData(ptxbuf, len);
 }
-//设置进度条前景色
-void DaCai_SetProgressForecolor(_UI_t *pUI,u8 R,u8 G)
+//设置文本控件背景透明 EE B1 17 00 00 00 01 FF FC FF FF 
+void DaCai_SetTXTBackgroundNoColor(_UI_t *pUI)
+{
+	u8 len;
+	//u8 *ptxbuf = dacai.puart->tx_buf;
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0xB1;
+	ptxbuf[len++] = 0X17;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->screen_id;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->ctrl_id;
+	DaCai_SendData(ptxbuf, len);
+}
+//设置文本控件背景色 EE B1 18 00 00 00 01 FF FF FF FC FF FF 
+void DaCai_SetTXTBackgroundColor(_UI_t *pUI, u16 color)
+{
+	u8 len;
+	//u8 *ptxbuf = dacai.puart->tx_buf;
+	mutex_lock(dacai.lock);
+	len = 0;
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0xB1;
+	ptxbuf[len++] = 0X18;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->screen_id;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->ctrl_id;
+	ptxbuf[len++] = color>>8;
+	ptxbuf[len++] = color&0xff;
+	DaCai_SendData(ptxbuf, len);
+}
+//设置前景色 EE B1 19 00 00 00 01 F8 00 FF FC FF FF 
+void DaCai_SetForeColor(_UI_t *pUI,u16 color)
 {
 	u8 len;
 	//u8 *ptxbuf = dacai.puart->tx_buf;
@@ -468,8 +502,8 @@ void DaCai_SetProgressForecolor(_UI_t *pUI,u8 R,u8 G)
 	ptxbuf[len++] = pUI->screen_id;
 	ptxbuf[len++] = 0;
 	ptxbuf[len++] = pUI->ctrl_id;
-	ptxbuf[len++] = R;
-	ptxbuf[len++] = G;
+	ptxbuf[len++] = color>>8;
+	ptxbuf[len++] = color&0xff;
 	DaCai_SendData(ptxbuf, len);
 }
 //设置文本闪烁 单位10ms

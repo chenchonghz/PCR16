@@ -24,7 +24,7 @@ max5401_dev_t	g_max5401_dev[MAX5401_ID_NUMS]	=	{
 	}
 };
 
-static void MAX5401_init(void)
+void MAX5401_init(void)
 {
 	max5401_dev_t  *pdev = &g_max5401_dev[MAX5401_ID1];
 
@@ -58,8 +58,9 @@ static INT32U MAX5401_spi_wr(max5401_dev_t *pdev, INT32U dat)
     return rxdat;
 }
 //MAX5401×èÖµ = (100k/255 = 392.2) * res_cell
-void MAX5401WriteResistor(max5401_dev_t *pdev, u32 res_cell)
+void MAX5401WriteResistor(u8 id, u32 res_cell)
 {
+	max5401_dev_t  *pdev = &g_max5401_dev[id];
 	MAX5401_spi_wr(pdev, res_cell);
 }
 

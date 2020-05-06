@@ -18,7 +18,7 @@
 #define Motor_StepsPerum              ((FP32)Motor_StepsPerRound_With_MicroSteps/(FP32)Motor_NumPerRound)//1um∂‡…Ÿ≤Ω£¨800/12=66.6
 //#define Motor_InitSpeed                0x57e3
 
-#define Motor_Move_MAX_LEN      80//97//mm
+#define Motor_Move_MAX_LEN      40//80//97//mm
 #define Motor_Move_MAX_STEP     Motor_Move_MAX_LEN*Motor_StepsPerum  //    
 //#define Motor_Timer_PSC         1
 //#define Motor_Timer_CLK         (rcc_clocks.PCLK2_Frequency/Motor_Timer_PSC)

@@ -173,7 +173,7 @@
           <Type>0</Type>
           <LineNumber>4541</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134291252</Address>
+          <Address>134292044</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -265,6 +265,11 @@
           <count>15</count>
           <WinNumber>1</WinNumber>
           <ItemText>json_out</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_max5401_dev[0]</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

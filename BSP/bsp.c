@@ -4,6 +4,7 @@
 #include "bsp_w25qxx.h"
 #include "motor.h"
 #include "sys_data.h"
+#include "bsp_max5401.h"
 
 ////////////////////////////////////
 //IO≈‰÷√∫Ø ˝
@@ -13,6 +14,7 @@ void	bsp_init(void)
 	BSP_W25Qx_Init();
 	SoftTimerInit();
 //	BspAD7091Init();
+	MAX5401_init();
 }
 //io≈‰÷√
 void ioconfig(const struct _io_map *pio, cpu_bool_t sw)
