@@ -185,9 +185,11 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					Sys.state |= SysState_DeleteLabTB;
 				}
 			}
-			else if(appdis.pUI->ctrl_id == 19)	{//启动实验
-				if(Sys.devstate == DevState_Running)
-					DisplayQiTingLab();
+			else if(appdis.pUI->ctrl_id == 13)	{//打开实验
+				if(Sys.devstate == DevState_Running)	{
+//					DisplayQiTingLab();
+					DisplayMessageUI((char *)&Code_Message[5][0],1);//运行中
+				}
 				else if(appdis.pUI->index >= gLabTemplatelist.num)	
 					DisplayMessageUI((char *)&Code_Message[3][0],1);//无效操作
 				else	{
@@ -195,8 +197,9 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 					ResetSampleDataDefault();
 					ResetTempDataDefault();					
 					AnalysisLabTemplate(appdis.pUI->index);//解析实验模板	
-					appdis.pUI->index = 0x0f;					
-					DisplayQiTingLab();//根据当前实验状态，提示停止实验还是启动实验	
+					appdis.pUI->index = 0x0f;				
+					DisplayMenuUI();					
+//					DisplayQiTingLab();//根据当前实验状态，提示停止实验还是启动实验	
 				}					
 			}
 		}
