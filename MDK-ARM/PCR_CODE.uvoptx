@@ -173,7 +173,7 @@
           <Type>0</Type>
           <LineNumber>4541</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134291916</Address>
+          <Address>134291844</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -239,35 +239,30 @@
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LastIdx</ItemText>
+          <ItemText>lab_data</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>lab_data</ItemText>
+          <ItemText>sample_data</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sample_data</ItemText>
+          <ItemText>gLabTemplatelist</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>gLabTemplatelist</ItemText>
+          <ItemText>app_ad</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pMultiTXT_t,0x0A</ItemText>
+          <ItemText>pd_data_max,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>json_out</ItemText>
-        </Ww>
-        <Ww>
-          <count>16</count>
           <WinNumber>1</WinNumber>
           <ItemText>g_max5401_dev[0]</ItemText>
         </Ww>

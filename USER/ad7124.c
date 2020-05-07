@@ -11,11 +11,10 @@ _ad7124_t ad7124;
 #define	TEC_DISCARD_NUM		2
 #define	PD_DISCARD_NUM		1
 #define	CH_AVERNUMS			6//需要算平均的通道个数
-struct _AdcVolAver_t {
+struct _AdcCodeAver_t {
 	u32 buf[AVER_MAX];
 	u8 idx;
-//	u16 aver;
-}AdcVolAver[CH_AVERNUMS];
+}AdcCodeAver[CH_AVERNUMS];//adc 二进制数据 均值处理
 
 static float CalcADCVoltage(u32 adcode);
 static void AD7124ChannelEnable(void);
@@ -31,10 +30,10 @@ void AD7124Init(void)
 	ad7124.channel = uCH_0;
 	ad7124.channel_last = uCH_0;
 	
-	AdcVolAver[uCH_0].idx = 0;
-	AdcVolAver[uCH_1].idx = 0;
-	AdcVolAver[uCH_2].idx = 0;
-	AdcVolAver[uCH_3].idx = 0;
+	AdcCodeAver[uCH_0].idx = 0;
+	AdcCodeAver[uCH_1].idx = 0;
+	AdcCodeAver[uCH_2].idx = 0;
+	AdcCodeAver[uCH_3].idx = 0;
 	
 	ad7124.pdev = bsp_ad7124_init(AD7124_ID1);
 	ad7124_id = bsp_ad7124_id_get(ad7124.pdev);
@@ -103,7 +102,7 @@ u8 r_channel;
 u8 ad7124_err;
 float ad_temp;
 u32 ad_code;
-u32 calc_start=0,calc_time;
+//u32 calc_start=0,calc_time;
 u8 StartADDataCollect(void)
 {
 //	u8 r_channel;
@@ -125,39 +124,37 @@ u8 StartADDataCollect(void)
 		return 0;
 	}
 	ad7124.channel = r_channel;
-	HAL_GPIO_WritePin(GPIOC, Fluo_Green_Pin,GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(GPIOC, Fluo_Green_Pin,GPIO_PIN_SET);
 	if(ad7124_err==AD7124_ERR_NONE)	{
 		if(r_channel <= ad7124.channel_last)	
 		{
 			ad_code = bsp_ad7124_value_get(ad7124.pdev); //读取ADC转换结果				
-			ad_temp = CalcADCVoltage(ad_code); //计算电压			
-//			calc_time = HAL_GetTick() - calc_start;
-//			calc_start = HAL_GetTick();
+//			ad_temp = CalcADCVoltage(ad_code); //计算电压			
 			switch(r_channel)	{
 				case uCH_0:	//测温通道 精确到mv
-					CalcADCVolAverage(uCH_0, (u32)(ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);
+					CalcADCVolAverage(uCH_0, ad_code, TEC_AVER_MAX, TEC_DISCARD_NUM);
 					break;
 				case uCH_1:	//测温通道 精确到mv
-					CalcADCVolAverage(uCH_1, (u32)(ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);
+					CalcADCVolAverage(uCH_1, ad_code, TEC_AVER_MAX, TEC_DISCARD_NUM);
 					break;
 				case uCH_2://测温通道 精确到mv	 
-					CalcADCVolAverage(uCH_2,(u32) (ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);				
+					CalcADCVolAverage(uCH_2, ad_code, TEC_AVER_MAX, TEC_DISCARD_NUM);				
 					break;
 				case uCH_3:	//测温通道 精确到mv
-					CalcADCVolAverage(uCH_3, (u32)(ad_temp*100), TEC_AVER_MAX, TEC_DISCARD_NUM);
+					CalcADCVolAverage(uCH_3, ad_code, TEC_AVER_MAX, TEC_DISCARD_NUM);
 					break;
-				case uCH_4:	
-					CalcADCVolAverage(uCH_4, (u32)ad_temp, PD_AVER_MAX, PD_DISCARD_NUM);
+				case uCH_4:	//PD通道
+//					CalcADCVolAverage(uCH_4, ad_code, PD_AVER_MAX, PD_DISCARD_NUM);
 					break;
-				case uCH_5:	
-					CalcADCVolAverage(uCH_5, (u32)ad_temp, PD_AVER_MAX, PD_DISCARD_NUM);
+				case uCH_5:	//PD通道
+//					CalcADCVolAverage(uCH_5, ad_code, PD_AVER_MAX, PD_DISCARD_NUM);
 					break;
 				default:
 					break;
 			}
 		}
 	}
-	HAL_GPIO_WritePin(GPIOC, Fluo_Green_Pin,GPIO_PIN_RESET);
+//	HAL_GPIO_WritePin(GPIOC, Fluo_Green_Pin,GPIO_PIN_RESET);
 	return 1;
 }
 
@@ -177,44 +174,37 @@ static float CalcADCVoltage(u32 adcode)
 	return adtemp*AD7124_REF_VOLTAGE;
 }
 
-//计算每个通道电压均值 去掉1个最大值 1个最小值 取平均
-static void CalcADCVolAverage(u8 ch, u32 advol, u8 aver_max, u8 discard)
+//计算每个通道电压均值（先计算adc二进制数据均值） 去掉1个最大值 1个最小值 取平均
+static void CalcADCVolAverage(u8 ch, u32 adcode, u8 aver_max, u8 discard)
 {	
-//	u32 advol;
 	u8 idx;
 	
-//	advol = (u32)(vol*100);
-	idx = AdcVolAver[ch].idx;
-//	if(ch==2&&idx==0)	{			
-//		calc_start = HAL_GetTick();
-//	}
-	AdcVolAver[ch].buf[idx] = advol;
-	AdcVolAver[ch].idx ++;
-	if(AdcVolAver[ch].idx >= aver_max)	{
-//		if(ch==2)
-//			calc_time = HAL_GetTick() - calc_start;
+	idx = AdcCodeAver[ch].idx;
+	AdcCodeAver[ch].buf[idx] = adcode;
+	AdcCodeAver[ch].idx ++;
+	if(AdcCodeAver[ch].idx >= aver_max)	{
 		u32 temp;
 		 /*---------------- 冒泡排序,由小到大排序 -----------------*/
-    	u8 i,j,flag;
+    	s8 i,j,flag;
 		i=0;
-		idx = AdcVolAver[ch].idx;
+		idx = AdcCodeAver[ch].idx;
 
 		do{
 			flag=0;
 			for (j=0;j<idx-i-1;j++)
 			{
-				if (AdcVolAver[ch].buf[j] > AdcVolAver[ch].buf[j+1])
+				if (AdcCodeAver[ch].buf[j] > AdcCodeAver[ch].buf[j+1])
 				{
-					temp = AdcVolAver[ch].buf[j];
-					AdcVolAver[ch].buf[j]   = AdcVolAver[ch].buf[j+1];
-					AdcVolAver[ch].buf[j+1] = temp;
+					temp = AdcCodeAver[ch].buf[j];
+					AdcCodeAver[ch].buf[j]   = AdcCodeAver[ch].buf[j+1];
+					AdcCodeAver[ch].buf[j+1] = temp;
 					flag = 1;
 				}
-				if (AdcVolAver[ch].buf[j] > AdcVolAver[ch].buf[j+1])
+				if (AdcCodeAver[ch].buf[j] > AdcCodeAver[ch].buf[j+1])
 				{
-					temp = AdcVolAver[ch].buf[j];
-					AdcVolAver[ch].buf[j]   = AdcVolAver[ch].buf[j+1];
-					AdcVolAver[ch].buf[j+1] = temp;
+					temp = AdcCodeAver[ch].buf[j];
+					AdcCodeAver[ch].buf[j]   = AdcCodeAver[ch].buf[j+1];
+					AdcCodeAver[ch].buf[j+1] = temp;
 					flag = 1;
 				}
 			}
@@ -226,12 +216,13 @@ static void CalcADCVolAverage(u8 ch, u32 advol, u8 aver_max, u8 discard)
 		j = idx - discard;
 		for (i=discard;i<j;i++)
 		{
-			temp += AdcVolAver[ch].buf[i];
+			temp += AdcCodeAver[ch].buf[i];
 		}
 		j = idx - discard*2;
-		ad7124.vol[ch] = temp/j;
+		temp /= j;
 		/*---------------- end -----------------*/
-		AdcVolAver[ch].idx = 0;
+		ad7124.vol[ch] = CalcADCVoltage(temp)*100; //计算电压 0.01mv		
+		AdcCodeAver[ch].idx = 0;
 	}
 }
 

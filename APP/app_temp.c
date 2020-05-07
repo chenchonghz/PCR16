@@ -164,10 +164,11 @@ static void AppTempTask (void *parg)
 	StopTempCtrl(&TempPid[HOLE_TEMP]);
 	OSTimeDly(1000);
 //	COOLFAN_ON();
-	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
+//	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
+	SetPIDVal(PID_ID1, 0.0, 0.0, 0.0);
 	for(;;)
     {
-		if(Sys.devstate == DevState_Running)	
+//		if(Sys.devstate == DevState_Running)	
 		{
 			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{//¼ÆËãÄ£¿éÎÂ¶È
 				TempProgramLookOver(cur_temp);
@@ -195,12 +196,13 @@ static void AppTempTask (void *parg)
 //			
 //			}
 		}
-		else	{
-			ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
-			StopTempCtrl(&TempPid[HOLE_TEMP]);
-			ClearPIDDiff(TempPid[COVER_TEMP].PIDid);
-			StopTempCtrl(&TempPid[COVER_TEMP]);
-		}
+//		else	
+//		{
+//			ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
+//			StopTempCtrl(&TempPid[HOLE_TEMP]);
+//			ClearPIDDiff(TempPid[COVER_TEMP].PIDid);
+//			StopTempCtrl(&TempPid[COVER_TEMP]);
+//		}
 		OSTimeDly(80);
 	}
 }
