@@ -1,7 +1,6 @@
 #include "ad7124.h"
 //#include "TempCtrl.h"
 
-#define AD7124_DATA_READY()		HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11)
 #define	AD7124_REF_VOLTAGE		(2500) //参考电压 mV 3304
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
@@ -111,17 +110,22 @@ u8 StartADDataCollect(void)
 //	u8 ad7124_err;
 //	float ad_temp;
 //	u32 ad_code;
-	u8 delaycnt=0;
+//	u8 delaycnt=0;
 	
-	ad7124_cs_low();
-	while(AD7124_DATA_READY())	{//RDY引脚为低时 表示转换完成
-		delaycnt++;
-		if(delaycnt>10)	{
-			ad7124_cs_high();
-			return 0;
-		}
-	}
+//	ad7124_cs_low();
+//	while(AD7124_DATA_READY())	{//RDY引脚为低时 表示转换完成
+//		delaycnt++;
+//		if(delaycnt>10)	{
+//			ad7124_cs_high();
+//			return 0;
+//		}
+//	}
 	r_channel = bsp_ad7124_conv_ready(ad7124.pdev, &ad7124_err);//回读当前采样通道
+	if(ad7124.channel == r_channel)	{
+		return 0;
+	}
+	ad7124.channel = r_channel;
+	HAL_GPIO_WritePin(GPIOC, Fluo_Green_Pin,GPIO_PIN_SET);
 	if(ad7124_err==AD7124_ERR_NONE)	{
 		if(r_channel <= ad7124.channel_last)	
 		{
@@ -151,17 +155,9 @@ u8 StartADDataCollect(void)
 				default:
 					break;
 			}
-//			ad7124.channel ++;
-//			if(ad7124.channel > ad7124.channel_last)	{
-//				ad7124.channel = uCH_0;
-//				ad7124.busy = DEF_Idle;
-//			}
 		}
-//		else if(r_channel > ad7124.channel_last)	{
-//			ad7124.channel = uCH_0;
-//			ad7124.busy = DEF_Idle;
-//		}
 	}
+	HAL_GPIO_WritePin(GPIOC, Fluo_Green_Pin,GPIO_PIN_RESET);
 	return 1;
 }
 

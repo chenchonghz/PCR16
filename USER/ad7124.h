@@ -23,6 +23,8 @@ typedef struct  _ad7124
 	u32 vol[AVALID_CH];
 }_ad7124_t;
 
+#define AD7124_DATA_READY()		HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11)
+
 extern _ad7124_t ad7124;
 void AD7124Init(void);
 u8 StartADDataCollect(void);

@@ -121,7 +121,7 @@ typedef struct Motor_t {
     INT16U		speed;			//速度
     INT16U		cur_speed;
     INT16U		acceleration;	//加速度
-//    INT8U               lock_current;
+    INT8U               if_acc;//是否开启加速
     INT32S		CurSteps;//当前编码器角度值
 
     INT32U              StepCnt;                    

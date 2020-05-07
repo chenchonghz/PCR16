@@ -366,7 +366,7 @@ void bsp_ad7124_filterreg_set(ad7124_dev_t *pdev)
 	ad7124_reg_filter_t r;
 	
 	r.uword = 0;
-	r.bits.FS = 30;
+	r.bits.FS = 4;
 	ad7124_reg_write(pdev, 0x21, 3, r.uword);
 }
 ad7124_dev_t* bsp_ad7124_find(CPU_INT08U id)

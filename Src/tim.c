@@ -22,6 +22,12 @@
 
 /* USER CODE BEGIN 0 */
 
+//tim2--CH4用于PWM生成，控制热盖tec温度
+//tim3--ch3用于pwm生成，控制电机运行
+//tim6--100us定时，用于电机加减速和ad7124转换结果查询
+//tim7--100ms定时，用于恒温时间计算
+//tim8--ch1用于pwm生成，控制孔tec温度
+
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim2;
@@ -112,7 +118,7 @@ void MX_TIM6_Init(void)
   TIM_MasterConfigTypeDef sMasterConfig = {0};
 
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 1000-1;
+  htim6.Init.Prescaler = 100-1;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 80-1;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;

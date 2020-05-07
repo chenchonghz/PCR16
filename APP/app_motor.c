@@ -23,6 +23,7 @@ static void MotorDatInit (void)
 	tMotor[MOTOR_ID1].tmr = &htim3;
 	tMotor[MOTOR_ID1].tmc260dev = TMC260_get_dev((TMC260_ID)MOTOR_ID1);
 //	tMotor[MOTOR_ID1].StepsCallback = &MotorArrivedCheck;
+	tMotor[MOTOR_ID1].if_acc             = DEF_False;
 	tMotor[MOTOR_ID1].ConSteps = 10;//ÔÈËÙ²½Êý
 }
 

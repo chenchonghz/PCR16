@@ -1,5 +1,4 @@
 #include "app_ad.h"
-#include "ad7124.h"
 
 //¶ÑÕ»
 __align(4) OS_STK  TASK_AD_STK[STK_SIZE_AD]; //ÈÎÎñ¶ÑÕ»Éù?
@@ -15,6 +14,8 @@ void AppADInit (void)
 
 static void ADDatInit(void)
 {
+	app_ad.sem                 = OSSemCreate(0);
+	app_ad.rflag = DEF_True;
 	app_ad.wait_t = 2;
 }
 
@@ -32,13 +33,24 @@ void StopAppADTask(void)
 //extern float ad_vol;
 static void AppADTask (void *parg)
 {
+	u8 err;
 	ADDatInit();
 	AD7124Init();
-	
+	__HAL_TIM_CLEAR_FLAG(&htim6, TIM_FLAG_UPDATE);
+	__HAL_TIM_ENABLE(&htim6);
+	__HAL_TIM_ENABLE_IT(&htim6, TIM_IT_UPDATE);
+//	ad7124_cs_low();
+	app_ad.rflag = DEF_False;
 	for(;;)
     {
-		StartADDataCollect();
-		OSTimeDly(app_ad.wait_t);
+		OSSemPend(app_ad.sem, 0, &err);
+		if(err==OS_ERR_NONE)	{
+			app_ad.rflag = DEF_True;			
+			StartADDataCollect();
+			app_ad.rflag = DEF_False;			
+		}
+//		StartADDataCollect();
+//		OSTimeDly(app_ad.wait_t);
 //		timecnt++;
 //		if(timecnt>300)	{
 //			timecnt = 0;

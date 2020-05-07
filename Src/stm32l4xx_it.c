@@ -68,6 +68,7 @@ extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 #include "app_display.h"
+#include "app_ad.h"
 extern void DaCaiUART_DMA_Callback(DMA_HandleTypeDef *hdma);
 /* USER CODE END EV */
 
@@ -313,11 +314,20 @@ OSIntExit();
   */
 void TIM6_DAC_IRQHandler(void)
 {
+	static u8 time_cnt;
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
 OSIntEnter();
 	if(__HAL_TIM_GET_FLAG(&htim6, TIM_IT_UPDATE)==SET)	{
-		__HAL_TIM_CLEAR_FLAG(&htim6, TIM_IT_UPDATE); 
-		MotorAccDec(&tMotor[MOTOR_ID1]);
+		__HAL_TIM_CLEAR_FLAG(&htim6, TIM_IT_UPDATE);
+		ad7124_cs_low();		
+		time_cnt++;
+		if(time_cnt>=10)	{//加减速时间间隔1ms
+			time_cnt = 0;
+			MotorAccDec(&tMotor[MOTOR_ID1]);
+		}		
+		if(app_ad.rflag == DEF_False&&AD7124_DATA_READY()==0)	{//ad7124转换结果查询
+			OSSemPost(app_ad.sem);//启动ad任务 读取ad转换结果及数据处理
+		}
 //		HAL_GPIO_TogglePin(GPIOC, Fluo_Green_Pin);
 	}
   /* USER CODE END TIM6_DAC_IRQn 0 */

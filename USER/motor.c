@@ -102,7 +102,8 @@ void StopMotor(TMotor *pMotor)
 		StopMotorPWM(pMotor->id);
 		OSSemPost(pMotor->Sem);
 		pMotor->status.is_run        = MotorState_Stop;
-		StopMotorAccDec(MOTOR_ID1);//停止加减速
+		pMotor->if_acc = DEF_False;
+//		StopMotorAccDec(MOTOR_ID1);//停止加减速
 	}
 }
 //设置电机方向
@@ -156,13 +157,13 @@ static void MotorArrivedCheck(TMotor *pMotor)
 		StopMotor(pMotor);		
 	}
 }
-u8 teat;
+
 //电机加减速 匀加速 1ms
 void MotorAccDec(TMotor *pMotor)
 {
 	u16 arr;
 	
-	if(pMotor->status.is_run != MotorState_Run||pMotor->AccSteps == -1)	{
+	if(pMotor->status.is_run != MotorState_Run||pMotor->if_acc == DEF_False)	{
 		return;		
 	}
 
@@ -174,7 +175,6 @@ void MotorAccDec(TMotor *pMotor)
 		pMotor->TableIndex ++;
 	}
 	else {//匀速
-		teat = 0;
 		return;
 	}
 	arr = pMotor->pCurve->pVelBuf[pMotor->TableIndex];
@@ -210,8 +210,9 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
         pMotor->TableIndex    = 0;
         pMotor->StepsCallback = &MotorArrivedCheck;
         StartMotorPWM(pMotor->id);
-		if(if_acc)//是否开启加减速
-			StartMotorAccDec(pMotor->id);
+//		if(if_acc)//是否开启加减速
+//			StartMotorAccDec(pMotor->id);
+		pMotor->if_acc = if_acc;
 		OSSemPend(pMotor->Sem, 0, &err);//等待事件触发
 		disable_motor(pMotor);
 	}
@@ -220,17 +221,17 @@ _end:
 	return 1;
 }
 
-static void StartMotorAccDec(MOTOR_ID id)
-{
-	__HAL_TIM_CLEAR_FLAG(&htim6, TIM_FLAG_UPDATE);
-	__HAL_TIM_ENABLE(&htim6);
-	__HAL_TIM_ENABLE_IT(&htim6, TIM_IT_UPDATE);
-}
+//static void StartMotorAccDec(MOTOR_ID id)
+//{
+//	__HAL_TIM_CLEAR_FLAG(&htim6, TIM_FLAG_UPDATE);
+//	__HAL_TIM_ENABLE(&htim6);
+//	__HAL_TIM_ENABLE_IT(&htim6, TIM_IT_UPDATE);
+//}
 
-static void StopMotorAccDec(MOTOR_ID id)
-{
-	__HAL_TIM_DISABLE(&htim6);
-}
+//static void StopMotorAccDec(MOTOR_ID id)
+//{
+//	__HAL_TIM_DISABLE(&htim6);
+//}
 
 #define	MOTORPWM_CH		TIM_CHANNEL_3
 static void StopMotorPWM(MOTOR_ID id)
