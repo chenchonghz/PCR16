@@ -6,13 +6,13 @@
 
 //#define MSG_SYSTEM_ACK_CMD              0x78    // 系统应答命令
 //#define MSG_ABNORMAL_CMD                0x79    // 消息错误命令
-//#define  PROTOCOL_RX_SD0        0x7E           /* Start delimiters                                */
-//#define  PROTOCOL_RX_SD1        0x7E
-//#define  PROTOCOL_RX_END        0x0D           /* End   delimiter                                 */
+#define  PROTOCOL_RX_SD0        0x7D           /* Start delimiters                                */
+#define  PROTOCOL_RX_SD1        0x7D
+#define  PROTOCOL_RX_END        0x0D           /* End   delimiter                                 */
                                                      /* Outbound packets (to NIOS-II)                   */
-//#define  PROTOCOL_TX_SD0        0x7E           /* Start delimiters                                */
-//#define  PROTOCOL_TX_SD1        0x7E
-//#define  PROTOCOL_TX_END        0x0D           /* End   delimiter                                 */
+#define  PROTOCOL_TX_SD0        0x7D           /* Start delimiters                                */
+#define  PROTOCOL_TX_SD1        0x7D
+#define  PROTOCOL_TX_END        0x0D           /* End   delimiter                                 */
 
 #define	 PRO_CMD_POSITION     6
 #define	 PRO_LENGTH_SIZE     4                                               ///< 消息中Length所占字节数
@@ -49,11 +49,10 @@
 typedef enum { 
     _CMD_RW_SYS_INFOR			=	0X01,//修改系统配置信息
     _CMD_EXECUTE_SYS_INFOR			=	0X02,//执行系统配置信息修改
-	_CMD_SENSOR_PRESS_CALIBRATE = 0X06,// 压力传感器校准
-	_CMD_ACK	= 0X0A,
-	_CMD_READ_SENSOR_DATA	= 0X0B,
-	
-	_CMD_REPLY_SAFEBOARD	= 0X50,//回复安全芯片心跳
+	_CMD_CALIBRATE = 0X08,// 压力传感器校准	
+	_CMD_READ_SENSOR_DATA	= 0X0B,	
+//	_CMD_REPLY_SAFEBOARD	= 0X50,//回复安全芯片心跳
+	_CMD_ACK	= 0XF8,
 } EMessageCmd;
 
 enum MSG_ERR {
@@ -69,10 +68,11 @@ enum MSG_ERR {
 };
 
 enum ACK_MSG	{
-	ACK_ERR=0,
+	ACK_Fail=0,
 	ACK_OK=1,
-	ACK_NONE=2,
+	ACK_Error=2,
 	ACK_BUSY=3,
+	ACK_NONE=0XFF,
 };
 
 void GetProductInfor(void);

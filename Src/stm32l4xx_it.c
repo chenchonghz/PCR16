@@ -69,6 +69,9 @@ extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 #include "app_display.h"
 #include "app_ad.h"
+#include "app_usart.h"
+
+extern void UART2_DMA_Callback(DMA_HandleTypeDef *hdma);
 extern void DaCaiUART_DMA_Callback(DMA_HandleTypeDef *hdma);
 /* USER CODE END EV */
 
@@ -231,6 +234,9 @@ void DMA1_Channel7_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
 OSIntEnter();//上位机通讯串口uart2 dma发送中断
+	if(__HAL_DMA_GET_FLAG(&hdma_usart2_tx, DMA_FLAG_TC7)==DMA_FLAG_TC7)	{
+		UART2_DMA_Callback(&hdma_usart2_tx);
+	}
   /* USER CODE END DMA1_Channel7_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_usart2_tx);
   /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
@@ -271,9 +277,23 @@ OSIntExit();
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
+	u8 rxdat;
 OSIntEnter();//上位机通讯
+	if(__HAL_UART_GET_IT(usart.port, UART_IT_RXNE)==SET)	{
+		rxdat = (uint8_t)(usart.port->Instance->RDR);
+		if(usart.rx_indicate!=NULL)	{
+				usart.rx_indicate(&usart,rxdat);
+		}
+	}
   /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);
+  HAL_UART_IRQHandler(&huart2);	
+	if(__HAL_UART_GET_FLAG(usart.port, UART_FLAG_ORE)==SET)	{
+		__HAL_UART_CLEAR_OREFLAG(usart.port);
+	}
+	if(__HAL_UART_GET_FLAG(usart.port, UART_CLEAR_TCF)==SET)	{
+		usart.port->gState = HAL_UART_STATE_READY;
+		__HAL_UART_CLEAR_FLAG(usart.port,UART_CLEAR_TCF);
+	}
   /* USER CODE BEGIN USART2_IRQn 1 */
 OSIntExit();
   /* USER CODE END USART2_IRQn 1 */

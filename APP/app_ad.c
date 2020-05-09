@@ -39,8 +39,8 @@ static void AppADTask (void *parg)
 	__HAL_TIM_CLEAR_FLAG(&htim6, TIM_FLAG_UPDATE);
 	__HAL_TIM_ENABLE(&htim6);
 	__HAL_TIM_ENABLE_IT(&htim6, TIM_IT_UPDATE);
-//	ad7124_cs_low();
 	app_ad.rflag = DEF_False;
+	
 	for(;;)
     {
 		OSSemPend(app_ad.sem, 0, &err);

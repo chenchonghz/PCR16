@@ -617,6 +617,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\json.c</FilePath>
             </File>
+            <File>
+              <FileName>protocol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\protocol.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -666,6 +671,11 @@
               <FileName>app_fluo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_fluo.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\app_usart.c</FilePath>
             </File>
           </Files>
         </Group>

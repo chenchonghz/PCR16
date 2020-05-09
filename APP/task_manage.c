@@ -8,6 +8,7 @@
 #include "app_motor.h"
 #include "app_temp.h"
 #include "app_ad.h"
+#include "app_usart.h"
 //////////////////////////////////////////////////////////
 __align(4) OS_STK  TASK_START_STK[STK_SIZE_START]; //ÈÎÎñ¶ÑÕ»ÉùÃ÷
 
@@ -57,7 +58,7 @@ static void TaskCreateOther(void)
 	AppFluoInit();
 	AppMotorInit();		
 	AppDisplayInit();
-//	AppPerfusemonitorInit();
+	AppUsartInit();
 //	AppSysmonitorInit();
 	AppSpiFlashInit();
 	AppUSBInit();	
