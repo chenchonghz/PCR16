@@ -49,10 +49,10 @@
 typedef enum { 
     _CMD_RW_SYS_INFOR			=	0X01,//修改系统配置信息
     _CMD_EXECUTE_SYS_INFOR			=	0X02,//执行系统配置信息修改
-	_CMD_CALIBRATE = 0X08,// 压力传感器校准	
+	_CMD_CALIBRATE = 0X08,//校准	
 	_CMD_READ_SENSOR_DATA	= 0X0B,	
-//	_CMD_REPLY_SAFEBOARD	= 0X50,//回复安全芯片心跳
-	_CMD_ACK	= 0XF8,
+	_CMD_LED_CTRL	= 0X0D,//LED on/off control
+	_CMD_ACK	= 0XF8,//ack cmd
 } EMessageCmd;
 
 enum MSG_ERR {

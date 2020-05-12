@@ -1,5 +1,5 @@
 #include "ad7124.h"
-//#include "TempCtrl.h"
+#include "PD_DataProcess.h"
 
 #define	AD7124_REF_VOLTAGE		(2500) //参考电压 mV 3304
 #define	DEFAULT_VDD						(float)(3.3)
@@ -145,6 +145,8 @@ u8 StartADDataCollect(void)
 					break;
 				case uCH_4:	//PD通道
 //					CalcADCVolAverage(uCH_4, ad_code, PD_AVER_MAX, PD_DISCARD_NUM);
+					ad_temp = CalcADCVoltage(ad_code); //计算电压	
+					PD_DataCollect(ad_temp, LED_BLUE);
 					break;
 				case uCH_5:	//PD通道
 //					CalcADCVolAverage(uCH_5, ad_code, PD_AVER_MAX, PD_DISCARD_NUM);

@@ -622,6 +622,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\protocol.c</FilePath>
             </File>
+            <File>
+              <FileName>PD_DataProcess.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\PD_DataProcess.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

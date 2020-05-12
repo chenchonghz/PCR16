@@ -27,6 +27,22 @@ void ioconfig(const struct _io_map *pio, cpu_bool_t sw)
 		GPIO_InitStructure.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(pio->port, &GPIO_InitStructure);
 }
+
+void FluoLED_OnOff(u8 led_t, u8 onoff)
+{
+	Led_FluoGreen_Off();
+	Led_FluoBlue_Off();
+	if(led_t&LED_BLUE)	{
+		Led_FluoBlue_On();
+	}
+	if(led_t&LED_GREEN)	{
+		Led_FluoGreen_On();
+	}
+	if(onoff==DEF_ON)
+		Led_Fluo_On();
+	else if(onoff==DEF_OFF)
+		Led_Fluo_Off();
+}
 ////修改串口波特率
 //void UartBaudrateSet(UART_HandleTypeDef *phuart, u32 baudrate)
 //{

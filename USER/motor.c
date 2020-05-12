@@ -150,12 +150,28 @@ static void CalcSpedingProcedure(TMotor *pMotor,INT8U if_acc)
 		}
 	}
 }
-//电机到达判断
-static void MotorArrivedCheck(TMotor *pMotor)
+
+#define	TemplateHolePositionMin		(u32)(30*Motor_StepsPerum)//采集空孔PD值位置范围 20mm-60mm之间
+#define	TemplateHolePositionMax		(u32)(60*Motor_StepsPerum)
+#include "PD_DataProcess.h"
+//电机位置判断
+void MotorPositionCheck(TMotor *pMotor)
 {
 	if(pMotor->StepCnt >= pMotor->MoveTotalSteps)	{
-		StopMotor(pMotor);		
+		StopMotor(pMotor);	
+		return;
 	}
+	if(Sys.state & SysState_CaliTemplateHoleFluo)	{//采集空孔PD最大值 最小值
+		if(pMotor->CurSteps > TemplateHolePositionMin && pMotor->CurSteps < TemplateHolePositionMax)	{//电机到达指定位置范围 启动pd采集
+			gPD_Data.coll_enable = DEF_True;
+		}
+		else	{
+			gPD_Data.coll_enable = DEF_False;
+		}
+	}
+//	else if(Sys.state & SysState_CaliHolePostion)	{//孔位置校准
+//		
+//	}
 }
 
 //电机加减速 匀加速 1ms
@@ -208,7 +224,7 @@ u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc)
 		pMotor->status.is_run = MotorState_Run;
         CalcSpedingProcedure(pMotor,if_acc);
         pMotor->TableIndex    = 0;
-        pMotor->StepsCallback = &MotorArrivedCheck;
+//        pMotor->StepsCallback = &MotorPositionCheck;
         StartMotorPWM(pMotor->id);
 //		if(if_acc)//是否开启加减速
 //			StartMotorAccDec(pMotor->id);

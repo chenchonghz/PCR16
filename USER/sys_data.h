@@ -31,6 +31,8 @@
 #define SysState_StepTB					DEF_BIT07_MASK
 #define SysState_AddStep					DEF_BIT08_MASK
 #define SysState_AddStage				DEF_BIT09_MASK
+#define SysState_CaliTemplateHoleFluo				DEF_BIT10_MASK
+#define SysState_CaliHolePostion				DEF_BIT11_MASK
 
 //设备运行模式
 enum	{
@@ -134,6 +136,18 @@ typedef struct _sample_data	{//样本数据
 	_hole_data_t hole[HOLE_NUM];
 }_sample_data_t;
 
+
+
+typedef struct _position	{//
+	u16 x1;
+	u16 x2;
+}_position_t;
+
+typedef struct _hole_pos	{//
+	u8 idx;
+	_position_t pos[HOLE_NUM];
+}_hole_pos_t;
+
 extern _sys_t Sys;
 extern RTC_TIME_ST SysTime;
 extern tlsf_t UserMem;
@@ -141,6 +155,7 @@ extern _syserror_t SysError;
 extern _sample_data_t sample_data;
 extern _lab_data_t	lab_data;
 extern _temp_data_t temp_data;
+extern _hole_pos_t HolePos;
 
 void *user_malloc(size_t size);
 void user_free(void* ptr);	

@@ -9,6 +9,7 @@ tlsf_t UserMem;
 _sample_data_t sample_data;
 _lab_data_t	lab_data;
 _temp_data_t temp_data;
+_hole_pos_t HolePos;
 
 const char SampleType[][2] = {
 	{0},{"S"},{"U"},{"N"},{"P"},
@@ -36,6 +37,7 @@ void SysDataInit(void)
 	SysTime.tm_sec = 20;
 	SysTime.tm_wday = 3;
 	
+	memset(&HolePos,0,sizeof(HolePos));
 	ResetLabDataDefault();
 	ResetSampleDataDefault();
 	ResetTempDataDefault();

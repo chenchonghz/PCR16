@@ -110,6 +110,12 @@ H*******************************************************************************
 #define	BEEP_ON()		HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin, GPIO_PIN_SET)
 #define	BEEP_OFF()		HAL_GPIO_WritePin(BEEP_GPIO_Port, BEEP_Pin, GPIO_PIN_RESET)
 
+enum	{
+	LED_NONE=0,
+	LED_BLUE=0x01,
+	LED_GREEN=0x02,
+};
+
 struct _io_map {
     GPIO_TypeDef   *port;
     uint16_t        pin;
@@ -123,5 +129,5 @@ void SoftReset(void);
 void SysShutDown(void);
 void SysStandbyEnter(void);
 void SysStandbyQuit(void);
-void UartBaudrateSet(UART_HandleTypeDef *phuart, u32 baudrate);
+void FluoLED_OnOff(u8 led_t, u8 onoff);
 #endif

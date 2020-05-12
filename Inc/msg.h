@@ -12,15 +12,14 @@ typedef enum _message_src{
     /* Task Mbox */
     USART_MSG_RX_TASK = 0,      // 邮箱消息来自Usart Rx(串口接收)任务(Mbox From Usart Message Receive Task)
 	USART_MSG_TX_TASK,
-    MSG_USB_DISCONNECT,          		// 邮箱消息来自Slider Motor(滑动电机)任务(Mbox From Slider Motor Task)
-    MSG_USB_READY,        		// 邮箱消息来自Rotating Motor(旋转电机)任务(Mbox From Rotating Motor Task)
-	MSG_USB_START,
-    SYSTEM_MONITOR_TASK,        // 邮箱消息来自System Monitor(系统监控)任务(Mbox From System Monitor Task)
-    MSG_MOTOR_ACTION,//
+    MSG_USB_DISCONNECT,   //u盘拔出事件
+    MSG_USB_READY,       // u盘事件
+	MSG_USB_START,	// u盘事件
     MSG_SYSTEM_RESTART,//重启
-	MSG_LIS3DH_INT_EVENT,
-	MSG_WRITELOG,
+	MSG_CaliTemplateHolePD_EVENT,//校准空孔pd最大值 最小值
+	MSG_CaliHolePostion_EVENT,//孔位置校准
 	MSG_WriteLabTemplate,
+	MSG_WRITELOG,
 	MSG_SB_OVC_EVENT,
 	MSG_USB_OVC_EVENT,
 	MSG_SYS_SHUTDOWN,

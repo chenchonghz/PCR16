@@ -203,7 +203,6 @@ static void AppUsartRxTask(void *parg)
 {
     INT8U err;
 
-	//__HAL_UART_ENABLE_IT(usart.uart, UART_IT_RXNE);          //使能串口接收FIFO非空中断
 	__HAL_UART_DISABLE(usart.port);
 	__HAL_UART_DISABLE_IT(usart.port, UART_IT_TXE); 
 	__HAL_UART_DISABLE_IT(usart.port, UART_IT_TC);
@@ -232,8 +231,6 @@ static void AppUsartTxTask(void *parg)
     message_pkt_t *msg;
 
     UsartInit();
-	//__HAL_DMA_ENABLE_IT(&hdma_usart1_tx,DMA_IT_TC);
-//	GetProductInfor();
 	
     for(;;)
     {
