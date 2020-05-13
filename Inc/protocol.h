@@ -49,9 +49,19 @@
 typedef enum { 
     _CMD_RW_SYS_INFOR			=	0X01,//修改系统配置信息
     _CMD_EXECUTE_SYS_INFOR			=	0X02,//执行系统配置信息修改
-	_CMD_CALIBRATE = 0X08,//校准	
+	_CMD_READ_DevState		=	0X03,//读取设备运行状态
+	_CMD_READ_RunningLabName		=	0X04,//读取当前实验名称
+	_CMD_READ_RunningLabData		=	0X05,//读取当前实验数据
+	_CMD_READ_SysError		=	0X06,//读取故障
+	_CMD_SET_LabState		=	0X07,//设置实验启停
+	_CMD_CALIBRATE = 0X08,//校准
+	_CMD_READ_CalibrateRes = 0X09,//读取校准结果
 	_CMD_READ_SENSOR_DATA	= 0X0B,	
 	_CMD_LED_CTRL	= 0X0D,//LED on/off control
+	_CMD_RESET_MOTOR	= 0X0E,//电机复位
+	_CMD_DBG_MoveAnyPosAtReset = 0x0F,//移动电机
+	_CMD_GetMotorStatus	= 0x10,//查询电机状态
+	_CMD_GetMotorPositon	= 0x11,//获取电机位置
 	_CMD_ACK	= 0XF8,//ack cmd
 } EMessageCmd;
 

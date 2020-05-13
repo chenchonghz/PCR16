@@ -119,6 +119,17 @@ static INT32S SetMotorDir(TMotor *pMotor,INT32S step)
     return step;
 }
 
+//将pc传下来的长度转换为距离，pc传下来的距离是0.1mm为单位
+INT32U LenToSteps(TMotor *pdev,INT32S len)
+{
+    INT32U tmp;
+
+    tmp = (Motor_StepsPerum*len);
+    tmp /= 10;
+ 
+    return tmp;
+}
+
 //以零点为参考点，向前移动len距离
 void CalcAnyPosAtResetSteps(TMotor *pMotor,INT32S step)
 {

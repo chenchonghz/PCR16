@@ -24,7 +24,7 @@ typedef struct _app_temp	{
 	OS_EVENT           *MSG_Q;
 	OS_EVENT           *lock;
 	
-	s32 current_t[TEMP_ID_NUMS];//当前温度 0.1
+	s32 current_t[TEMP_ID_NUMS];//当前温度 0.01
 //	pid_ctrl_t *pPid;
 }_app_temp_t;
 

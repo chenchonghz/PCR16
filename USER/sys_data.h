@@ -36,10 +36,12 @@
 #define SysState_CollHolePD			DEF_BIT12_MASK
 //设备运行模式
 enum	{
-	DevState_IDLE,//待机模式
-	DevState_Running,
+	DevState_IDLE=0,//待机模式
+	DevState_Running,//运行中
+	DevState_Pause,//暂停中
+	DevState_Standby,//休眠
 	DevState_Error,//设备有故障
-	DevState_Test,
+	DevState_Debug,
 };
 
 enum lab_type	{

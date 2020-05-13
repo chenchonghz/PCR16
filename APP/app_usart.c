@@ -193,7 +193,7 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
 		//BSP_PRINTF("ACK");
 		OSSemPost(pUsart->ack_sem);
 	}
-	ack = UsartCmdProcess(pUsart, &msg_pkt_usart[0]);
+	ack = UsartCmdProcess(pUsart, msg_pkt_usart);
 	if(ack != ACK_NONE)	{
 		UsartSendAck(&msg_pkt_usart[1],ack);
 	}

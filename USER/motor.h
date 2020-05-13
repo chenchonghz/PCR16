@@ -91,9 +91,9 @@ enum eMotorAction {
 };
 
 typedef struct {
-volatile    INT8U   is_run;
-volatile    INT8U   action;
-volatile    INT8U   abort_type;
+	volatile    INT8U   is_run;
+	volatile    INT8U   action;
+	volatile    INT8U   abort_type;
 } motor_state_t;
 
 typedef struct _velprofile_t {
@@ -123,7 +123,7 @@ typedef struct Motor_t {
     INT16U		acceleration;	//加速度
     INT8U               if_acc;//是否开启加速
     INT32S		CurSteps;//当前编码器角度值
-
+	INT32S		dst_pos;
     INT32U              StepCnt;                    
     INT32U              MoveTotalSteps;      
 	INT32S              SysAbsoluteOffsetStep;//系统绝对偏移量，以0点为基准, 0.1um为单位    
@@ -145,5 +145,7 @@ void StopMotor(TMotor *pMotor);
 void MotorAccDec(TMotor *pMotor);
 void MotorArrivedCheck(TMotor *pMotor);
 void MotorPositionCheck(TMotor *pMotor);
+INT32U LenToSteps(TMotor *pdev,INT32S len);
+void CalcAnyPosAtResetSteps(TMotor *pMotor,INT32S step);
 #endif
 

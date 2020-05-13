@@ -43,7 +43,31 @@ static void MotorReset(void)
 	else 	{
 		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetFail;
 	}
-	OSTimeDly(1000);
+//	OSTimeDly(1000);
+}
+
+static void DealUsartMessage(message_pkt_t *pmsg)
+{
+    INT8U  cmd;
+
+    cmd = pmsg->Cmd;
+
+    switch (cmd)
+	{
+		case _CMD_RESET_MOTOR://0X0E,//µç»ú¸´Î»		
+			MotorReset();
+			break;
+		case _CMD_DBG_MoveAnyPosAtReset:
+		{
+			u32 steps = LenToSteps(&tMotor[MOTOR_ID1], tMotor[MOTOR_ID1].dst_pos);
+			CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], steps);
+			StartMotor(&tMotor[MOTOR_ID1], tMotor[MOTOR_ID1].Dir, steps, DEF_True);
+			break;
+		}
+		default:
+			break;
+	}
+	
 }
 extern u8 HolePositionCaliFlag;
 static void AppMotorTask (void *parg)
@@ -104,6 +128,9 @@ static void AppMotorTask (void *parg)
 				FluoLED_OnOff(LED_BLUE, DEF_OFF);
 				OSTimeDly(500);
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
+			}
+			else if (msg->Src == USART_MSG_RX_TASK)	{	
+				DealUsartMessage(msg);
 			}
 		//}
 	}

@@ -19,6 +19,9 @@ void PD_DataInit(void)
 	gPD_Data.coll_enable = DEF_False;
 	gPD_Data.ch = LED_NONE;
 	memset(&templatehole, 0, sizeof(templatehole));
+	p_pdbuf = &pdbuf[0];
+	p_pdbuf->idx = 0;
+	memset(gPD_Data.PDVol, 0, HOLE_NUM);
 }
 
 //开启空孔PD值采集 使用蓝光LED扫描
@@ -99,7 +102,7 @@ void ReadyToCollPD_LabData(void)
 {
 	p_pdbuf = &pdbuf[0];
 	p_pdbuf->idx = 0;
-	memset(gPD_Data.PDVol, 0, HOLE_NUM);
+//	memset(gPD_Data.PDVol, 0, HOLE_NUM);
 }
 //交换缓冲地址
 void ExchangePDBuf(void)
