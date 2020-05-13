@@ -343,8 +343,9 @@ OSIntEnter();
 		time_cnt++;
 		if(time_cnt>=10)	{//加减速时间间隔1ms
 			time_cnt = 0;
-			MotorAccDec(&tMotor[MOTOR_ID1]);
-		}		
+			MotorAccDec(&tMotor[MOTOR_ID1]);//电机加减速
+			MotorPositionCheck(&tMotor[MOTOR_ID1]);//电机位置检测
+		}
 		if(app_ad.rflag == DEF_False&&AD7124_DATA_READY()==0)	{//ad7124转换结果查询
 			OSSemPost(app_ad.sem);//启动ad任务 读取ad转换结果及数据处理
 		}

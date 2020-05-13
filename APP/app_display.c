@@ -32,6 +32,21 @@ static void DisDatInit(void)
 	appdis.pUI = &UI;
 //	LIFOBuffer_Init(&ScreenIDLIFO,(u8 *)appdis.pUI->screen_idlifo, 1 ,SCREEN_BUFSIZE);
 }
+
+void StartSysLab(void)
+{
+	StartAPPTempCtrl();
+	StartAppADTask();
+	StartCollFluo();
+	Sys.devstate = DevState_Running;
+}
+
+void StopSysLab(void)
+{
+	Sys.devstate = DevState_IDLE;
+	StopAppADTask();
+	StopAPPTempCtrl();
+}
 //u8 touchid;
 static void ButtonClickProcess(u8 button);
 static void ScreenDataProcess(_dacai_usart_t *pUsart);
@@ -489,11 +504,11 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		else	if(appdis.pUI->ctrl_id == 3)	{//确认键
 			if(Sys.state & SysState_RunningTB)	{//启动实验
 				Sys.state &= ~SysState_RunningTB;				
-				StartAPPTempCtrl();//参数正常 启动实验 
+				StartSysLab();//参数正常 启动实验 
 				DisplayBackupUIID();	
 			}
 			else if(Sys.state & SysState_StopTB)	{//停止实验
-				StopAPPTempCtrl();
+				StopSysLab();
 			}
 			else if(Sys.state & SysState_DeleteLabTB)	{//删除实验记录
 				DisplayMessageUI((char *)&Code_Message[6][0], 0);//提示 删除中

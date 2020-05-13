@@ -23,11 +23,15 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t *msg)
 			break;				
 		case _CMD_CALIBRATE://0x08 执行校准
 			if(iPara==0)	{//空孔荧光值校准				
-				msg_pkt_pro.Src = MSG_CaliTemplateHolePD_EVENT;//启动电机
+				msg_pkt_pro.Src = MSG_CollTemplateHolePD_EVENT;//启动电机 开始采集空孔PD最大值 最小值
 				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
 			}
 			else if(iPara==1)	{//孔位置校准				
-				msg_pkt_pro.Src = MSG_CaliHolePostion_EVENT;//启动电机
+				msg_pkt_pro.Src = MSG_CaliHolePostion_EVENT;//启动电机 开始校准孔位置
+				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
+			}
+			else if(iPara==2)	{
+				msg_pkt_pro.Src = MSG_CollectHolePD_EVENT;//启动电机 开始采集孔PD值
 				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
 			}
 			break;

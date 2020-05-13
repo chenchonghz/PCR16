@@ -143,6 +143,7 @@ void Motor_Init(void);
 u8 StartMotor(TMotor *pMotor, INT8U dir, INT32U steps,INT8U if_acc);
 void StopMotor(TMotor *pMotor);
 void MotorAccDec(TMotor *pMotor);
+void MotorArrivedCheck(TMotor *pMotor);
 void MotorPositionCheck(TMotor *pMotor);
 #endif
 

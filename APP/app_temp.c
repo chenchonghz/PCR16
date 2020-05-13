@@ -97,16 +97,13 @@ u8 StartAPPTempCtrl(void)
 	msg_pkt_temp.Src = MSG_WriteLabTemplate;//保存实验模板, 路径./lab/Temp.json; ./lab/Lab.json
 	OSQPost(spiflash.MSG_Q, &msg_pkt_temp);	
 	OSTimeDly(500);
-	ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
-	Sys.devstate = DevState_Running;
-	StartAppADTask();
+	ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);	
+
 	return 1;
 }
 
 void StopAPPTempCtrl(void)
 {
-	Sys.devstate = DevState_IDLE;
-	StopAppADTask();
 }
 u8 hengwenflag;
 //恒温时间达到 调用该函数

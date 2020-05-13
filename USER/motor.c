@@ -1,5 +1,6 @@
 #include "motor.h"
 
+message_pkt_t    msg_pkt_motor;
 struct _motor_port{
 	struct _io_map en;
 	struct _io_map dir;
@@ -151,17 +152,45 @@ static void CalcSpedingProcedure(TMotor *pMotor,INT8U if_acc)
 	}
 }
 
+void MotorArrivedCheck(TMotor *pMotor)
+{
+	if(pMotor->status.is_run != MotorState_Run)	{
+		return;		
+	}
+	if(pMotor->StepCnt >= pMotor->MoveTotalSteps)	{
+		StopMotor(pMotor);	
+	}
+}
 #define	TemplateHolePositionMin		(u32)(30*Motor_StepsPerum)//采集空孔PD值位置范围 20mm-60mm之间
 #define	TemplateHolePositionMax		(u32)(60*Motor_StepsPerum)
 #include "PD_DataProcess.h"
-//电机位置判断
+#include "app_fluo.h"
+//电机位置判断 MotorArrivedCheck
 void MotorPositionCheck(TMotor *pMotor)
 {
-	if(pMotor->StepCnt >= pMotor->MoveTotalSteps)	{
-		StopMotor(pMotor);	
-		return;
+	u8 i;
+	
+	if(pMotor->status.is_run != MotorState_Run)	{
+		return;		
 	}
-	if(Sys.state & SysState_CaliTemplateHoleFluo)	{//采集空孔PD最大值 最小值
+	if(Sys.state & SysState_CollHolePD)	{//根据电机是否到达孔位置 采集孔PD值
+		for(i=0;i<HOLE_NUM;i++)	
+		{
+			if(pMotor->CurSteps > HolePos.pos[i].x1 && pMotor->CurSteps < HolePos.pos[i].x2)	{//电机到达孔位置范围 启动pd采集
+				gPD_Data.coll_enable = DEF_True;
+				HolePos.idx = i;//记录当前孔编号
+				break;
+			}
+			else if(gPD_Data.coll_enable == DEF_True)	{//走出孔位置 
+				ExchangePDBuf();//交换数据缓冲地址
+				msg_pkt_motor.Src = MSG_CalcPD_EVENT;//开始计算PD
+				msg_pkt_motor.Cmd = HolePos.idx;
+				OSMboxPost(fluo.CalcMbox, &msg_pkt_motor);
+				gPD_Data.coll_enable = DEF_False;
+			}	
+		}
+	}
+	else if(Sys.state & SysState_CollTemplateHolePD)	{//根据电机是否到达孔位置 采集空孔PD最大值 最小值
 		if(pMotor->CurSteps > TemplateHolePositionMin && pMotor->CurSteps < TemplateHolePositionMax)	{//电机到达指定位置范围 启动pd采集
 			gPD_Data.coll_enable = DEF_True;
 		}
@@ -169,9 +198,6 @@ void MotorPositionCheck(TMotor *pMotor)
 			gPD_Data.coll_enable = DEF_False;
 		}
 	}
-//	else if(Sys.state & SysState_CaliHolePostion)	{//孔位置校准
-//		
-//	}
 }
 
 //电机加减速 匀加速 1ms

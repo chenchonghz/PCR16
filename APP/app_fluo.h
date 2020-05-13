@@ -6,8 +6,12 @@
 typedef struct _Fluo_t {
 //	OS_EVENT            *Sem;
     OS_EVENT            *Mbox;
+	OS_EVENT            *CalcMbox;
 }Fluo_t;
 
+extern Fluo_t fluo;
+
 void AppFluoInit(void);
+
 #endif
 
