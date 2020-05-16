@@ -84,8 +84,8 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			break;
 		case _CMD_CALIBRATE://0x08 执行校准
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			if(iPara==0)	{//空孔荧光值校准				
-				msg_pkt_pro.Src = MSG_CollTemplateHolePD_EVENT;//启动电机 开始采集空孔PD最大值 最小值
+			if(iPara==0)	{//校准空孔PD本底信号				
+				msg_pkt_pro.Src = MSG_CaliHolePDBase_EVENT;//启动电机 校准空孔PD本底信号	
 				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
 			}
 			else if(iPara==1)	{//孔位置校准				
@@ -101,19 +101,20 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			break;
 		case _CMD_READ_CalibrateRes://0X09,//读取校准结果
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			idx = 0;
 			if(iPara==0)	{//读取空孔荧光最大值最小值
-				memcpy(data_buf,(u8 *)templatehole.min, 4);
-				idx += 4;
-				memcpy(data_buf+idx,(u8 *)templatehole.max, 4);
-				idx += 4;
+//				memcpy(data_buf,(u8 *)gPD_Data.PDBase, sizeof(gPD_Data.PDBase));
+//				idx += sizeof(gPD_Data.PDBase);
+				msg[1].Data = (u8 *)gPD_Data.PDBase;
+				msg[1].dLen = sizeof(gPD_Data.PDBase);
 			}
 			else if(iPara==1)	{//读取孔位置
 //				memcpy(data_buf,(u8 *)HolePos.pos, sizeof(HolePos.pos));
 //				idx += sizeof(HolePos.pos);
+				msg[1].Data = (u8 *)HolePos.pos;
+				msg[1].dLen = sizeof(HolePos.pos);
 			}
-			msg[1].Data = data_buf;
-			msg[1].dLen = idx;
+			else 
+				break;
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		case _CMD_LED_CTRL://0x0d LED灯控制
@@ -152,7 +153,7 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		case _CMD_GetMotorPositon://0x11,//获取电机位置
-			temp = tMotor[MOTOR_ID1].CurSteps*Motor_NumPerStep;
+			temp = StepsToLen(&tMotor[MOTOR_ID1]);
 			memcpy(data_buf,(u8 *)&temp, 2);
 			msg[1].Data = data_buf;
 			msg[1].dLen = 2;

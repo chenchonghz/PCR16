@@ -119,6 +119,15 @@ static INT32S SetMotorDir(TMotor *pMotor,INT32S step)
     return step;
 }
 
+INT32S StepsToLen(TMotor *pdev)
+{
+    INT32S tmp;
+
+    tmp = (INT32S)(Motor_NumPerStep*pdev->CurSteps*10);
+ 
+    return tmp;
+}
+
 //将pc传下来的长度转换为距离，pc传下来的距离是0.1mm为单位
 INT32U LenToSteps(TMotor *pdev,INT32S len)
 {
@@ -198,15 +207,7 @@ void MotorPositionCheck(TMotor *pMotor)
 				msg_pkt_motor.Cmd = HolePos.idx;
 				OSMboxPost(fluo.CalcMbox, &msg_pkt_motor);
 				gPD_Data.coll_enable = DEF_False;
-			}	
-		}
-	}
-	else if(Sys.state & SysState_CollTemplateHolePD)	{//根据电机是否到达孔位置 采集空孔PD最大值 最小值
-		if(pMotor->CurSteps > TemplateHolePositionMin && pMotor->CurSteps < TemplateHolePositionMax)	{//电机到达指定位置范围 启动pd采集
-			gPD_Data.coll_enable = DEF_True;
-		}
-		else	{
-			gPD_Data.coll_enable = DEF_False;
+			}
 		}
 	}
 }

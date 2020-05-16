@@ -16,7 +16,7 @@ typedef enum _message_src{
     MSG_USB_READY,       // u盘事件
 	MSG_USB_START,	// u盘事件
     MSG_SYSTEM_RESTART,//重启
-	MSG_CollTemplateHolePD_EVENT,//校准空孔pd最大值 最小值
+	MSG_CaliHolePDBase_EVENT,//校准空孔PD本底信号
 	MSG_CaliHolePostion_EVENT,//孔位置校准
 	MSG_CollectHolePD_EVENT,
 	MSG_CalcPD_EVENT,

@@ -1,9 +1,13 @@
 #include "PD_DataProcess.h"
+#include "motor.h"
 
 #define BUFSIZE         64
+#define	HOLE_POSITION_MIN_OFFSET	(u32)(1*Motor_StepsPerum)	//
+#define	HOLE_POSITION_MAX_OFFSET	(u32)(1*Motor_StepsPerum)	//
+#define	HOLE_POSITION_DISTANCE	(u32)(4.5*Motor_StepsPerum)	//
 
 _pd_data_t gPD_Data;
-_pd_maxmin_t templatehole;
+u16 PD_max;
 
 typedef struct _pd_buf	{
 	u8 idx;
@@ -18,91 +22,96 @@ void PD_DataInit(void)
 {
 	gPD_Data.coll_enable = DEF_False;
 	gPD_Data.ch = LED_NONE;
-	memset(&templatehole, 0, sizeof(templatehole));
+	memset(gPD_Data.PDBase, 0, sizeof(gPD_Data.PDBase));
 	p_pdbuf = &pdbuf[0];
 	p_pdbuf->idx = 0;
 	memset(gPD_Data.PDVol, 0, HOLE_NUM);
+	PD_max = 0x00;
 }
 
-//开启空孔PD值采集 使用蓝光LED扫描
-void StartCollTemplateHolePD(void)
+//开启孔位置校准 使用蓝光LED扫描
+void StartCaliHolePosition(void)
+{
+	gPD_Data.ch = LED_BLUE;
+	FluoLED_OnOff(LED_BLUE, DEF_ON);
+	PD_max = 0;	
+	Sys.state |= SysState_CaliHolePostion;//孔位置校准
+	gPD_Data.coll_enable = DEF_True;
+}
+void StopCaliHolePosition(void)
+{	
+	Sys.state &= ~SysState_CaliHolePostion;//校准结束
+	gPD_Data.coll_enable = DEF_False;
+	gPD_Data.ch = LED_NONE;
+	FluoLED_OnOff(LED_BLUE, DEF_OFF);
+}
+//计算孔位置 已知第一个孔位置 其它孔位置按照孔间距4.5mm推算
+void CalcHolePositon(void)
+{
+	u8 i;
+	
+	HolePos.pos[0].x1 -= HOLE_POSITION_MIN_OFFSET;
+	HolePos.pos[0].x2 =  HolePos.pos[0].x1 + HOLE_POSITION_MAX_OFFSET;
+	for(i=1;i<HOLE_NUM;i++)	{
+		HolePos.pos[i].x1 = HolePos.pos[i-1].x1 + HOLE_POSITION_DISTANCE;
+		HolePos.pos[i].x2 =  HolePos.pos[i-1].x2 + HOLE_POSITION_DISTANCE;
+	}
+}
+
+//开启空孔PD本底信号校准 使用蓝光LED扫描
+void StartCaliHolePDBase(void)
 {	
 	gPD_Data.ch = LED_BLUE;
 	FluoLED_OnOff(LED_BLUE, DEF_ON);
-	Sys.state |= SysState_CollTemplateHolePD;//校准空孔PD值
-	memset(&templatehole, 0, sizeof(templatehole));
-	templatehole.min[0] = 0xffff;
-	templatehole.min[1] = 0xffff;
-	gPD_Data.coll_enable = DEF_False;
+	memset(gPD_Data.PDBase, 0, sizeof(gPD_Data.PDBase));
+	StartCollPDData();//孔PD数据采集准备
 }
-void StopCollTemplateHolePD(void)
+void StopCaliHolePDBase(void)
 {	
-	Sys.state &= ~SysState_CollTemplateHolePD;//校准结束
-	gPD_Data.coll_enable = DEF_False;
-	FluoLED_OnOff(LED_BLUE, DEF_OFF);	
+	StopCollPDData();
 }
-
-//计算空孔PD均值
-void CalcTemplateHolePDAver(void)
+//计算孔本底信号
+void CalcHolePDBase(void)
 {
-	u32 temp;
-	
-	temp = templatehole.min[0] + templatehole.min[1] + templatehole.max[0] + templatehole.max[1];
-	templatehole.aver = temp/4;//计算空孔PD均值
-	temp = templatehole.aver*15;//计算有效孔位置PD阀值
-	gPD_Data.HoleThreshold = temp/10;
+	memcpy(gPD_Data.PDBase, gPD_Data.PDVol, HOLE_NUM);
 }
 
-#include "motor.h"
-u8 HolePositionCaliFlag;
 //PD数据采集
 void PD_DataCollect(u16 ad_vol, u8 pd_ch)
-{
-	u8 idx;
+{	
 	if(gPD_Data.coll_enable==DEF_False)//是否采集数据
 		return;
 	if(pd_ch != gPD_Data.ch)
 		return;
-	if(Sys.state & SysState_CollHolePD)	{//采集孔PD值
+	
+	if(Sys.state & SysState_CollHolePD)	{//采集孔PD有效值
 		if(p_pdbuf->idx<BUFSIZE)	{
 			p_pdbuf->buf[p_pdbuf->idx] = ad_vol;
 			p_pdbuf->idx++;
 		}
 	}
-	else if(Sys.state & SysState_CollTemplateHolePD)	{//采集空孔PD最大值 最小值		
-		idx = templatehole.idx;
-		if(ad_vol>templatehole.max[idx])	//最大值
-			templatehole.max[idx] = ad_vol;
-		else if(ad_vol<templatehole.min[idx])//最小值
-			templatehole.min[idx] = ad_vol;
-	}
-	else if(Sys.state & SysState_CaliHolePostion)	{//孔位置校准
-		idx = HolePos.idx;
-//		if(ad_vol < gPD_Data.HoleThreshold)	{
-		if(ad_vol <= templatehole.aver)	{
-			if(HolePositionCaliFlag == 0)	{
-				HolePositionCaliFlag = 1;
-			}
-			else if(HolePositionCaliFlag == 2)	{
-				HolePos.pos[idx].x2 = tMotor[MOTOR_ID1].CurSteps;
-				HolePositionCaliFlag = 0;
-				HolePos.idx ++;
-			}
-		}
-		else if(ad_vol >= gPD_Data.HoleThreshold)	{
-			if(HolePositionCaliFlag == 1)	{
-				HolePos.pos[idx].x1 = tMotor[MOTOR_ID1].CurSteps;
-				HolePositionCaliFlag = 2;	
-			}				
+	else if(Sys.state & SysState_CaliHolePostion)	{//孔位置校准 找到第一个孔位置 其它孔位置按照孔间距4.5mm推算
+		if(ad_vol>PD_max)	{	//找到第一个孔的最大值 
+			PD_max = ad_vol;
+			HolePos.pos[0].x1 = tMotor[MOTOR_ID1].CurSteps;
 		}
 	}
 }
 //准备采集实验PD数据 采用双缓存
-void ReadyToCollPD_LabData(void)
+void StartCollPDData(void)
 {
 	p_pdbuf = &pdbuf[0];
 	p_pdbuf->idx = 0;
-//	memset(gPD_Data.PDVol, 0, HOLE_NUM);
+	Sys.state |= SysState_CollHolePD;
+	gPD_Data.coll_enable = DEF_False;
+}
+void StopCollPDData(void)
+{
+	Sys.state &= ~SysState_CollHolePD;//采集结束
+	gPD_Data.coll_enable = DEF_False;
+	gPD_Data.ch = LED_NONE;
+	FluoLED_OnOff(LED_BLUE|LED_GREEN, DEF_OFF);
+	
 }
 //交换缓冲地址
 void ExchangePDBuf(void)
@@ -139,6 +148,6 @@ void CalcPDData(u8 hole_idx)
 		temp += p_pdbuf_bk->buf[i];
 	}
 	temp /= (PDMaxFont + PDMaxBack);
-	gPD_Data.PDVol[hole_idx] = (u16)temp;//当前孔PD值
+	gPD_Data.PDVol[hole_idx] = (u16)temp;//当前孔PD有效值
 }
 

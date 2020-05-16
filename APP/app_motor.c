@@ -61,7 +61,7 @@ static void DealUsartMessage(message_pkt_t *pmsg)
 		{
 			u32 steps = LenToSteps(&tMotor[MOTOR_ID1], tMotor[MOTOR_ID1].dst_pos);
 			CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], steps);
-			StartMotor(&tMotor[MOTOR_ID1], tMotor[MOTOR_ID1].Dir, steps, DEF_True);
+			StartMotor(&tMotor[MOTOR_ID1], tMotor[MOTOR_ID1].Dir, tMotor[MOTOR_ID1].MoveTotalSteps, DEF_True);
 			break;
 		}
 		default:
@@ -95,45 +95,36 @@ static void AppMotorTask (void *parg)
 			if(msg->Src == MSG_CollectHolePD_EVENT)	{//采集实验过程孔PD值
 				gPD_Data.ch = LED_BLUE;//蓝光扫描
 				FluoLED_OnOff(LED_BLUE, DEF_ON);
-				Sys.state |= SysState_CollHolePD;
-				ReadyToCollPD_LabData();//孔PD数据采集准备
+				StartCollPDData();//孔PD数据采集准备
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
 				OSTimeDly(50);
 				Sys.state &= ~SysState_CollHolePD;//采集结束
 				gPD_Data.ch = LED_GREEN;//绿光扫描
 				FluoLED_OnOff(LED_GREEN, DEF_ON);
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
-				FluoLED_OnOff(LED_BLUE|LED_GREEN, DEF_OFF);
-				Sys.state &= ~SysState_CollHolePD;//采集结束
-			}
-			else if(msg->Src == MSG_CollTemplateHolePD_EVENT)	{//使用蓝光LED扫描 校准空孔pd最大值 最小值，计算两次
-				Sys.devstate = DevState_Debug;
-				StartCollTemplateHolePD();//开启空孔PD值采集
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
-				OSTimeDly(500);
-				templatehole.idx = 1;//第二次计算最大值 最小值
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
-				StopCollTemplateHolePD();
-				Sys.devstate = DevState_IDLE;
+				StopCollPDData();
 			}
 			else if(msg->Src == MSG_CaliHolePostion_EVENT)	{//使用蓝光扫描 校准孔位置
 				Sys.devstate = DevState_Debug;
-				gPD_Data.ch = LED_BLUE;
-				FluoLED_OnOff(LED_BLUE, DEF_ON);			
-				HolePos.idx = 0;
-				HolePositionCaliFlag = 0;
-				CalcTemplateHolePDAver();//计算空孔情况下PD均值
-				Sys.state |= SysState_CaliHolePostion;//孔位置校准
-				gPD_Data.coll_enable = DEF_True;
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_False);
-				Sys.state &= ~SysState_CaliHolePostion;//校准结束
-				gPD_Data.coll_enable = DEF_False;
-				FluoLED_OnOff(LED_BLUE, DEF_OFF);
+				StartCaliHolePosition();//开启孔位置校准
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, (u32)(20*Motor_StepsPerum), DEF_False);
+				StopCaliHolePosition();//停止孔位置校准
 				OSTimeDly(500);
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, (u32)(20*Motor_StepsPerum), DEF_True);
+				CalcHolePositon();//计算孔位置
 				Sys.devstate = DevState_IDLE;
 			}
-			else if (msg->Src == USART_MSG_RX_TASK)	{	
+			else if(msg->Src == MSG_CaliHolePDBase_EVENT)	{//使用蓝光LED扫描 校准空孔PD本底信号
+				Sys.devstate = DevState_Debug;
+				StartCaliHolePDBase();//校准空孔PD本底信号
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
+				StopCaliHolePDBase();//校准结束
+				OSTimeDly(500);
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
+				CalcHolePDBase();//计算孔本底信号		
+				Sys.devstate = DevState_IDLE;
+			}
+			else if (msg->Src == USART_MSG_RX_TASK)	{
 				DealUsartMessage(msg);
 			}
 		//}

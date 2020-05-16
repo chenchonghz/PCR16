@@ -59,6 +59,7 @@ static void AppCalcFLUOTask (void *parg)
     message_pkt_t *msg;
 	
 	fluo.CalcMbox                = OSMboxCreate((void *)0);
+	PD_DataInit();
 	
 	for(;;)
     {

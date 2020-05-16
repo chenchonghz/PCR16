@@ -8,7 +8,7 @@ __align(4) OS_STK      AppUsartTxStk       [STK_SIZE_USART_TX];           // Usa
 #define USART_RXBUFF_SIZE		50
 usart_t      usart;
 
-static  message_pkt_t    msg_pkt_usart[2];
+message_pkt_t    msg_pkt_usart[2];
 static INT8U       usart_rx_buf        [USART_RXBUFF_SIZE];
 static INT8U       usart_tx_buf        [USART_TXBUFF_SIZE];
 static void AppUsartTxTask(void *parg);
@@ -68,12 +68,12 @@ static void uart_message_rx_handler(usart_t *pUsart, INT8U rx_dat)
             }
             break;
         case PRO_RX_STATE_LEN0:                    /* waiting for 'len' HIGH byte                      */
-            pUsart->rx_len       = rx_dat<<8;
+            pUsart->rx_len       = rx_dat&0xff;
             pUsart->rx_crc       += rx_dat;
             pUsart->rx_state     = PRO_RX_STATE_LEN1;
             break;
         case PRO_RX_STATE_LEN1:                    /* waiting for 'len' LOW byte                     */
-            pUsart->rx_len      |= rx_dat&0XFF;
+            pUsart->rx_len      |= rx_dat<<8;
             if ((pUsart->rx_len < PRO_EXTENT_LEN) || (pUsart->rx_len > pUsart->rx_bufsize)) {
                 pUsart->rx_state = PRO_RX_STATE_SD0;/* Can not handle this size ...                    */
                 pUsart->rx_err   = MSG_ERR_LENGTH;
@@ -95,7 +95,7 @@ static void uart_message_rx_handler(usart_t *pUsart, INT8U rx_dat)
             break;
 
         case PRO_RX_STATE_CHKSUM0:                 /* waiting for checksum HIGH byte                   */
-            if ((pUsart->rx_crc  >> 8) == rx_dat) {
+            if ((pUsart->rx_crc & 0xff) == rx_dat) {
                 pUsart->rx_state = PRO_RX_STATE_CHKSUM1;
             } else {
                 pUsart->rx_state = PRO_RX_STATE_SD0;
@@ -106,7 +106,7 @@ static void uart_message_rx_handler(usart_t *pUsart, INT8U rx_dat)
             break;
 
         case PRO_RX_STATE_CHKSUM1:                 /* waiting for checksum                            */
-             if ((pUsart->rx_crc &0XFF) == rx_dat) {
+             if ((pUsart->rx_crc >>8) == rx_dat) {
                 pUsart->rx_state = PRO_RX_STATE_END;
             } else {
                 pUsart->rx_state = PRO_RX_STATE_SD0;
@@ -157,16 +157,16 @@ static void UsartSendData(message_pkt_t *pmsg)
 	pUsart->tx_buf[idx++] = PROTOCOL_RX_SD0;
 	pUsart->tx_buf[idx++] = PROTOCOL_RX_SD1;
 	datlen = pmsg->dLen + PRO_EXTENT_LEN; //SENSOR_EXTENT_LEN = 1字节命令 + 2字节校验和 + 1字节结束符
-	pUsart->tx_buf[idx++] = datlen>>8;
 	pUsart->tx_buf[idx++] = datlen&0xff;
+	pUsart->tx_buf[idx++] = datlen>>8;
 	pUsart->tx_buf[idx++] = pmsg->Cmd;
 	if (pmsg->dLen) {
 		memcpy(pUsart->tx_buf + idx, pmsg->Data, pmsg->dLen);
     }
 	idx += pmsg->dLen;
 	temp = CRC16_Sum(pUsart->tx_buf,idx);
-	pUsart->tx_buf[idx++] = temp>>8;
 	pUsart->tx_buf[idx++] = temp&0xff;
+	pUsart->tx_buf[idx++] = temp>>8;
 	pUsart->tx_buf[idx++] = PROTOCOL_RX_END;
 	pUsart->tx_len = idx;
 	HAL_UART_Transmit_DMA(pUsart->port, pUsart->tx_buf, pUsart->tx_len);
@@ -189,10 +189,6 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
         pUsart->rx_err = MSG_ERR_NONE;        // clear rx error
         return;
     }
-//	if(cmd == _CMD_ACK)	{//ack ok 
-//		//BSP_PRINTF("ACK");
-//		OSSemPost(pUsart->ack_sem);
-//	}
 	ack = UsartCmdProcess(pUsart, msg_pkt_usart);
 	if(ack != ACK_NONE)	{
 		UsartSendAck(&msg_pkt_usart[1],ack);
