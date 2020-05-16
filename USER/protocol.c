@@ -8,14 +8,14 @@
 static  message_pkt_t    msg_pkt_pro;
 static u8 data_buf[100];
 
-u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t **msg)
+u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 {
 	u8 iPara,data,idx;
 	u8 ack_state;
 	s32 temp;
 	
 	ack_state = ACK_NONE;
-	switch(msg[0]->Cmd)	{
+	switch(msg[0].Cmd)	{
 		case _CMD_RW_SYS_INFOR:
 			break;
 		case _CMD_EXECUTE_SYS_INFOR:
@@ -25,8 +25,8 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t **msg)
 			idx = 0;
 			data_buf[idx++] = Sys.devstate;
 			data_buf[idx++] = Sys.devsubstate;
-			msg[1]->Data = data_buf;
-			msg[1]->dLen = idx;
+			msg[1].Data = data_buf;
+			msg[1].dLen = idx;
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;		
 		case _CMD_READ_RunningLabName://0X04,//读取当前实验名称
@@ -36,8 +36,8 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t **msg)
 			else	{
 				strcpy((char *)data_buf,"NONE");
 			}
-			msg[1]->Data = data_buf;
-			msg[1]->dLen = idx;
+			msg[1].Data = data_buf;
+			msg[1].dLen = idx;
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		case _CMD_READ_RunningLabData://0X05,//读取当前实验数据
@@ -93,6 +93,7 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t **msg)
 				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
 			}
 			else if(iPara==2)	{
+				memset(gPD_Data.PDVol, 0, HOLE_NUM);
 				msg_pkt_pro.Src = MSG_CollectHolePD_EVENT;//启动电机 开始采集孔PD值
 				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
 			}
@@ -111,8 +112,8 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t **msg)
 //				memcpy(data_buf,(u8 *)HolePos.pos, sizeof(HolePos.pos));
 //				idx += sizeof(HolePos.pos);
 			}
-			msg[1]->Data = data_buf;
-			msg[1]->dLen = idx;
+			msg[1].Data = data_buf;
+			msg[1].dLen = idx;
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		case _CMD_LED_CTRL://0x0d LED灯控制
@@ -136,25 +137,25 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t **msg)
 			break;
 		}
 		case _CMD_RESET_MOTOR://0X0E,//电机复位
-			OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[1]);
+			OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);
 			ack_state = ACK_OK;		
 			break;
 		case _CMD_DBG_MoveAnyPosAtReset://0x0F,//移动电机	
-			tMotor[MOTOR_ID1].dst_pos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-			OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[1]);
+			tMotor[MOTOR_ID1].dst_pos = (s32)UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+			OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);
 			ack_state = ACK_OK;
 			break;
 		case _CMD_GetMotorStatus://0x10,//查询电机状态
 			data_buf[0] = tMotor[MOTOR_ID1].status.is_run;
-			msg[1]->Data = data_buf;
-			msg[1]->dLen = 1;
+			msg[1].Data = data_buf;
+			msg[1].dLen = 1;
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		case _CMD_GetMotorPositon://0x11,//获取电机位置
 			temp = tMotor[MOTOR_ID1].CurSteps*Motor_NumPerStep;
 			memcpy(data_buf,(u8 *)&temp, 2);
-			msg[1]->Data = data_buf;
-			msg[1]->dLen = 2;
+			msg[1].Data = data_buf;
+			msg[1].dLen = 2;
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		default:

@@ -29,6 +29,7 @@ void StartCollFluo(void)
 //	if(temp_data.stage[m].step[n].CollEnable)	{//如果荧光采集使能 启动电机 采集荧光
 //		
 //	}
+	memset(gPD_Data.PDVol, 0, HOLE_NUM);
 }
 
 void StopCollFluo(void)

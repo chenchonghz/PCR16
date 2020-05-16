@@ -172,7 +172,7 @@ static void UsartSendData(message_pkt_t *pmsg)
 	HAL_UART_Transmit_DMA(pUsart->port, pUsart->tx_buf, pUsart->tx_len);
 }
 
-extern u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t *msg);
+extern u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[]);
 static  void  UsartCmdParsePkt (usart_t *pUsart)
 {
     INT8U cmd,ack;
@@ -189,10 +189,10 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
         pUsart->rx_err = MSG_ERR_NONE;        // clear rx error
         return;
     }
-	if(cmd == _CMD_ACK)	{//ack ok 
-		//BSP_PRINTF("ACK");
-		OSSemPost(pUsart->ack_sem);
-	}
+//	if(cmd == _CMD_ACK)	{//ack ok 
+//		//BSP_PRINTF("ACK");
+//		OSSemPost(pUsart->ack_sem);
+//	}
 	ack = UsartCmdProcess(pUsart, msg_pkt_usart);
 	if(ack != ACK_NONE)	{
 		UsartSendAck(&msg_pkt_usart[1],ack);

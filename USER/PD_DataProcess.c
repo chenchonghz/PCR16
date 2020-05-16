@@ -49,7 +49,7 @@ void CalcTemplateHolePDAver(void)
 	
 	temp = templatehole.min[0] + templatehole.min[1] + templatehole.max[0] + templatehole.max[1];
 	templatehole.aver = temp/4;//计算空孔PD均值
-	temp = templatehole.aver*14;//计算有效孔位置PD阀值
+	temp = templatehole.aver*15;//计算有效孔位置PD阀值
 	gPD_Data.HoleThreshold = temp/10;
 }
 
