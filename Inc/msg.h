@@ -22,7 +22,7 @@ typedef enum _message_src{
 	MSG_CalcPD_EVENT,
 	MSG_WriteLabTemplate,
 	MSG_WRITELOG,
-	MSG_SB_OVC_EVENT,
+	MSG_WriteCaliRes,
 	MSG_USB_OVC_EVENT,
 	MSG_SYS_SHUTDOWN,
 	MSG_KEYEVENT,

@@ -1,5 +1,6 @@
 #include "app_motor.h"
 #include "PD_DataProcess.h"
+#include "app_spiflash.h"
 //堆栈
 __align(4) OS_STK  TASK_MOTOR_STK[STK_SIZE_MOTOR]; //任务堆栈声?
 extern  message_pkt_t    msg_pkt_motor;
@@ -25,6 +26,7 @@ static void MotorDatInit (void)
 	tMotor[MOTOR_ID1].StepsCallback = &MotorArrivedCheck;
 	tMotor[MOTOR_ID1].if_acc             = DEF_False;
 	tMotor[MOTOR_ID1].ConSteps = 10;//匀速步数
+	tMotor[MOTOR_ID1].CurSteps = 0;
 }
 
 static void MotorReset(void)
@@ -38,12 +40,13 @@ static void MotorReset(void)
 //	CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], Motor_Move_MAX_STEP);
 	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_False);
 	if(tMotor[MOTOR_ID1].status.abort_type == MotorAbort_Min_LimitOpt)	{//复位过程碰到零点 成功
-		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetOK;
+		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetOK;		
 	}
 	else 	{
 		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetFail;
 	}
-//	OSTimeDly(1000);
+	OSTimeDly(500);//等待一段时间清零位置 消除过充误差
+	tMotor[MOTOR_ID1].CurSteps = 0;
 }
 
 static void DealUsartMessage(message_pkt_t *pmsg)
@@ -80,8 +83,6 @@ static void AppMotorTask (void *parg)
 	__HAL_TIM_ENABLE_IT(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE);
 	TMC260_install(tMotor[MOTOR_ID1].tmc260dev);
 	TMC260_read_status(tMotor[MOTOR_ID1].tmc260dev);
-	MotorReset();
-	tMotor[MOTOR_ID1].CurSteps = 0;
 	
 	for(;;)
     {
@@ -98,7 +99,6 @@ static void AppMotorTask (void *parg)
 				StartCollPDData();//孔PD数据采集准备
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
 				OSTimeDly(50);
-				Sys.state &= ~SysState_CollHolePD;//采集结束
 				gPD_Data.ch = LED_GREEN;//绿光扫描
 				FluoLED_OnOff(LED_GREEN, DEF_ON);
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
@@ -107,22 +107,31 @@ static void AppMotorTask (void *parg)
 			else if(msg->Src == MSG_CaliHolePostion_EVENT)	{//使用蓝光扫描 校准孔位置
 				Sys.devstate = DevState_Debug;
 				StartCaliHolePosition();//开启孔位置校准
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, (u32)(20*Motor_StepsPerum), DEF_False);
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, (u32)(30*Motor_StepsPerum), DEF_False);
 				StopCaliHolePosition();//停止孔位置校准
-				OSTimeDly(500);
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, (u32)(20*Motor_StepsPerum), DEF_True);
+				OSTimeDly(100);
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, (u32)(30*Motor_StepsPerum), DEF_True);
 				CalcHolePositon();//计算孔位置
 				Sys.devstate = DevState_IDLE;
 			}
 			else if(msg->Src == MSG_CaliHolePDBase_EVENT)	{//使用蓝光LED扫描 校准空孔PD本底信号
 				Sys.devstate = DevState_Debug;
+				gPD_Data.ch = LED_BLUE;//蓝光扫描
+				FluoLED_OnOff(LED_BLUE, DEF_ON);
 				StartCaliHolePDBase();//校准空孔PD本底信号
+				HolePos.idx = 0;
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
-				StopCaliHolePDBase();//校准结束
-				OSTimeDly(500);
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_True);
-				CalcHolePDBase();//计算孔本底信号		
+				CalcHolePDBase(LED_BLUE);//计算蓝光本底信号	
+				gPD_Data.ch = LED_GREEN;
+				FluoLED_OnOff(LED_GREEN, DEF_ON);
+				OSTimeDly(100);
+//				HolePos.idx = HOLE_NUM;
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, tMotor[MOTOR_ID1].CurSteps, DEF_True);
+				StopCaliHolePDBase();//校准结束				
+				CalcHolePDBase(LED_GREEN);//计算绿光本底信号		
 				Sys.devstate = DevState_IDLE;
+//				msg_pkt_motor.Src = MSG_WriteCaliRes;//校准结果写入文件
+//				OSQPost(spiflash.MSG_Q, &msg_pkt_motor);
 			}
 			else if (msg->Src == USART_MSG_RX_TASK)	{
 				DealUsartMessage(msg);
@@ -130,3 +139,5 @@ static void AppMotorTask (void *parg)
 		//}
 	}
 }
+
+

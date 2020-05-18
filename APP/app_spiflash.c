@@ -75,6 +75,7 @@ static void TaskSPIFLASH(void * ppdata)
 			BSP_PRINTF("filesys init ok");		
 			CreateSysFile();//创建系统文件
 			ReadLabTemplateList();
+			AnalysisCalibrateRes();//从文件解析校准结果
 		}
 	}
 	OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_2, OS_FLAG_SET, &err);
@@ -91,6 +92,9 @@ static void TaskSPIFLASH(void * ppdata)
 				}
 				else if(msg->Src == MSG_WriteLabTemplate)	{//保存灌注数据
 					WriteLabTemplate();
+				}
+				else if(msg->Src == MSG_WriteCaliRes)	{
+					WriteCalibrateRes();
 				}
 			}
 		}else if(err==OS_ERR_TIMEOUT)	{

@@ -44,5 +44,7 @@ void WriteLabTemplate(void);
 void ReadLabTemplateList(void);
 void DeleteLabTemplate(u8 item);
 int AnalysisLabTemplate(u8 item);
+int WriteCalibrateRes(void);
+int AnalysisCalibrateRes(void);
 FRESULT f_deldir(const TCHAR *path);
 #endif

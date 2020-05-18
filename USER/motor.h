@@ -146,6 +146,7 @@ void MotorAccDec(TMotor *pMotor);
 void MotorArrivedCheck(TMotor *pMotor);
 void MotorPositionCheck(TMotor *pMotor);
 INT32U LenToSteps(TMotor *pdev,INT32S len);
+INT32S StepsToLen(TMotor *pdev);
 void CalcAnyPosAtResetSteps(TMotor *pMotor,INT32S step);
 #endif
 

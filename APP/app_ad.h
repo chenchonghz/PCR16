@@ -6,7 +6,7 @@
 
 typedef struct _app_ad	{
 	OS_EVENT           *sem;
-	u8 rflag;
+	volatile u8 rflag;
 	u16 wait_t;
 }_app_ad_t;
 

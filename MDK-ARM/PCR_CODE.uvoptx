@@ -173,7 +173,7 @@
           <Type>0</Type>
           <LineNumber>4541</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134294044</Address>
+          <Address>134294396</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -274,32 +274,27 @@
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pdbuf,0x0A</ItemText>
+          <ItemText>PD_max,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_pdbuf</ItemText>
+          <ItemText>pdbuf,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>usart_rx_buf</ItemText>
+          <ItemText>p_pdbuf,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>20</count>
           <WinNumber>1</WinNumber>
-          <ItemText>tMotor[0],0x0A</ItemText>
+          <ItemText>tMotor[0].CurSteps,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>1</WinNumber>
-          <ItemText>msg_pkt_usart</ItemText>
-        </Ww>
-        <Ww>
-          <count>22</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>PD_max</ItemText>
+          <ItemText>xxxx</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

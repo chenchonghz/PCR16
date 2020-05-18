@@ -43,7 +43,7 @@
 #define STK_SIZE_AD								 (STK_SIZE_MIN * 2)
 #define STK_SIZE_TEMP								 (STK_SIZE_MIN * 2)
 #define STK_SIZE_FLUO								 (STK_SIZE_MIN * 2)
-#define STK_SIZE_CalcFLUO								 (STK_SIZE_MIN * 2)
+//#define STK_SIZE_MOTORMONITOR								 (STK_SIZE_MIN * 2)
 
 
 /* Task Message Size Configure */
@@ -78,10 +78,11 @@ enum _task_prio {
 	TASK_PRIO_AD, 	
 	TASK_PRIO_TEMP,
 	TASK_PRIO_FLUO,
-	TASK_PRIO_CalcFLUO,
+//	TASK_PRIO_CalcFLUO,
     TASK_PRIO_USART_TX,
     TASK_PRIO_USART_RX,
-	TASK_PRIO_MOTOR,	
+	TASK_PRIO_MOTOR,
+//	TASK_PRIO_MOTORMONITOR,
 	TASK_PRIO_DISPLAY,	
 	TASK_PRIO_SYSMONITOR,	
 	TASK_PRIO_SPIFLASH,

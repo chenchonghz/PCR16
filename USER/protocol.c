@@ -28,16 +28,16 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			msg[1].Data = data_buf;
 			msg[1].dLen = idx;
 			OSMboxPost(usart.mbox, &msg[1]);
-			break;		
+			break;
 		case _CMD_READ_RunningLabName://0X04,//读取当前实验名称
 			if(Sys.devstate == DevState_Running||Sys.devstate == DevState_Pause)	{
 				strcpy((char *)data_buf,lab_data.name);				
 			}
 			else	{
 				strcpy((char *)data_buf,"NONE");
-			}
+			}		
 			msg[1].Data = data_buf;
-			msg[1].dLen = idx;
+			msg[1].dLen = strlen((char *)data_buf);
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		case _CMD_READ_RunningLabData://0X05,//读取当前实验数据
@@ -102,14 +102,10 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 		case _CMD_READ_CalibrateRes://0X09,//读取校准结果
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0)	{//读取空孔荧光最大值最小值
-//				memcpy(data_buf,(u8 *)gPD_Data.PDBase, sizeof(gPD_Data.PDBase));
-//				idx += sizeof(gPD_Data.PDBase);
-				msg[1].Data = (u8 *)gPD_Data.PDBase;
-				msg[1].dLen = sizeof(gPD_Data.PDBase);
+				msg[1].Data = (u8 *)gPD_Data.PDBaseBlue;
+				msg[1].dLen = sizeof(gPD_Data.PDBaseBlue);
 			}
 			else if(iPara==1)	{//读取孔位置
-//				memcpy(data_buf,(u8 *)HolePos.pos, sizeof(HolePos.pos));
-//				idx += sizeof(HolePos.pos);
 				msg[1].Data = (u8 *)HolePos.pos;
 				msg[1].dLen = sizeof(HolePos.pos);
 			}
@@ -138,13 +134,21 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			break;
 		}
 		case _CMD_RESET_MOTOR://0X0E,//电机复位
-			OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);
-			ack_state = ACK_OK;		
+			if(tMotor[MOTOR_ID1].status.is_run == MotorState_Run)
+				ack_state = ACK_Fail;	
+			else	{
+				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);
+				ack_state = ACK_OK;		
+			}
 			break;
 		case _CMD_DBG_MoveAnyPosAtReset://0x0F,//移动电机	
-			tMotor[MOTOR_ID1].dst_pos = (s32)UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-			OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);
-			ack_state = ACK_OK;
+			if(tMotor[MOTOR_ID1].status.is_run == MotorState_Run)
+				ack_state = ACK_Fail;	
+			else	{
+				tMotor[MOTOR_ID1].dst_pos = (s32)UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);
+				ack_state = ACK_OK;
+			}
 			break;
 		case _CMD_GetMotorStatus://0x10,//查询电机状态
 			data_buf[0] = tMotor[MOTOR_ID1].status.is_run;

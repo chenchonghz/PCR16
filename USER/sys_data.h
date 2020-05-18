@@ -12,6 +12,7 @@
 #define	LOG_FILE_NAME		"Pcr16Log.txt"//"PerfusionLog.txt"
 #define	TEMPJSON_FILE_NAME		"Temp.json"
 #define	LabJSON_FILE_NAME		"Lab.json"
+#define	CALI_FILE_NAME		"calibrate"
 
 #define	LabFolderName		"Lab"
 #define	DataFolderName		"Data"

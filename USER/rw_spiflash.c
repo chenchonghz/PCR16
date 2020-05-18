@@ -390,8 +390,44 @@ int AnalysisLabTemplate(u8 item)
 		BSP_PRINTF("analysis file: %s",filepath);
 	return res;
 }
+#include "PD_DataProcess.h"
+int WriteCalibrateRes(void)
+{
+	int res;
+	char filename[FILE_NAME_LEN];
+	
+	sprintf(filename, "%s%s", USERPath, CALI_FILE_NAME);//文件名
+	res = f_open(flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and rw mode
+	if(res != FR_OK)
+		goto _exit;
+	f_write(flashfs.fil, (u8 *)HolePos.pos, sizeof(HolePos.pos), NULL);	//孔位置信息写入校准文件
+//	f_write(flashfs.fil, SYS_LINE_ENDING, strlen(SYS_LINE_ENDING), NULL);
+	f_write(flashfs.fil, (u8 *)gPD_Data.PDBaseBlue, sizeof(gPD_Data.PDBaseBlue), NULL);	//荧光校准值写入校准文件
+//	f_write(flashfs.fil, SYS_LINE_ENDING, strlen(SYS_LINE_ENDING), NULL);
+	f_write(flashfs.fil, (u8 *)gPD_Data.PDBaseGreen, sizeof(gPD_Data.PDBaseGreen), NULL);
+//	f_write(flashfs.fil, SYS_LINE_ENDING, strlen(SYS_LINE_ENDING), NULL);
 
+_exit:
+	f_close(flashfs.fil);
+	return 1;
+}
 
+int AnalysisCalibrateRes(void)
+{
+	int res;
+	char filename[FILE_NAME_LEN];
+	
+	sprintf(filename, "%s%s", USERPath, CALI_FILE_NAME);//文件名
+	res = f_open(flashfs.fil, filename, FA_READ);//create new file and rw mode
+	if(res != FR_OK)
+		return 0;
+	f_read(flashfs.fil, (u8 *)HolePos.pos, sizeof(HolePos.pos), NULL);
+	f_read(flashfs.fil, (u8 *)gPD_Data.PDBaseBlue, sizeof(gPD_Data.PDBaseBlue), NULL);
+	f_read(flashfs.fil, (u8 *)gPD_Data.PDBaseGreen, sizeof(gPD_Data.PDBaseGreen), NULL);
+_exit:
+	f_close(flashfs.fil);
+	return 1;
+}
 
 
 
