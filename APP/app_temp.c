@@ -93,18 +93,18 @@ static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
 //
 u8 StartAPPTempCtrl(void)
 {
-//	if(temp_data.StageNum==0)//无效参数
-//		return 0;
 	msg_pkt_temp.Src = MSG_WriteLabTemplate;//保存实验模板, 路径./lab/Temp.json; ./lab/Lab.json
 	OSQPost(spiflash.MSG_Q, &msg_pkt_temp);	
 	OSTimeDly(500);
 	ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);	
-
+	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
 	return 1;
 }
 
 void StopAPPTempCtrl(void)
-{
+{	
+	SoftTimerStop(&SoftTimer1, DEF_True);
+	SoftTimerStop(&SoftTimer2, DEF_False);
 }
 u8 hengwenflag;
 //恒温时间达到 调用该函数
@@ -128,14 +128,14 @@ static void ConstantTempArrivedCallback(void)
 			temp_data.stage[m].CurStep = 0;
 		}
 	}
-	SoftTimerStop(&SoftTimer1);
+	SoftTimerStop(&SoftTimer1, DEF_True);
 }
 
 static void PD_DataCollectCallback(void)
 {
 	msg_pkt_temp.Src = MSG_CollectHolePD_EVENT;//启动电机 开始采集孔PD值
 	OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_temp);
-	SoftTimerStop(&SoftTimer2);
+	SoftTimerStop(&SoftTimer2, DEF_False);
 }
 
 //按照设置好的温度程序巡视 设置的温度曲线控温
@@ -143,23 +143,28 @@ void TempProgramLookOver(s16 c_temp)
 {
 	u8 m,n;
 	s16 target;
+	static u8 ConstantTempCnt;
 	
 	m = temp_data.CurStage;
 	n = temp_data.stage[m].CurStep;
 	target = temp_data.stage[m].step[n].temp;
-	if(abs(c_temp-target)>100)	{//温度差大于1度 当前处于升降温阶段
-//		ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
+	if(abs(c_temp-target)>100)	{//温度差大于1度 当前处于升降温阶段		
+		ConstantTempCnt = 0;
 		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, target);
 		hengwenflag = 0;
 	}
 	else {//到达目标温度 当前处于恒温阶段
-		if(GetSoftTimerState(&SoftTimer1)==DEF_Stop)	{//100ms 为单位
-			SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim*10); //设置恒温时间定时
-			SoftTimer1.pCallBack = &ConstantTempArrivedCallback;
-			SoftTimerStart(&SoftTimer2, (temp_data.stage[m].step[n].tim-8)*10);//设置PD数据采集时间定时
-			SoftTimer2.pCallBack = &PD_DataCollectCallback;
+		ConstantTempCnt++;
+		if(ConstantTempCnt>=5)	{//持续500ms 温度差小于1度 判断温度控制已稳定
+			ConstantTempCnt = 0;
+			if(GetSoftTimerState(&SoftTimer1)==DEF_Stop)	{//100ms 为单位
+				SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim*10, DEF_True); //设置恒温时间定时
+				SoftTimer1.pCallBack = &ConstantTempArrivedCallback;
+				SoftTimerStart(&SoftTimer2, (temp_data.stage[m].step[n].tim-8)*10, DEF_False);//设置PD数据采集时间定时
+				SoftTimer2.pCallBack = &PD_DataCollectCallback;
+			}
+			hengwenflag = target;
 		}
-		hengwenflag = target;
 	}
 }
 

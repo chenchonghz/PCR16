@@ -107,10 +107,10 @@ static void AppMotorTask (void *parg)
 			else if(msg->Src == MSG_CaliHolePostion_EVENT)	{//使用蓝光扫描 校准孔位置
 				Sys.devstate = DevState_Debug;
 				StartCaliHolePosition();//开启孔位置校准
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, (u32)(30*Motor_StepsPerum), DEF_False);
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, (u32)(25*Motor_StepsPerum), DEF_False);
 				StopCaliHolePosition();//停止孔位置校准
 				OSTimeDly(100);
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, (u32)(30*Motor_StepsPerum), DEF_True);
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, (u32)(25*Motor_StepsPerum), DEF_True);
 				CalcHolePositon();//计算孔位置
 				Sys.devstate = DevState_IDLE;
 			}

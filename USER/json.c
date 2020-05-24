@@ -143,7 +143,7 @@ int AnalysisTemp_Jsonfile(const char *path)
 	return -1;
 }
 
-//解析温度曲线json文件
+//解析温lab json文件
 int AnalysisLab_Jsonfile(const char *path)
 {
 	json_t *jdata,*jsubdata;

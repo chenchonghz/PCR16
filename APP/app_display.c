@@ -45,6 +45,7 @@ void StopSysLab(void)
 {
 	Sys.devstate = DevState_IDLE;
 	StopAppADTask();
+	StopCollFluo();
 	StopAPPTempCtrl();
 }
 //u8 touchid;
@@ -406,7 +407,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				}
 			}	
 			else if(appdis.pUI->ctrl_id == 9)	{//恒温时间 min	
-				temp /= 10;
+				temp /= 100;
 				if(temp > 10||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0],1);
 				else	{
@@ -416,7 +417,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				}
 			}
 			else if(appdis.pUI->ctrl_id == 10)	{//恒温时间 sec	
-				temp /= 10;
+				temp /= 100;
 				if(temp > 60||temp < 0)	
 					DisplayMessageUI((char *)&Code_Message[3][0],1);
 				else	{

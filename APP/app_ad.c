@@ -16,17 +16,16 @@ static void ADDatInit(void)
 {
 	app_ad.sem                 = OSSemCreate(0);
 	app_ad.rflag = DEF_True;
-	app_ad.wait_t = 2;
 }
 
 void StartAppADTask(void)
 {
-	app_ad.wait_t = 2;
+
 }
 
 void StopAppADTask(void)
 {
-	app_ad.wait_t = 2;
+
 }
 //u16 timecnt=0;
 //u32 advol;
