@@ -1,7 +1,7 @@
 #include "timer.h"
 #include "motor.h"
 
-_softtimer_t SoftTimer1;
+_softtimer_t SoftTimer1,SoftTimer2;
 
 void timer_update(TIM_HandleTypeDef *tmr,u32 val)
 {
@@ -29,11 +29,20 @@ void SoftTimerInit(void)
 	SoftTimer1.period = 0;
 	SoftTimer1.state = DEF_Stop;
 	SoftTimer1.TIM = &htim7;
+		SoftTimer2.cnt = 0;
+	SoftTimer2.period = 0;
+	SoftTimer2.state = DEF_Stop;
+	SoftTimer2.TIM = &htim7;
+}
+
+u8 GetSoftTimerState(_softtimer_t *psofttimer)
+{
+	return psofttimer->state;
 }
 
 u8 SoftTimerStart(_softtimer_t *psofttimer, u32 value)
 {
-	if(psofttimer->state == DEF_Stop)	{
+	if(GetSoftTimerState(psofttimer) == DEF_Stop)	{
 		psofttimer->cnt = 0;
 		psofttimer->period = value;
 		psofttimer->state = DEF_Run;
@@ -52,33 +61,30 @@ void SoftTimerStop(_softtimer_t *psofttimer)
 
 void SoftTimerCallback(void)
 {
-	if(SoftTimer1.state == DEF_Run)	{//电机运行时间控制
+	if(SoftTimer1.state == DEF_Run)	{//恒温保持时间控制
 		SoftTimer1.cnt ++;
 		if(SoftTimer1.cnt>=SoftTimer1.period)	{
 			SoftTimer1.cnt = 0;
 			if(SoftTimer1.pCallBack != NULL)
 				(*SoftTimer1.pCallBack)();
-			SoftTimerStop(&SoftTimer1);
+		}
+	}
+	else if(SoftTimer2.state == DEF_Run)	{//恒温保持时间控制
+		SoftTimer2.cnt ++;
+		if(SoftTimer2.cnt>=SoftTimer2.period)	{
+			SoftTimer2.cnt = 0;
+			if(SoftTimer2.pCallBack != NULL)
+				(*SoftTimer2.pCallBack)();
 		}
 	}
 }
-//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-//{
-//	if(htim == tMotor[MOTOR_ID1].tmr)	{
-//	    __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);  //清除TIMx的中断待处理位:TIM 中断源 
-//		if(tMotor[MOTOR_ID1].status.is_run == MotorState_Run)      {
-//		  if(tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)
-//			tMotor[MOTOR_ID1].CurSteps--;
-//		  else
-//			tMotor[MOTOR_ID1].CurSteps++;
-////		  tMotor[MOTOR_ID1].StepCnt++;          
 
-//		  if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
-//			(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
-//		  }
-//		}
-//	}
-//}
+
+
+
+
+
+
 ///////////////////////////////////////////PWM控制/////////////////////////////////////////////////
 void StopPWM(TIM_HandleTypeDef *pPWM, u8 ch)
 {

@@ -55,7 +55,7 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 	u8 cmd;
 	u16 iPara;
 	
-	cmd = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+	cmd = DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 	switch(cmd)	{
 		case HANDSHAKE_OK://握手成功
 			appdis.pDaCai->state = DEF_ONLINE;
@@ -67,16 +67,16 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 		case 0x01:
 			if(appdis.pUI->screen_id == Temp_UIID&&Sys.devstate != DevState_Running)	{
 				u16 x,y;
-				x = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-				y = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				x = DaCaiRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				y = DaCaiRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				u8 touchid = TempButtonClick(x,y);
 				ButtonClickProcess(touchid);
 			}
 			break;
 		case 0xb1:	{//画面相关指令
-			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			iPara = DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0x01)	{//回读screen id
-				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				appdis.pUI->screen_id = DaCaiRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				if(appdis.pUI->screen_id == Main_UIID)	{
 					if(Sys.devstate != DevState_Running)	{
 						ResetLabDataDefault();
@@ -88,20 +88,20 @@ static  void  UsartCmdParsePkt (_dacai_usart_t *pUsart)
 				}
 			}
 			else if(iPara==0x11||iPara==0x14)	{//按钮状态
-				appdis.pUI->screen_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-				appdis.pUI->ctrl_id = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				appdis.pUI->screen_id = DaCaiRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				appdis.pUI->ctrl_id = DaCaiRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				ScreenDataProcess(pUsart);
 			}
 			break;
 		}
 		case 0xf7:	{//时间格式是BCD码
-			SysTime.tm_year = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)) + 2000;
-			SysTime.tm_mon = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_wday = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_mday = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_hour = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_min = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
-			SysTime.tm_sec = BCD_Decimal(UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_year = BCD_Decimal(DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)) + 2000;
+			SysTime.tm_mon = BCD_Decimal(DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_wday = BCD_Decimal(DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_mday = BCD_Decimal(DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_hour = BCD_Decimal(DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_min = BCD_Decimal(DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
+			SysTime.tm_sec = BCD_Decimal(DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx));
 			break;
 		}
 	}
@@ -143,10 +143,10 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 	s32 temp;
 	u8 iPara;
 	
-	ctrl_type = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//0x10-表示按钮 0x11-表示文本 0x1a-表示下拉框
+	ctrl_type = DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//0x10-表示按钮 0x11-表示文本 0x1a-表示下拉框
 	if(ctrl_type==0x10||ctrl_type==0x1a)	{		
-		subtype = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-		status = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//获取按钮状态 按下/弹起
+		subtype = DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+		status = DaCaiRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//获取按钮状态 按下/弹起
 	}
 	if(appdis.pUI->screen_id==Main_UIID)	{//主界面按钮响应		
 		if(status == DEF_Release)	{
@@ -285,7 +285,7 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 		}
 		else if(appdis.pUI->ctrl_id==67&&status == DEF_Release)	{//下页
 			appdis.pUI->index += 5;
-			if(appdis.pUI->index>HOLE_NUM)	appdis.pUI->index = HOLE_NUM;
+			if(appdis.pUI->index>=HOLE_NUM)	appdis.pUI->index = HOLE_NUM-1;
 			UpdateSampleInforList(appdis.pUI->index);
 		}
 	}
@@ -573,10 +573,6 @@ static void TaskDisplay(void * ppdata)
 			if(appdis.pDaCai->state==DEF_OFFLINE)	{
 				DaCai_CheckDevice();//check online
 			}else if(appdis.pDaCai->state==DEF_ONLINE)	{
-//				if(appdis.pUI->screen_id == Invalid_UIID)	{
-//					DaCai_GetScreenID();
-//				}
-//				else if(appdis.pUI->screen_id == Welcome_UIID)	{
 				if(appdis.pUI->screen_id == Invalid_UIID)	{
 					OSTimeDly(2000);
 					appdis.pUI->screen_id = Main_UIID;							

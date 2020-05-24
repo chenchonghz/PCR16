@@ -97,7 +97,9 @@ typedef struct _Multi_	{
 
 void DaCai_SendData(u8 *pbuf, u16 len);
 void DaCaiProto_init(void);
-
+INT8U  DaCaiRxGetINT8U (u8 *buf,INT32U *idx);
+INT16U  DaCaiRxGetINT16U (u8 *buf,INT32U *idx);
+INT32U  DaCaiRxGetINT32U (u8 *buf,INT32U *idx);
 extern _DACAI_t  dacai;
 
 #endif

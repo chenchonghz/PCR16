@@ -34,8 +34,8 @@ static void MotorReset(void)
     tMotor[MOTOR_ID1].status.action     = MotorAction_Resetting;
 	if(!Motor_MinLimit())	{//已经在下限位 前进
 		StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, 30*Motor_StepsPerum, DEF_False);//前进10mm
-		OSTimeDly(1000);
-	} 
+		OSTimeDly(500);
+	}
 	tMotor[MOTOR_ID1].status.abort_type = MotorAbort_Normal;
 //	CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], Motor_Move_MAX_STEP);
 	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_False);
@@ -70,7 +70,6 @@ static void DealUsartMessage(message_pkt_t *pmsg)
 		default:
 			break;
 	}
-	
 }
 extern u8 HolePositionCaliFlag;
 static void AppMotorTask (void *parg)
@@ -83,6 +82,7 @@ static void AppMotorTask (void *parg)
 	__HAL_TIM_ENABLE_IT(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE);
 	TMC260_install(tMotor[MOTOR_ID1].tmc260dev);
 	TMC260_read_status(tMotor[MOTOR_ID1].tmc260dev);
+//	MotorReset();
 	
 	for(;;)
     {

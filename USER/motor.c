@@ -186,10 +186,8 @@ void MotorArrivedCheck(TMotor *pMotor)
 //		for(i=0;i<HOLE_NUM;i++)	
 		{
 			if(tMotor[MOTOR_ID1].CurSteps > HolePos.pos[i].x1 && tMotor[MOTOR_ID1].CurSteps < HolePos.pos[i].x2)	{//电机到达孔位置范围 启动pd采集
-				gPD_Data.coll_enable = DEF_True;
-//				gPD_Data.DataValid = DEF_True;
-//				HolePos.idx = i;//记录当前孔编号					
-//				break;
+				if(sample_data.hole[i].sample_t[0] != 0||Sys.devstate == DevState_Debug)
+					gPD_Data.coll_enable = DEF_True;
 			}
 			else if(gPD_Data.coll_enable == DEF_True)	{//走出孔位置 
 				gPD_Data.coll_enable = DEF_False;

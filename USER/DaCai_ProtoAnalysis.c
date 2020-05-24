@@ -104,3 +104,27 @@ void DaCaiUART_DMA_Callback(DMA_HandleTypeDef *hdma)
 	mutex_unlock(dacai.lock);
 }
 
+INT8U  DaCaiRxGetINT8U (u8 *buf,INT32U *idx)
+{
+    return (buf[(*idx)++]);
+}
+
+INT16U  DaCaiRxGetINT16U (u8 *buf,INT32U *idx)
+{
+    INT16U  lowbyte;
+    INT16U  highbyte;
+
+    highbyte  = UsartRxGetINT8U(buf,idx);
+    lowbyte = UsartRxGetINT8U(buf,idx);
+    return ((highbyte << 8) | lowbyte);
+}
+
+INT32U  DaCaiRxGetINT32U (u8 *buf,INT32U *idx)
+{
+    INT32U  highword;
+    INT32U  lowword;
+
+    highword = UsartRxGetINT16U(buf,idx);
+    lowword = UsartRxGetINT16U(buf,idx);
+    return ((highword << 16) | lowword);
+}

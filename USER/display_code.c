@@ -254,22 +254,40 @@ void UpdateSampleInforList(u8 index)
 	pMultiTXT_t = (_MultiTXT_ *)user_malloc(sizeof(_MultiTXT_));
 	for(i=0;i<5;i++)	{
 		hole_idx = index + i;
-		if(sample_data.hole[hole_idx].sample_t[0] != 0)
-			value[i] = DEF_Press;
-		else
+		if(hole_idx<HOLE_NUM)
+		{
+			if(sample_data.hole[hole_idx].sample_t[0] != 0)
+				value[i] = DEF_Press;
+			else
+				value[i] = DEF_Release;
+			button_id[i] = 1+i;
+			j=0;
+			pMultiTXT_t->data[j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "A%d", hole_idx+1);
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].name);
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].prj);
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].sample_t);
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "None");//实验结果
+		}
+		else	{
 			value[i] = DEF_Release;
-		button_id[i] = 1+i;
-		j=0;
-		pMultiTXT_t->data[j].id = ctrl_id++;
-		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "A%d", hole_idx+1);
-		pMultiTXT_t->data[++j].id = ctrl_id++;
-		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].name);
-		pMultiTXT_t->data[++j].id = ctrl_id++;
-		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].prj);
-		pMultiTXT_t->data[++j].id = ctrl_id++;
-		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "%s", sample_data.hole[hole_idx].sample_t);
-		pMultiTXT_t->data[++j].id = ctrl_id++;
-		pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, "None");//实验结果
+			button_id[i] = 1+i;
+			j=0;
+			pMultiTXT_t->data[j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, " ");
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, " ");
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, " ");
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, " ");
+			pMultiTXT_t->data[++j].id = ctrl_id++;
+			pMultiTXT_t->data[j].len = sprintf(pMultiTXT_t->data[j].buf, " ");//实验结果
+		}
 		DaCai_UpdateMultiTXT(appdis.pUI, pMultiTXT_t->data, j+1);
 	}
 	user_free(pMultiTXT_t);

@@ -3,6 +3,7 @@
 #include "PID.h"
 #include "timer.h"
 #include "app_spiflash.h"
+#include "app_motor.h"
 //堆栈
 __align(4) OS_STK  TASK_TEMP_STK[STK_SIZE_TEMP]; //任务堆栈声?
 
@@ -107,7 +108,7 @@ void StopAPPTempCtrl(void)
 }
 u8 hengwenflag;
 //恒温时间达到 调用该函数
-void ConstantTempReadCallback(void)
+static void ConstantTempArrivedCallback(void)
 {
 	u8 m;
 	
@@ -127,6 +128,14 @@ void ConstantTempReadCallback(void)
 			temp_data.stage[m].CurStep = 0;
 		}
 	}
+	SoftTimerStop(&SoftTimer1);
+}
+
+static void PD_DataCollectCallback(void)
+{
+	msg_pkt_temp.Src = MSG_CollectHolePD_EVENT;//启动电机 开始采集孔PD值
+	OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_temp);
+	SoftTimerStop(&SoftTimer2);
 }
 
 //按照设置好的温度程序巡视 设置的温度曲线控温
@@ -143,9 +152,13 @@ void TempProgramLookOver(s16 c_temp)
 		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, target);
 		hengwenflag = 0;
 	}
-	else {//到达目标温度 当前处于恒温阶段 设置恒温时间
-		if(SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim*10)==1)//100ms 为单位
-			SoftTimer1.pCallBack = &ConstantTempReadCallback;
+	else {//到达目标温度 当前处于恒温阶段
+		if(GetSoftTimerState(&SoftTimer1)==DEF_Stop)	{//100ms 为单位
+			SoftTimerStart(&SoftTimer1, temp_data.stage[m].step[n].tim*10); //设置恒温时间定时
+			SoftTimer1.pCallBack = &ConstantTempArrivedCallback;
+			SoftTimerStart(&SoftTimer2, (temp_data.stage[m].step[n].tim-8)*10);//设置PD数据采集时间定时
+			SoftTimer2.pCallBack = &PD_DataCollectCallback;
+		}
 		hengwenflag = target;
 	}
 }
@@ -165,7 +178,7 @@ static void AppTempTask (void *parg)
 	SetPIDVal(PID_ID1, 0.0, 0.0, 0.0);
 	for(;;)
     {
-//		if(Sys.devstate == DevState_Running)	
+		if(Sys.devstate == DevState_Running)	
 		{
 			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{//计算模块温度
 				TempProgramLookOver(cur_temp);
@@ -193,13 +206,13 @@ static void AppTempTask (void *parg)
 //			
 //			}
 		}
-//		else	
-//		{
-//			ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
-//			StopTempCtrl(&TempPid[HOLE_TEMP]);
-//			ClearPIDDiff(TempPid[COVER_TEMP].PIDid);
-//			StopTempCtrl(&TempPid[COVER_TEMP]);
-//		}
+		else	
+		{
+			ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
+			StopTempCtrl(&TempPid[HOLE_TEMP]);
+			ClearPIDDiff(TempPid[COVER_TEMP].PIDid);
+			StopTempCtrl(&TempPid[COVER_TEMP]);
+		}
 		OSTimeDly(80);
 	}
 }

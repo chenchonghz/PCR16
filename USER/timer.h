@@ -13,11 +13,14 @@ typedef struct _softtimer
 }_softtimer_t;
 
 extern _softtimer_t SoftTimer1;
+extern _softtimer_t SoftTimer2;
+
 void timer_update(TIM_HandleTypeDef *tmr,u32 val);
 void timer_start(TIM_HandleTypeDef *tmr)  ;
 void timer_stop(TIM_HandleTypeDef *tmr);
 void SoftTimerInit(void);
 u8 SoftTimerStart(_softtimer_t *psofttimer, u32 value);
+u8 GetSoftTimerState(_softtimer_t *psofttimer);
 void SoftTimerStop(_softtimer_t *psofttimer);
 void SoftTimerCallback(void);
 void UpdatePWM(TIM_HandleTypeDef *pPWM, u8 ch, INT16U val);
