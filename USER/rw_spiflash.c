@@ -100,28 +100,28 @@ void CreateSysFile(void)
 	sprintf(filename, "%s%s", USERPath, LabFolderName);
 	res = f_opendir(&dir,filename);
 	if(res != FR_OK)	{
-		f_mkdir(filename);
+		f_mkdir((const char *)filename);
 	}
 	f_closedir(&dir);
 	sprintf(filename, "%s%s", USERPath, DataFolderName);
 	res = f_opendir(&dir,filename);
 	if(res != FR_OK)	{
-		f_mkdir(filename);
+		f_mkdir((const char *)filename);
 	}
 	f_closedir(&dir);
 	sprintf(filename, "%s%s", USERPath, TmpFolderName);
 	res = f_opendir(&dir,filename);
 	if(res != FR_OK)	{
-		f_mkdir(filename);
+		f_mkdir((const char *)filename);
 	}
 	f_closedir(&dir);
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);
-	res = f_stat(filename, &fn);//若文件已存在，检测大小，超过指定大小，删除旧数据
+	res = f_stat((const char *)filename, &fn);//若文件已存在，检测大小，超过指定大小，删除旧数据
 	if(res == FR_OK)	{//If exist, the function returns with FR_OK
 //		BSP_PRINTF("Time: %u/%02u/%02u, %02u:%02u\n",
 //               (fn.fdate >> 9)+1980, (fn.fdate >> 5) & 0x0f, fn.fdate & 0x1f,
 //               fn.ftime >> 11, (fn.ftime >> 5) & 0x3f);
-		res = f_open(flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);
+		res = f_open(flashfs.fil, (const char *)filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);
 		fil_size = f_size(flashfs.fil);//获取log文件大小
 		if(fil_size>LOG_FILE_MAXSIZE)	{//文件大于10k 删除旧数据
 			char data;
@@ -137,14 +137,14 @@ void CreateSysFile(void)
 			pLogBufer = (char *)user_malloc(RLOG_BUFSIZE);
 			f_read(flashfs.fil, pLogBufer, LOG_FILE_TRUNCATION_SIZE, &rsize);//读出需要保留的内容
 			f_close(flashfs.fil);
-			f_open(flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//重新创建文件
+			f_open(flashfs.fil, (const char *)filename, FA_CREATE_ALWAYS | FA_WRITE);//重新创建文件
 			f_write(flashfs.fil, pLogBufer, rsize, NULL);//重新写入保留的内容
 			user_free(pLogBufer);
 		}
 	}
 	else if(res == FR_NO_FILE)	
 	{//文件不存在 or 强制创建标志有效 创建文件
-		res = f_open(flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and w mode
+		res = f_open(flashfs.fil, (const char *)filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and w mode
 		if(res != FR_OK)	{
 			return;
 		}
@@ -166,7 +166,7 @@ u8 write_log(void)
 	}
 	mutex_lock(spiflash.lock);
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);//log文件名
-	res = f_open(flashfs.fil, filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);//create new file and rw mode
+	res = f_open(flashfs.fil, (const char *)filename, FA_OPEN_APPEND | FA_WRITE| FA_READ);//create new file and rw mode
 	if(res != FR_OK)
 		goto _exit;
 	f_write(flashfs.fil, LogInfor.pbuf, LogInfor.len, &len);	//写入log文件
@@ -189,7 +189,7 @@ u32 read_log(char *pbuf)
 	
 	rsize = 0;	
 	sprintf(filename, "%s%s", USERPath, LOG_FILE_NAME);
-	res = f_open(flashfs.fil, filename, FA_READ);
+	res = f_open(flashfs.fil, (const char *)filename, FA_READ);
 	if(res != FR_OK)
 		return 0;
 	logPosition = 0;
@@ -268,14 +268,14 @@ void WriteLabTemplate(void)
 	char filepath[FILE_NAME_LEN];
 	
 	sprintf(filename, "%s%s/%s", USERPath, LabFolderName, lab_data.name);
-	res = f_mkdir(filename);
+	res = f_mkdir((const char *)filename);
 	if(res==FR_OK || res==FR_EXIST)	{
 		sprintf(filepath, "%s/%s", filename, LabJSON_FILE_NAME);
-		if(CreateLab_Jsonfile(filepath)==0)	{
+		if(CreateLab_Jsonfile((const char *)filepath)==0)	{
 			SYS_PRINTF("write %s",filepath);
 		}
 		sprintf(filepath, "%s/%s", filename, TEMPJSON_FILE_NAME);
-		if(CreateTemp_Jsonfile(filepath)==0)	{
+		if(CreateTemp_Jsonfile((const char *)filepath)==0)	{
 			SYS_PRINTF("write %s",filepath);
 		}
 	}
@@ -299,7 +299,7 @@ void ReadLabTemplateList(void)
 	pTemplateList = (_labtemplatelist_t *)user_malloc(sizeof(_labtemplatelist_t));
 	num=0;	
 	sprintf(filename, "%s%s", USERPath, LabFolderName);
-	res = f_opendir(&dir, filename);
+	res = f_opendir(&dir, (const char *)filename);
 	if(res==FR_OK)	{
 		for(;;)	{
 			res=f_readdir(&dir,&fn);
@@ -364,7 +364,7 @@ void DeleteLabTemplate(u8 item)
 	if(item>=gLabTemplatelist.num)
 		return;
 	sprintf(filedir, "%s%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name);
-	res = f_deldir(filedir);
+	res = f_deldir((const char *)filedir);
 	if(res==FR_OK)	{
 		BSP_PRINTF("delete file: %s",filedir);
 		gLabTemplatelist.num -= 1;
@@ -381,11 +381,11 @@ int AnalysisLabTemplate(u8 item)
 	if(item>=gLabTemplatelist.num)
 		return -1;
 	sprintf(filepath, "%s%s/%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name, LabJSON_FILE_NAME);
-	res = AnalysisLab_Jsonfile(filepath);
+	res = AnalysisLab_Jsonfile((const char *)filepath);
 	if(res==FR_OK)
 		BSP_PRINTF("analysis file: %s",filepath);
 	sprintf(filepath, "%s%s/%s/%s",USERPath, LabFolderName, gLabTemplatelist.list[item].name, TEMPJSON_FILE_NAME);
-	res = AnalysisTemp_Jsonfile(filepath);
+	res = AnalysisTemp_Jsonfile((const char *)filepath);
 	if(res==FR_OK)
 		BSP_PRINTF("analysis file: %s",filepath);
 	return res;
@@ -397,7 +397,7 @@ int WriteCalibrateRes(void)
 	char filename[FILE_NAME_LEN];
 	
 	sprintf(filename, "%s%s", USERPath, CALI_FILE_NAME);//文件名
-	res = f_open(flashfs.fil, filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and rw mode
+	res = f_open(flashfs.fil, (const char *)filename, FA_CREATE_ALWAYS | FA_WRITE);//create new file and rw mode
 	if(res != FR_OK)
 		goto _exit;
 	f_write(flashfs.fil, (u8 *)HolePos.pos, sizeof(HolePos.pos), NULL);	//孔位置信息写入校准文件
@@ -418,7 +418,7 @@ int AnalysisCalibrateRes(void)
 	char filename[FILE_NAME_LEN];
 	
 	sprintf(filename, "%s%s", USERPath, CALI_FILE_NAME);//文件名
-	res = f_open(flashfs.fil, filename, FA_READ);//create new file and rw mode
+	res = f_open(flashfs.fil, (const char *)filename, FA_READ);//create new file and rw mode
 	if(res != FR_OK)
 		return 0;
 	f_read(flashfs.fil, (u8 *)HolePos.pos, sizeof(HolePos.pos), NULL);
@@ -443,24 +443,24 @@ FRESULT f_deldir(const TCHAR *path)
     FILINFO fn;  
 	char filedir[FILE_NAME_LEN];
 	
-	res = f_opendir(&dir, path);
+	res = f_opendir(&dir, (const char *)path);
 	if(res==FR_OK)	{
 		for(;;)	{
 			res=f_readdir(&dir,&fn);
 			if(res!=FR_OK||fn.fname[0]==0)	break;
-			sprintf(filedir, "%s/%s",path, fn.fname);
+			sprintf(filedir, "%s/%s",(const char *)path, fn.fname);
 			if (fn.fattrib & AM_DIR)  
 			{//若是文件夹，递归删除  
 				f_closedir(&dir);
-				res = f_deldir(filedir);  
+				res = f_deldir((const char *)filedir);  
 			}  
 			else  
 			{//若是文件，直接删除  
-				res = f_unlink(filedir);  
+				res = f_unlink((const char *)filedir);  
 			}  
 		}
 		//删除本身  
-		if(res == FR_OK)    res = f_unlink(path); 
+		if(res == FR_OK)    res = f_unlink((const char *)path); 
 		f_closedir(&dir);
 	}
 	return res;

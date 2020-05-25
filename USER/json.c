@@ -1,6 +1,7 @@
 #include "json.h"
 
 json_error_t *jsonerror;
+json_t *jdata,*jsubdata;
 char *json_out;
 
 void jansson_init(void)
@@ -11,7 +12,6 @@ void jansson_init(void)
 //创建温度曲线json文件
 int CreateTemp_Jsonfile(const char *path)
 {
-	json_t *jdata,*jsubdata;
 	json_t *jarr,*jarr1,*jarr2,*jval;
 	u8 i,j;
 	int ret;
@@ -60,7 +60,6 @@ int CreateTemp_Jsonfile(const char *path)
 //创建lab json文件
 int CreateLab_Jsonfile(const char *path)
 {
-	json_t *jdata,*jsubdata;
 	json_t *jarr;
 	u8 i;
 	int ret;
@@ -75,7 +74,7 @@ int CreateLab_Jsonfile(const char *path)
 		{
 //			jsubdata = json_pack_ex(jsonerror,0,"{si,ss,ss,ss,ss}", "ID", i+1,"name",sample_data.hole[i].name,"prj",sample_data.hole[i].prj,\
 //						"sample",&sample_data.hole[i].sample_t,"ch",sample_data.hole[i].channel);
-			jsubdata = json_pack_ex(jsonerror,0,"{si,ss,ss}", "ID", i+1, "name",sample_data.hole[i].name, "prj",sample_data.hole[i].prj);	
+			jsubdata = json_pack_ex(jsonerror,0,"{si,ss,ss}", "ID", i, "name",sample_data.hole[i].name, "prj",sample_data.hole[i].prj);	
 			json_object_set_new(jsubdata, "sample", json_string((const char *)sample_data.hole[i].sample_t));
 			json_object_set_new(jsubdata, "ch", json_string(sample_data.hole[i].channel));
 			json_array_append_new( jarr, jsubdata );
@@ -95,12 +94,11 @@ int CreateLab_Jsonfile(const char *path)
 //解析温度曲线json文件
 int AnalysisTemp_Jsonfile(const char *path)
 {
-	json_t *jdata,*jsubdata;
 	json_t *jtmp,*jtmp2,*jtmp3;
 	u8 i,j;
 
 	jdata = json_load_file(path, JSON_DECODE_ANY, jsonerror);
-	jsubdata = json_object_get(jdata,"HeatCoverTemp");
+	jsubdata = json_object_get((const json_t *)jdata,"HeatCoverTemp");
 	if(jsubdata!=NULL && json_is_object(jsubdata))	{
 //		jtmp = json_object_get(jsubdata,"Enable");
 //		temp_data.HeatCoverEnable = json_integer_value(jtmp);			
@@ -108,7 +106,7 @@ int AnalysisTemp_Jsonfile(const char *path)
 		temp_data.HeatCoverTemp = json_integer_value(jsubdata);			
 	}
 	json_decref(jsubdata);
-	jsubdata = json_object_get(jdata,"Stage");
+	jsubdata = json_object_get((const json_t *)jdata,"Stage");
 	if(jsubdata!=NULL && json_is_array(jsubdata))	{
 		temp_data.StageNum = json_array_size(jsubdata);
 		for(i=0;i<temp_data.StageNum;i++)	{
@@ -146,13 +144,12 @@ int AnalysisTemp_Jsonfile(const char *path)
 //解析温lab json文件
 int AnalysisLab_Jsonfile(const char *path)
 {
-	json_t *jdata,*jsubdata;
 	json_t *jtmp=NULL;
 	u8 i,j;
 	u16 total;
 
 	jdata = json_load_file(path, JSON_DECODE_ANY, jsonerror);
-	jsubdata = json_object_get(jdata,"Lab");
+	jsubdata = json_object_get((const json_t *)jdata,"Lab");
 	if(jsubdata!=NULL && json_is_object(jsubdata))	{
 		strcpy(lab_data.id, json_string_value(json_object_get(jsubdata,"id")));
 		strcpy(lab_data.name, json_string_value(json_object_get(jsubdata,"name")));
@@ -211,13 +208,12 @@ void add_2array_to_json( json_t* obj, const char* name, const int* arr_adrr, siz
 
 
 #if 1
+json_t *root;
 //jansson Test
 int arr1[2][3] = { {1,2,3}, {4,5,6} };
 int arr2[4][4] = { {1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16} };
 void jansson_pack_test(void)
 {
-	json_t *root;
-	
 	/* Build an empty JSON object */
 	root = json_pack("{}");
 	
