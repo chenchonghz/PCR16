@@ -682,6 +682,11 @@
               <FileType>1</FileType>
               <FilePath>..\APP\app_usart.c</FilePath>
             </File>
+            <File>
+              <FileName>app_filetransmit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\app_filetransmit.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

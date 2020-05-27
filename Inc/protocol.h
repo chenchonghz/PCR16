@@ -56,7 +56,8 @@ typedef enum {
 	_CMD_SET_LabState		=	0X07,//设置实验启停
 	_CMD_CALIBRATE = 0X08,//校准
 	_CMD_READ_CalibrateRes = 0X09,//读取校准结果
-	_CMD_READ_SENSOR_DATA	= 0X0B,	
+	_CMD_FILETRANSMIT_DOWNLOAD	= 0X0A,//下载文件
+	_CMD_FILETRANSMIT_UPLOAD	= 0X0B,	//读取文件
 	_CMD_LED_CTRL	= 0X0D,//LED on/off control
 	_CMD_RESET_MOTOR	= 0X0E,//电机复位
 	_CMD_DBG_MoveAnyPosAtReset = 0x0F,//移动电机

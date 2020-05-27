@@ -9,6 +9,7 @@
 #include "app_temp.h"
 #include "app_ad.h"
 #include "app_usart.h"
+#include "app_filetransmit.h"
 //////////////////////////////////////////////////////////
 __align(4) OS_STK  TASK_START_STK[STK_SIZE_START]; //ÈÎÎñ¶ÑÕ»ÉùÃ÷
 
@@ -60,6 +61,7 @@ static void TaskCreateOther(void)
 	AppDisplayInit();
 	AppUsartInit();
 //	AppSysmonitorInit();
+	AppFileTransmitInit();
 	AppSpiFlashInit();
 	AppUSBInit();	
 }

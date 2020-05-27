@@ -134,7 +134,7 @@ static void uart_message_rx_handler(usart_t *pUsart, INT8U rx_dat)
     }
 }
 
-static void UsartSendAck(message_pkt_t *pMsg, INT8U ack)
+void UsartSendAck(message_pkt_t *pMsg, INT8U ack)
 {
 	static INT8U ack_code[2];
 		
@@ -177,8 +177,8 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
 {
     INT8U cmd,ack;
 
-    msg_pkt_usart[0].Src = USART_MSG_RX_TASK;
-	msg_pkt_usart[1].Src = USART_MSG_RX_TASK;
+    msg_pkt_usart[0].Src = USART_MSG_RX_TASK;//任务间通讯
+	msg_pkt_usart[1].Src = USART_MSG_RX_TASK;//指令回复
     cmd = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);                                 /* First byte contains command      */
 
     if (pUsart->rx_err == MSG_ERR_NONE) {

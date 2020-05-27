@@ -5,7 +5,7 @@
 #include "protocol.h"
 #include "PD_DataProcess.h"
 
-static  message_pkt_t    msg_pkt_pro;
+//static  message_pkt_t    msg_pkt_pro;
 static u8 data_buf[100];
 
 u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
@@ -85,21 +85,21 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 		case _CMD_CALIBRATE://0x08 执行校准
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0)	{//校准空孔PD本底信号				
-				msg_pkt_pro.Src = MSG_CaliHolePDBase_EVENT;//启动电机 校准空孔PD本底信号	
-				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
+				msg[0].Src = MSG_CaliHolePDBase_EVENT;//启动电机 校准空孔PD本底信号	
+				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);	
 			}
 			else if(iPara==1)	{//孔位置校准				
-				msg_pkt_pro.Src = MSG_CaliHolePostion_EVENT;//启动电机 开始校准孔位置
-				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
+				msg[0].Src = MSG_CaliHolePostion_EVENT;//启动电机 开始校准孔位置
+				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);	
 			}
 			else if(iPara==2)	{
 				memset(gPD_Data.PDVol, 0, HOLE_NUM);
-				msg_pkt_pro.Src = MSG_CollectHolePD_EVENT;//启动电机 开始采集孔PD值
-				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg_pkt_pro);	
+				msg[0].Src = MSG_CollectHolePD_EVENT;//启动电机 开始采集孔PD值
+				OSMboxPost(tMotor[MOTOR_ID1].Mbox, &msg[0]);	
 			}
 			ack_state = ACK_OK;
 			break;
-		case _CMD_READ_CalibrateRes://0X09,//读取校准结果
+		case _CMD_READ_CalibrateRes://0X09 读取校准结果
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0)	{//读取空孔荧光最大值最小值
 				msg[1].Data = (u8 *)gPD_Data.PDBaseBlue;
@@ -112,6 +112,18 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			else 
 				break;
 			OSMboxPost(usart.mbox, &msg[1]);
+			break;
+		case _CMD_FILETRANSMIT_DOWNLOAD://0X0A,//下载文件
+			msg[0].Src = MSG_FILETRANSMIT_DOWNLOAD;
+			msg[0].Data = (u8 *)(pUsart->rx_buf+pUsart->rx_idx);
+			msg[0].dLen = pUsart->rx_cnt - 1;
+			OSMboxPost(usart.mbox, &msg[0]);
+			break;
+		case _CMD_FILETRANSMIT_UPLOAD://0X0B 读取文件
+			msg[0].Src = MSG_FILETRANSMIT_UPLOAD;
+			msg[0].Data = (u8 *)(pUsart->rx_buf+pUsart->rx_idx);
+			msg[0].dLen = pUsart->rx_cnt - 1;
+			OSMboxPost(usart.mbox, &msg[0]);
 			break;
 		case _CMD_LED_CTRL://0x0d LED灯控制
 		{

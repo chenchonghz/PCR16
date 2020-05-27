@@ -159,11 +159,15 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 			}
 			else if(appdis.pUI->ctrl_id == 3)	{//DNA 
 				DisplayMenuUI();
-				ResetTempDataDNA();
+				if(Sys.devstate != DevState_Running)	{
+					ResetTempDataDNA();
+				}
 			}
 			else if(appdis.pUI->ctrl_id == 4)	{//RNA
 				DisplayMenuUI();
-				ResetTempDataRNA();
+				if(Sys.devstate != DevState_Running)	{
+					ResetTempDataRNA();
+				}
 			}
 			else if(appdis.pUI->ctrl_id == 5)	{//Êý¾Ý
 				appdis.pUI->screen_id = Data_UIID;
