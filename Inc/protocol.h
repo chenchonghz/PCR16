@@ -63,6 +63,9 @@ typedef enum {
 	_CMD_DBG_MoveAnyPosAtReset = 0x0F,//移动电机
 	_CMD_GetMotorStatus	= 0x10,//查询电机状态
 	_CMD_GetMotorPositon	= 0x11,//获取电机位置
+	_CMD_ReadFlashSpace	= 0x12,//获取存储信息
+	_CMD_SetTemp	= 0x13,//设置模块温度
+	_CMD_GetTemp	= 0x14,//读取模块温度
 	_CMD_ACK	= 0XF8,//ack cmd
 } EMessageCmd;
 

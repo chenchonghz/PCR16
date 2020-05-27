@@ -3,6 +3,7 @@
 
 #include "includes.h"
 #include "TempCalc.h"
+#include "PID.h"
 
 #define	HOLE_TEMP		0
 #define	COVER_TEMP		1
@@ -31,5 +32,7 @@ typedef struct _app_temp	{
 void AppTempInit (void);
 u8 StartAPPTempCtrl(void);
 void StopAPPTempCtrl(void);
+s16 GetCoverTemperature(void);
+s16 GetHoleTemperature(void);
 #endif
 

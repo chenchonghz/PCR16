@@ -1,6 +1,5 @@
 #include "app_temp.h"
 #include "ad7124.h"
-#include "PID.h"
 #include "timer.h"
 #include "app_spiflash.h"
 #include "app_motor.h"
@@ -150,7 +149,7 @@ void TempProgramLookOver(s16 c_temp)
 	target = temp_data.stage[m].step[n].temp;
 	if(abs(c_temp-target)>100)	{//温度差大于1度 当前处于升降温阶段		
 		ConstantTempCnt = 0;
-		SetPIDTarget(TempPid[HOLE_TEMP].PIDid, target);
+		SetPIDTarget(PID_ID1, target);
 		hengwenflag = 0;
 	}
 	else {//到达目标温度 当前处于恒温阶段
@@ -181,14 +180,15 @@ static void AppTempTask (void *parg)
 //	COOLFAN_ON();
 //	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
 	SetPIDVal(PID_ID1, 0.0, 0.0, 0.0);
+	
 	for(;;)
     {
-		if(Sys.devstate == DevState_Running)	
+		if(Sys.devstate == DevState_Running||Sys.devsubstate == DevSubState_DebugTemp)	
 		{
 			if(CalcTemperature(GetADCVol(TEMP_ID1), &cur_temp)==0)	{//计算模块温度
 				TempProgramLookOver(cur_temp);
 				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
-//				SetPIDTarget(TempPid[HOLE_TEMP].PIDid, TempPid[HOLE_TEMP].target_t);//设置控制目标
+//				SetPIDTarget(PID_ID1, TempPid[HOLE_TEMP].target_t);//设置控制目标
 				TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
 			}else	{//温度传感器脱落
 			
@@ -200,7 +200,7 @@ static void AppTempTask (void *parg)
 			}
 			if(CalcTemperature(GetADCVol(TEMP_ID3), (s32 *)&cur_temp)==0)	{
 				app_temp.current_t[TEMP_ID3] = cur_temp;
-//				SetPIDTarget(TempPid[COVER_TEMP].PIDid, TempPid[COVER_TEMP].target_t);//设置控制目标
+//				SetPIDTarget(PID_ID2, TempPid[COVER_TEMP].target_t);//设置控制目标
 //				TempCtrl(&TempPid[COVER_TEMP], cur_temp);//热盖pid调节 增量法计算
 			}else	{
 			
@@ -221,3 +221,14 @@ static void AppTempTask (void *parg)
 		OSTimeDly(80);
 	}
 }
+
+s16 GetCoverTemperature(void)
+{
+	return app_temp.current_t[TEMP_ID3];
+}
+
+s16 GetHoleTemperature(void)
+{
+	return app_temp.current_t[TEMP_ID1];
+}
+

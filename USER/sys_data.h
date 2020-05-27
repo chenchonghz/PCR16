@@ -45,8 +45,9 @@ enum devstate	{
 	DevState_Debug,
 };
 //设备运行子模式
-enum devsubstate	{
+enum devsubstate	{	
 	DevSubState_Fluo=3,//荧光采集中
+	DevSubState_DebugTemp=4,
 	DevSubState_Unkown=0xff,//未知
 };
 

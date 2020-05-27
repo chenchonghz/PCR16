@@ -4,6 +4,7 @@
 #include "app_motor.h"
 #include "protocol.h"
 #include "PD_DataProcess.h"
+#include "app_temp.h"
 
 //static  message_pkt_t    msg_pkt_pro;
 static u8 data_buf[100];
@@ -170,6 +171,38 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			break;
 		case _CMD_GetMotorPositon://0x11,//获取电机位置
 			temp = StepsToLen(&tMotor[MOTOR_ID1]);
+			memcpy(data_buf,(u8 *)&temp, 2);
+			msg[1].Data = data_buf;
+			msg[1].dLen = 2;
+			OSMboxPost(usart.mbox, &msg[1]);
+			break;
+		case _CMD_SetTemp:// 0x13,//设置模块温度
+			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			data = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			temp = (s16)UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+			if(iPara==0)	{//控制模块温度			
+				SetPIDTarget(PID_ID1, temp);
+			}else if(iPara==1)	{//控制热盖温度
+				SetPIDTarget(PID_ID2, temp);
+			}
+			if(data==0)	{//停止
+				Sys.devstate = DevState_IDLE;
+				Sys.devsubstate = DevSubState_Unkown;
+			}else if(data==1)	{//启动
+				Sys.devstate = DevState_Debug;
+				Sys.devsubstate = DevSubState_DebugTemp;
+			}						
+			break;
+		case _CMD_GetTemp://0x14,//读取模块温度
+			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			if(iPara==0)	{//读取模块温度	
+				temp = GetHoleTemperature();				
+			}
+			else if(iPara==1)	{//读取热盖温度
+				temp = GetCoverTemperature();
+			}
+			else 
+				break;
 			memcpy(data_buf,(u8 *)&temp, 2);
 			msg[1].Data = data_buf;
 			msg[1].dLen = 2;
