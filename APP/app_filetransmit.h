@@ -30,6 +30,7 @@ typedef struct _transmit_ctrl {
     INT32U  size_total;                     // 文件总大小
     INT32U  size_cnt;                       // 单帧字节数
     INT32U  frame_cnt;                      // transmit帧计数器
+	INT32U  frame_total;
     INT32U  calcsum;                        // transmit计算校验和
     INT32U  chksum;                         // 校验和
     void (* call_begin)(struct _transmit_ctrl *);     // 启动回调
@@ -37,6 +38,7 @@ typedef struct _transmit_ctrl {
     void (* call_end)(struct _transmit_ctrl *);       // 结束回调
 } transmit_ctrl_t;
 
+extern app_filetransmit_t	app_filetransmit;
 void AppFileTransmitInit(void);
 void UploadFileOpt(transmit_ctrl_t *ptfile, message_pkt_t *pmsg);
 #endif

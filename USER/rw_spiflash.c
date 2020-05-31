@@ -5,11 +5,7 @@
 #define FORMAT_DISK			0
 _labtemplatelist_t gLabTemplatelist;
 
-struct _flashfs	{
-//	DIR dir;
-	FATFS *fs;
-	FIL	*fil;
-} flashfs;
+_flashfs_t flashfs;
 
 _loginfor_t LogInfor;
 
@@ -424,7 +420,7 @@ int AnalysisCalibrateRes(void)
 	f_read(flashfs.fil, (u8 *)HolePos.pos, sizeof(HolePos.pos), NULL);
 	f_read(flashfs.fil, (u8 *)gPD_Data.PDBaseBlue, sizeof(gPD_Data.PDBaseBlue), NULL);
 	f_read(flashfs.fil, (u8 *)gPD_Data.PDBaseGreen, sizeof(gPD_Data.PDBaseGreen), NULL);
-_exit:
+
 	f_close(flashfs.fil);
 	return 1;
 }

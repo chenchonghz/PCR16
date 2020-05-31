@@ -35,4 +35,5 @@ typedef struct _usart {
 extern usart_t      usart;
 void UART1_DMA_Callback(DMA_HandleTypeDef *hdma);
 void AppUsartInit(void);
+void UsartSendAck(message_pkt_t *pMsg, INT8U ack);
 #endif

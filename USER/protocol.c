@@ -5,7 +5,7 @@
 #include "protocol.h"
 #include "PD_DataProcess.h"
 #include "app_temp.h"
-
+#include "app_filetransmit.h"
 //static  message_pkt_t    msg_pkt_pro;
 static u8 data_buf[100];
 
@@ -118,13 +118,13 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			msg[0].Src = MSG_FILETRANSMIT_DOWNLOAD;
 			msg[0].Data = (u8 *)(pUsart->rx_buf+pUsart->rx_idx);
 			msg[0].dLen = pUsart->rx_cnt - 1;
-			OSMboxPost(usart.mbox, &msg[0]);
+			OSMboxPost(app_filetransmit.Mbox, &msg[0]);
 			break;
 		case _CMD_FILETRANSMIT_UPLOAD://0X0B 读取文件
 			msg[0].Src = MSG_FILETRANSMIT_UPLOAD;
 			msg[0].Data = (u8 *)(pUsart->rx_buf+pUsart->rx_idx);
 			msg[0].dLen = pUsart->rx_cnt - 1;
-			OSMboxPost(usart.mbox, &msg[0]);
+			OSMboxPost(app_filetransmit.Mbox, &msg[0]);
 			break;
 		case _CMD_LED_CTRL://0x0d LED灯控制
 		{

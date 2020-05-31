@@ -28,9 +28,14 @@ typedef struct _labtemplatelist	{
 	_labtemplate_t list[LabTemplateMax];
 }_labtemplatelist_t;
 
-extern _labtemplatelist_t gLabTemplatelist;
+typedef struct _flashfs	{
+//	DIR dir;
+	FATFS *fs;
+	FIL	*fil;
+} _flashfs_t;
 
-extern struct _flashfs flashfs;
+extern _labtemplatelist_t gLabTemplatelist;
+extern _flashfs_t flashfs;
 extern _loginfor_t LogInfor;
 //void fs_test();
 int FlashFSInit(void);
