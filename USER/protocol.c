@@ -115,12 +115,20 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
 		case _CMD_FILETRANSMIT_DOWNLOAD://0X0A,//下载文件
+			if(GetTransmitState() == DEF_Busy)	{
+				ack_state = ACK_BUSY;
+				break;
+			}
 			msg[0].Src = MSG_FILETRANSMIT_DOWNLOAD;
 			msg[0].Data = (u8 *)(pUsart->rx_buf+pUsart->rx_idx);
 			msg[0].dLen = pUsart->rx_cnt - 1;
 			OSMboxPost(app_filetransmit.Mbox, &msg[0]);
 			break;
 		case _CMD_FILETRANSMIT_UPLOAD://0X0B 读取文件
+			if(GetTransmitState() == DEF_Busy)	{
+				ack_state = ACK_BUSY;
+				break;
+			}
 			msg[0].Src = MSG_FILETRANSMIT_UPLOAD;
 			msg[0].Data = (u8 *)(pUsart->rx_buf+pUsart->rx_idx);
 			msg[0].dLen = pUsart->rx_cnt - 1;

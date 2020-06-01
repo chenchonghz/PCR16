@@ -10,5 +10,5 @@ INT16U CRC16_Sum(INT8U *dat, INT8U len);
 u8 BubbleSort(u8 *pbuf,u32 size);
 u8 BCD_Decimal(u8 bcd);
 s16 FUN_MIN16S(s16 x, s16 y);
-
+void split(char *src,const char *separator,char **dest,u16 *num);
 #endif

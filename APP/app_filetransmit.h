@@ -3,7 +3,9 @@
 
 #include "includes.h"
 
-#define	TransmitMaxBufSize 	1024
+#define	TransmitBufMaxSize 	1024
+#define	TransmitFileMaxSize 	102400//100kb
+#define	TransmitFilePathSize 	32
 
 typedef struct _app_filetransmit_t {
     OS_EVENT            *Mbox;
@@ -16,15 +18,21 @@ typedef enum {
     TransmitCmd_End       = 0x04,     // 传输结束
 } Transmit_cmd_t;
 
+typedef enum {
+	TransmitType_Unkown = 0,
+	TransmitType_FW = 1,
+	TransmitType_File = 2,
+}TransmitType;
+
 typedef struct _transmit_ctrl {
     INT8U   state;                          // transmit状态
     INT8U   ack;                            // transmit ACK
     INT8U   trans_start;                     // transmit启动
-    INT8U   trans_last;                      // transmit结束
+    INT8U   trans_type;                      // transmit结束
     INT8U   trans_is_ok;                   // transmit是否成功
     INT16U  trans_cnt;                       // 一次收发计数器
     INT8U  *const buf_addr;                 // transmit缓存起始地址
-    char  filepath[64];                      // transmit 文件保存路径
+    char  filepath[TransmitFilePathSize];                      // transmit 文件保存路径
 	FILE	*fp;
     INT32U const size_max;                  // 可存储最大量
     INT32U  size_total;                     // 文件总大小
@@ -40,6 +48,6 @@ typedef struct _transmit_ctrl {
 
 extern app_filetransmit_t	app_filetransmit;
 void AppFileTransmitInit(void);
-void UploadFileOpt(transmit_ctrl_t *ptfile, message_pkt_t *pmsg);
+u8 GetTransmitState(void);
 #endif
 
