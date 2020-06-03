@@ -22,26 +22,24 @@ static void DataInit(void)
 	LogInfor.pbuf = (char *)user_malloc(LOG_BUF);//日志缓存
 }
 //u8 devid[2];
-void CheckSPIFlash(void)
+u8 CheckSPIFlash(void)
 {
 	u8 devid[2];
 	
 	BSP_W25Qx_Read_ID(devid);
-	if(devid[0] == W25QXX_MANUFACTURER_ID)	{//devid[1] -- DEVICE_ID; devid[0] -- MANUFACTURER_ID 
-		BSP_PRINTF("SPI FLASH OK.");
+	if(devid[0] == W25QXX_MANUFACTURER_ID)	{//devid[1] -- DEVICE_ID; devid[0] -- MANUFACTURER_ID 		
 		SysError.Y2.bits.b7 = DEF_Active;
+		return 1;
 	}else	{
-		BSP_PRINTF("SPI FLASH error.");
 		SysError.Y2.bits.b7 = DEF_Inactive;
 	}
+	return 0;
 }
 //通过任务写log
 u8 WriteLogToBuff(char *str)
 {
 	char *pbuf;
 	u8 len, log_len;
-//	RTC_TimeTypeDef sTime = {0};
-//	RTC_DateTypeDef sDate = {0};
 	
 	if(LogInfor.len>=LOG_BUF)
 		return 0;
@@ -69,19 +67,14 @@ static void TaskSPIFLASH(void * ppdata)
 	ppdata = ppdata;
 	
 	DataInit();
-	CheckSPIFlash();
-	if(SysError.Y2.bits.b7 == DEF_Active)	{
+	
+	if(CheckSPIFlash() == 1)	{
 		if(FlashFSInit()==FR_OK)	{
 			BSP_PRINTF("filesys init ok");		
-			CreateSysFile();//创建系统文件
-			ReadLabTemplateList();
-			AnalysisCalibrateRes();//从文件解析校准结果
 		}
 	}
 	OSFlagPost(SysFlagGrp, (OS_FLAGS)FLAG_GRP_2, OS_FLAG_SET, &err);
 	
-//		WriteTempJsonFile();
-//	ReadTempJsonFile();
 	for(;;)
 	{
 		msg = (message_pkt_t *)OSQPend(spiflash.MSG_Q, 0, &err);//
@@ -89,12 +82,6 @@ static void TaskSPIFLASH(void * ppdata)
 			if(SysError.Y2.bits.b7 == DEF_Active)	{
 				if(msg->Src == MSG_WRITELOG)	{//写日志
 					write_log();
-				}
-				else if(msg->Src == MSG_WriteLabTemplate)	{//保存灌注数据
-					WriteLabTemplate();
-				}
-				else if(msg->Src == MSG_WriteCaliRes)	{
-					WriteCalibrateRes();
 				}
 			}
 		}else if(err==OS_ERR_TIMEOUT)	{

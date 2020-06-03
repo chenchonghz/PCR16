@@ -1,5 +1,4 @@
 #include "timer.h"
-#include "motor.h"
 
 _softtimer_t SoftTimer1,SoftTimer2;
 

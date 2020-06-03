@@ -4,7 +4,6 @@
 #include "includes.h"
 #include "DaCai_ProtoAnalysis.h"
 #include "DaCai_API.h"
-#include "LIFO_buffer.h"
 
 typedef struct _appdisplay	{
 	OS_EVENT		*sem;

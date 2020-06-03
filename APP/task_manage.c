@@ -4,12 +4,8 @@
 #include "app_spiflash.h"
 #include "app_display.h"
 //#include "sys_monitor.h"
-#include "app_fluo.h"
-#include "app_motor.h"
-#include "app_temp.h"
-#include "app_ad.h"
 #include "app_usart.h"
-#include "app_filetransmit.h"
+
 //////////////////////////////////////////////////////////
 __align(4) OS_STK  TASK_START_STK[STK_SIZE_START]; //任务堆栈声明
 
@@ -53,15 +49,9 @@ static void TaskStart(void * ppdata)
 /////////////////////////////////////////////////////////////////////////////
 //创建其他所有任务 在这里我建立了个LED闪烁的任务当例子
 static void TaskCreateOther(void)
-{
-	AppADInit();	
-	AppTempInit();	
-	AppFluoInit();
-	AppMotorInit();		
+{	
 	AppDisplayInit();
 	AppUsartInit();
-//	AppSysmonitorInit();
-	AppFileTransmitInit();
 	AppSpiFlashInit();
 	AppUSBInit();	
 }

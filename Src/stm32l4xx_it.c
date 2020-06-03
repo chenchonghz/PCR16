@@ -24,7 +24,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "includes.h"
-#include "motor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,16 +58,12 @@
 
 /* External variables --------------------------------------------------------*/
 extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
-extern TIM_HandleTypeDef htim3;
-extern TIM_HandleTypeDef htim6;
-extern TIM_HandleTypeDef htim7;
 extern DMA_HandleTypeDef hdma_uart4_tx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 #include "app_display.h"
-#include "app_ad.h"
 #include "app_usart.h"
 
 extern void UART2_DMA_Callback(DMA_HandleTypeDef *hdma);
@@ -245,33 +240,6 @@ OSIntExit();
 }
 
 /**
-  * @brief This function handles TIM3 global interrupt.
-  */
-void TIM3_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM3_IRQn 0 */
-OSIntEnter();
-	if(__HAL_TIM_GET_FLAG(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE)==SET)	{
-		__HAL_TIM_CLEAR_FLAG(tMotor[MOTOR_ID1].tmr, TIM_IT_UPDATE);  //清除TIMx的中断待处理位:TIM 中断源 
-		if(tMotor[MOTOR_ID1].status.is_run == MotorState_Run)      {
-			if(tMotor[MOTOR_ID1].Dir == MOTOR_TO_MIN)
-				tMotor[MOTOR_ID1].CurSteps--;
-			else
-				tMotor[MOTOR_ID1].CurSteps++;
-			
-			tMotor[MOTOR_ID1].StepCnt++;          
-			if ((void *)tMotor[MOTOR_ID1].StepsCallback != (void *)0) {
-				(*tMotor[MOTOR_ID1].StepsCallback)(&tMotor[MOTOR_ID1]);
-			}
-		}
-	}
-  /* USER CODE END TIM3_IRQn 0 */
-  /* USER CODE BEGIN TIM3_IRQn 1 */
-OSIntExit();
-  /* USER CODE END TIM3_IRQn 1 */
-}
-
-/**
   * @brief This function handles USART2 global interrupt.
   */
 void USART2_IRQHandler(void)
@@ -286,14 +254,7 @@ OSIntEnter();//上位机通讯
 		}
 	}
   /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);	
-	if(__HAL_UART_GET_FLAG(usart.port, UART_FLAG_ORE)==SET)	{
-		__HAL_UART_CLEAR_OREFLAG(usart.port);
-	}
-	if(__HAL_UART_GET_FLAG(usart.port, UART_CLEAR_TCF)==SET)	{
-		usart.port->gState = HAL_UART_STATE_READY;
-		__HAL_UART_CLEAR_FLAG(usart.port,UART_CLEAR_TCF);
-	}
+  HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
 OSIntExit();
   /* USER CODE END USART2_IRQn 1 */
@@ -327,48 +288,6 @@ OSIntEnter();
   /* USER CODE BEGIN UART4_IRQn 1 */
 OSIntExit();
   /* USER CODE END UART4_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM6 global interrupt, DAC channel1 and channel2 underrun error interrupts.
-  */
-void TIM6_DAC_IRQHandler(void)
-{
-	static u32 time_cnt;
-  /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
-OSIntEnter();
-	if(__HAL_TIM_GET_FLAG(&htim6, TIM_IT_UPDATE)==SET)	{
-		__HAL_TIM_CLEAR_FLAG(&htim6, TIM_IT_UPDATE);
-		ad7124_cs_low();		
-		time_cnt++;
-		if((time_cnt%10)==0)	{//加减速时间间隔1ms
-			MotorAccDec(&tMotor[MOTOR_ID1]);//电机加减速			
-		}
-		if(app_ad.rflag == DEF_False&&AD7124_DATA_READY()==0)	{//ad7124转换结果查询
-			OSSemPost(app_ad.sem);//启动ad任务 读取ad转换结果及数据处理
-		}
-	}
-  /* USER CODE END TIM6_DAC_IRQn 0 */
-  /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
-OSIntExit();
-  /* USER CODE END TIM6_DAC_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM7 global interrupt.
-  */
-void TIM7_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM7_IRQn 0 */
-OSIntEnter();
-	if(__HAL_TIM_GET_FLAG(&htim7, TIM_IT_UPDATE)==SET)	{
-		__HAL_TIM_CLEAR_FLAG(&htim7, TIM_IT_UPDATE); 
-		SoftTimerCallback();
-	}
-  /* USER CODE END TIM7_IRQn 0 */
-  /* USER CODE BEGIN TIM7_IRQn 1 */
-OSIntExit();
-  /* USER CODE END TIM7_IRQn 1 */
 }
 
 /**

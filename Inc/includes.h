@@ -35,7 +35,7 @@
 #include "usb_host.h"
 #include "misc.h"
 #include "bsp.h"
-#include "tim.h"
+//#include "tim.h"
 #include "task_config.h"
 #include "task_manage.h"
 #include "timer.h"

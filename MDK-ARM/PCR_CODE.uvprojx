@@ -369,7 +369,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32L476xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                      ../Drivers/STM32L4xx_HAL_Driver/Inc;                      ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                      ../Middlewares/Third_Party/FatFs/src;                      ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;                      ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;                      ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                      ../Drivers/CMSIS/Include;                      ..\BSP;                      ..\USER;                      ..\APP;                      ..\UCOSII\CONFIG;                      ..\UCOSII\PORT;                      ..\UCOSII\CORE</IncludePath>
+              <IncludePath>../Inc;                        ../Drivers/STM32L4xx_HAL_Driver/Inc;                        ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                        ../Middlewares/Third_Party/FatFs/src;                        ../Middlewares/ST/STM32_USB_Host_Library/Core/Inc;                        ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc;                        ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                        ../Drivers/CMSIS/Include;                        ..\BSP;                        ..\USER;                        ..\APP;                        ..\UCOSII\CONFIG;                        ..\UCOSII\PORT;                        ..\UCOSII\CORE</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -436,6 +436,51 @@
               <FileName>bsp_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\bsp_spi.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>2</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>bsp_printf.c</FileName>
@@ -488,21 +533,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>bsp_ad7124.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BSP\bsp_ad7124.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_tmc260.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BSP\bsp_tmc260.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_max5401.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BSP\bsp_max5401.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BSP\bsp_rtc.c</FilePath>
@@ -528,11 +558,6 @@
               <FilePath>..\USER\sys_data.c</FilePath>
             </File>
             <File>
-              <FileName>motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\motor.c</FilePath>
-            </File>
-            <File>
               <FileName>rw_spiflash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\rw_spiflash.c</FilePath>
@@ -546,6 +571,51 @@
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\timer.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>2</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>msg.c</FileName>
@@ -556,11 +626,6 @@
               <FileName>spiflash_fs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\spiflash_fs.c</FilePath>
-            </File>
-            <File>
-              <FileName>ad7124.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\ad7124.c</FilePath>
             </File>
             <File>
               <FileName>DaCai_API.c</FileName>
@@ -588,21 +653,6 @@
               <FilePath>..\USER\ring_buffer.c</FilePath>
             </File>
             <File>
-              <FileName>LIFO_buffer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\LIFO_buffer.c</FilePath>
-            </File>
-            <File>
-              <FileName>PID.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\PID.c</FilePath>
-            </File>
-            <File>
-              <FileName>TempCalc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TempCalc.c</FilePath>
-            </File>
-            <File>
               <FileName>misc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\misc.c</FilePath>
@@ -613,19 +663,9 @@
               <FilePath>..\USER\DaCai_TouchEvent.c</FilePath>
             </File>
             <File>
-              <FileName>json.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\json.c</FilePath>
-            </File>
-            <File>
               <FileName>protocol.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\protocol.c</FilePath>
-            </File>
-            <File>
-              <FileName>PD_DataProcess.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\PD_DataProcess.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -653,39 +693,14 @@
               <FilePath>..\APP\app_udisk.c</FilePath>
             </File>
             <File>
-              <FileName>app_motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\app_motor.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_ad.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\app_ad.c</FilePath>
-            </File>
-            <File>
               <FileName>app_display.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_display.c</FilePath>
             </File>
             <File>
-              <FileName>app_temp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\app_temp.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_fluo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\app_fluo.c</FilePath>
-            </File>
-            <File>
               <FileName>app_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\app_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_filetransmit.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\app_filetransmit.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -726,11 +741,6 @@
               <FileName>spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/tim.c</FilePath>
             </File>
             <File>
               <FileName>usart.c</FileName>
@@ -1047,9 +1057,6 @@
         <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
-        <Group>
-          <GroupName>::Data Exchange</GroupName>
-        </Group>
       </Groups>
     </Target>
   </Targets>
@@ -1063,21 +1070,13 @@
           <targetInfo name="PCR_CODE"/>
         </targetInfos>
       </component>
-      <component Cclass="Data Exchange" Cgroup="JSON" Csub="Jansson" Cvendor="Keil" Cversion="2.7.0" condition="ARMCC">
-        <package license="doc\license.txt" name="Jansson" schemaVersion="1.0" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
-        <targetInfos>
-          <targetInfo name="PCR_CODE"/>
-        </targetInfos>
-      </component>
     </components>
     <files>
       <file attr="config" category="source" name="src\jansson_config.c" version="2.7.0">
-        <instance index="0">RTE\Data_Exchange\jansson_config.c</instance>
+        <instance index="0" removed="1">RTE\Data_Exchange\jansson_config.c</instance>
         <component Cclass="Data Exchange" Cgroup="JSON" Csub="Jansson" Cvendor="Keil" Cversion="2.7.0" condition="ARMCC"/>
         <package license="doc\license.txt" name="Jansson" schemaVersion="1.0" url="http://www.keil.com/pack/" vendor="Keil" version="1.0.0"/>
-        <targetInfos>
-          <targetInfo name="PCR_CODE"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
     </files>
   </RTE>

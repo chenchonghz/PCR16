@@ -58,10 +58,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MAX5401_CS1_Pin GPIO_PIN_13
-#define MAX5401_CS1_GPIO_Port GPIOC
-#define MAX5401_CS2_Pin GPIO_PIN_14
-#define MAX5401_CS2_GPIO_Port GPIOC
 #define EquipFanCtrl_Pin GPIO_PIN_0
 #define EquipFanCtrl_GPIO_Port GPIOC
 #define CoolFanCtrl_Pin GPIO_PIN_1
@@ -116,10 +112,6 @@ void Error_Handler(void);
 #define LimitSwitchLeft_Pin GPIO_PIN_4
 #define LimitSwitchLeft_GPIO_Port GPIOB
 #define LimitSwitchLeft_EXTI_IRQn EXTI4_IRQn
-#define MAX5401_SCLK_Pin GPIO_PIN_8
-#define MAX5401_SCLK_GPIO_Port GPIOB
-#define MAX5401_DIN_Pin GPIO_PIN_9
-#define MAX5401_DIN_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
