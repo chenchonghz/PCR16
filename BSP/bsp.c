@@ -89,30 +89,31 @@ void FluoLED_OnOff(u8 led_t, u8 onoff)
 //	UsbPowerDisable();
 //	SysPowerDisable();
 //}
-////系统复位
-//void SoftReset(void)
-//{
-//	__set_FAULTMASK(1);      // 关闭所有中端
-//	NVIC_SystemReset();// 复位
-//}
-//#define 	RunIAPKeyword               0xA5A55A5A
-//#define		ApplicationUpgradeKeywordAddr		0x080FF800
-//void FWUpdate_reboot(void)
-//{
-//	FLASH_EraseInitTypeDef f;
-//	f.TypeErase = FLASH_TYPEERASE_PAGES;
-//	f.Page = 511;
-//	f.NbPages = 1;
-//	f.Banks = FLASH_BANK_2;
-//	//设置PageError
-//	uint32_t PageError = 0;
-//	HAL_FLASH_Unlock();
-//	HAL_FLASHEx_Erase(&f, &PageError);	//调用擦除函数	
-//	if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD,ApplicationUpgradeKeywordAddr, RunIAPKeyword) == HAL_OK) {
-//		HAL_FLASH_Lock();
-//		SYS_PRINTF("SYS Reboot");
-//		OSTimeDly(1000);
-//		SoftReset();//RUN IAP
-//	}
-//	HAL_FLASH_Lock();
-//}
+//系统复位
+void SoftReset(void)
+{
+	__set_FAULTMASK(1);      // 关闭所有中端
+	NVIC_SystemReset();// 复位
+}
+//固件升级 复位
+#define 	RunIAPKeyword               0xA5A55A5A
+#define		ApplicationUpgradeKeywordAddr		0x080FF800
+void FWUpdate_reboot(void)
+{
+	FLASH_EraseInitTypeDef f;
+	f.TypeErase = FLASH_TYPEERASE_PAGES;
+	f.Page = 511;
+	f.NbPages = 1;
+	f.Banks = FLASH_BANK_2;
+	//设置PageError
+	uint32_t PageError = 0;
+	HAL_FLASH_Unlock();
+	HAL_FLASHEx_Erase(&f, &PageError);	//调用擦除函数	
+	if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD,ApplicationUpgradeKeywordAddr, RunIAPKeyword) == HAL_OK) {
+		HAL_FLASH_Lock();
+		SYS_PRINTF("SYS Reboot");
+		OSTimeDly(1000);
+		SoftReset();//RUN IAP
+	}
+	HAL_FLASH_Lock();
+}

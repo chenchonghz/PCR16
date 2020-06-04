@@ -32,7 +32,7 @@
 #define SysState_StepTB					DEF_BIT07_MASK
 #define SysState_AddStep					DEF_BIT08_MASK
 #define SysState_AddStage				DEF_BIT09_MASK
-//#define SysState_CaliHolePDBase				DEF_BIT10_MASK
+#define SysState_UpdataFWTB				DEF_BIT10_MASK
 #define SysState_CaliHolePostion				DEF_BIT11_MASK
 #define SysState_CollHolePD			DEF_BIT12_MASK
 //设备运行模式

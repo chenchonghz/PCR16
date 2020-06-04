@@ -261,15 +261,15 @@ void DownloadFileOpt(transmit_ctrl_t *ptfile, message_pkt_t *pmsg)
     {
         case TransmitCmd_Start:
             if (ptfile->state == DEF_Idle) {
-				ptfile->trans_type = pdata[1];//传输文件类型
-				tmp.ubyte[0] = pdata[2];
-                tmp.ubyte[1] = pdata[3];
-                tmp.ubyte[2] = pdata[4];
-                tmp.ubyte[3] = pdata[5];
+//				ptfile->trans_type = pdata[1];//传输文件类型
+				tmp.ubyte[0] = pdata[1];
+                tmp.ubyte[1] = pdata[2];
+                tmp.ubyte[2] = pdata[3];
+                tmp.ubyte[3] = pdata[4];
                 ptfile->size_total = tmp.uword;//文件大小				
-				if(ptfile->size_total>0&&ptfile->size_total<TransmitFileMaxSize&&strlen((char *)&pdata[6])<TransmitFilePathSize)
+				if(ptfile->size_total>0&&ptfile->size_total<TransmitFileMaxSize&&strlen((char *)&pdata[5])<TransmitFilePathSize)
 				{//下发文件大小和文件名长度检查，文件小于100kb 文件名长度小于32byte
-					strcpy(ptfile->filepath, (char *)&pdata[6]);//保存文件路径
+					strcpy(ptfile->filepath, (char *)&pdata[5]);//保存文件路径
 					ptfile->call_begin    = &download_start;
 //					ptfile->call_transmit = &download_transmit;
 					ptfile->call_end      = &download_end;
@@ -349,6 +349,11 @@ static void TaskFileTransmit(void * ppdata)
 		}
 		else if(msg->Src == MSG_FILETRANSMIT_DOWNLOAD)	{//文件下载操作
 			DownloadFileOpt(&transmit_ctrl, msg);
+		}
+		else if(msg->Src == MSG_JUMP_IAP)	{
+			 INT8U  *pdata = (INT8U *)msg->Data;
+			if(pdata[0] == TYPE_JumpToIap)
+				FWUpdate_reboot();//进入IAP 升级固件
 		}
 	}
 }

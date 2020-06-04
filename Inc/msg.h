@@ -33,6 +33,7 @@ typedef enum _message_src{
 	MSG_MESSAGE_DSIPLAY,
 	MSG_WARNING_DSIPLAY,
 	MSG_NONE_DSIPLAY,
+	MSG_JUMP_IAP,
 } message_src_t;
 
 typedef struct _message_pkt {

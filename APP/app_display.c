@@ -532,6 +532,11 @@ static void ScreenDataProcess(_dacai_usart_t *pUsart)
 				Sys.state &= ~SysState_AddStage;
 				return;
 			}
+			else if(Sys.state & SysState_UpdataFWTB)	{//升级固件
+				Sys.state &= ~SysState_UpdataFWTB;
+				FWUpdate_reboot();//进入IAP 升级固件
+				return;
+			}
 		}
 		else	if(appdis.pUI->ctrl_id == 6)	{//退出键
 			
@@ -572,6 +577,16 @@ static void TaskDisplay(void * ppdata)
 		if(err==OS_ERR_NONE)    {
 			if(msg->Src==USART_MSG_RX_TASK)	{//屏串口回复事件
 				UsartCmdParsePkt(appdis.pDaCai->puart_t);//解析串口数据				
+			}
+			else if(msg->Src == MSG_MESSAGE_DSIPLAY)	{//显示其它任务需要显示的内容
+				DisplayMessageUI((char *)msg->Data, 1);
+			}
+			else if(msg->Src == MSG_WARNING_DSIPLAY)	{
+				DisplayWarningUI((char *)appdis.pUI->pdata, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
+			}
+			else if(msg->Src == MSG_NONE_DSIPLAY)	{
+				DaCai_SwitchUI(appdis.pUI);
+				appdis.pUI->sub_screen_id = Invalid_UIID;
 			}
 		}
 		else if(err==OS_ERR_TIMEOUT)	{

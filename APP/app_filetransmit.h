@@ -24,6 +24,12 @@ typedef enum {
 	TransmitType_File = 2,
 }TransmitType;
 
+typedef enum {
+	TYPE_JumpToIap = 0X05,////jump to IAP
+	TYPE_JumpToApp = 0x06,//jump to APP
+} UpdateType;
+
+
 typedef struct _transmit_ctrl {
     INT8U   state;                          // transmit״̬
     INT8U   ack;                            // transmit ACK

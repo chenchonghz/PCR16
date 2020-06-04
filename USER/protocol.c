@@ -134,6 +134,20 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			msg[0].dLen = pUsart->rx_cnt - 1;
 			OSMboxPost(app_filetransmit.Mbox, &msg[0]);
 			break;
+		case _CMD_UPDATE_FW://0x0c 固件升级
+			if(GetTransmitState() == DEF_Busy)	{
+				ack_state = ACK_BUSY;
+				break;
+			}
+			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			if(iPara==1)	{//主板固件升级
+				msg[0].Data = (u8 *)(pUsart->rx_buf+pUsart->rx_idx);
+				msg[0].dLen = pUsart->rx_cnt - 1;
+				msg[0].Src = MSG_JUMP_IAP;
+				OSMboxPost(app_filetransmit.Mbox, &msg[0]);
+			}
+			ack_state = DEF_Busy;
+			break;
 		case _CMD_LED_CTRL://0x0d LED灯控制
 		{
 			u8 led_type;
