@@ -63,6 +63,7 @@ void MX_USB_HOST_Process(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 #include "task_manage.h"
+#include "iap.h"
 /* USER CODE END 0 */
 
 /**
@@ -90,7 +91,7 @@ int main(void)
   /* USER CODE BEGIN SysInit */
 __set_PRIMASK(1);//¹Ø±Õ×ÜÖÐ¶Ï
   /* USER CODE END SysInit */
-
+run_application();	
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FATFS_Init();

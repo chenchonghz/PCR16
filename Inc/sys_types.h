@@ -147,13 +147,13 @@
 //typedef volatile    unsigned long   const   VINT32UC;   /* Volatile Unsigned 32 bit Constant          */
 //typedef volatile      signed long   const   VINT32SC;   /* Volatile   Signed 32 bit Constant          */
 /************************************* 64-bit DATA TYPE DEFINITION ************************************/
-//typedef          unsigned long long         INT64U;     /*          Unsigned 64 bit Quantity          */
+typedef          unsigned long long         INT64U;     /*          Unsigned 64 bit Quantity          */
 //typedef            signed long long         INT64S;     /*            Signed 64 bit Quantity          */
 //typedef          unsigned long long const   INT64UC;    /*          Unsigned 64 bit Constant          */
 //typedef            signed long long const   INT64SC;    /*            Signed 64 bit Constant          */
-//typedef volatile unsigned long long         VINT64U;    /* Volatile Unsigned 64 bit Quantity          */
+typedef volatile unsigned long long         VINT64U;    /* Volatile Unsigned 64 bit Quantity          */
 //typedef volatile   signed long long         VINT64S;    /* Volatile   Signed 64 bit Quantity          */
-//typedef volatile unsigned long long const   VINT64UC;   /* Volatile Unsigned 64 bit Constant          */
+typedef volatile unsigned long long const   VINT64UC;   /* Volatile Unsigned 64 bit Constant          */
 //typedef volatile   signed long long const   VINT64SC;   /* Volatile   Signed 64 bit Constant          */
 /************************************* Float DATA TYPE DEFINITION *************************************/
 //typedef float                             FP32;       /* Single precision floating point            */
@@ -168,14 +168,14 @@ typedef  unsigned  short        CPU_INT16U;             /* 16-bit unsigned integ
 typedef    signed  short        CPU_INT16S;             /* 16-bit   signed integer                    */
 typedef  unsigned  int          CPU_INT32U;             /* 32-bit unsigned integer                    */
 typedef    signed  int          CPU_INT32S;             /* 32-bit   signed integer                    */
-//typedef  unsigned  long  long   CPU_INT64U;             /* 64-bit unsigned integer                    */
+typedef  unsigned  long  long   CPU_INT64U;             /* 64-bit unsigned integer                    */
 //typedef    signed  long  long   CPU_INT64S;             /* 64-bit   signed integer                    */
 typedef            float        CPU_FP32;               /* 32-bit floating point                      */
 typedef            double       CPU_FP64;               /* 64-bit floating point                      */
 typedef  volatile  CPU_INT08U   CPU_REG08;              /*  8-bit register                            */
 typedef  volatile  CPU_INT16U   CPU_REG16;              /* 16-bit register                            */
 typedef  volatile  CPU_INT32U   CPU_REG32;              /* 32-bit register                            */
-//typedef  volatile  CPU_INT64U   CPU_REG64;              /* 64-bit register                            */
+typedef  volatile  CPU_INT64U   CPU_REG64;              /* 64-bit register                            */
 typedef            void       (*CPU_FNCT_VOID)(void  ); /* See Note #2a.                              */
 typedef            void       (*CPU_FNCT_PTR )(void *); /* See Note #2b.                              */
 /******************************************************************************************************/

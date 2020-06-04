@@ -33,6 +33,7 @@ extern _UI_t UI;
 void DaCaiAPI_Init(void);
 void DaCai_CheckDevice(void);
 void DaCai_SwitchUI(_UI_t *pUI);
+void DaCai_UpdateProgressBar(_UI_t *pUI, u8 value);
 void DaCai_DynamicCtrl(_UI_t *pUI, u8 flag);
 void DaCai_UpdateTXT(_UI_t *pUI);
 void DaCai_ReadTXT(_UI_t *pUI);

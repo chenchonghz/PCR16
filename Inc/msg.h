@@ -16,23 +16,17 @@ typedef enum _message_src{
     MSG_USB_READY,       // u盘事件
 	MSG_USB_START,	// u盘事件
     MSG_SYSTEM_RESTART,//重启
-	MSG_CaliHolePDBase_EVENT,//校准空孔PD本底信号
-	MSG_CaliHolePostion_EVENT,//孔位置校准
-	MSG_CollectHolePD_EVENT,
-	MSG_CalcPD_EVENT,
-	MSG_WriteLabTemplate,
-	MSG_WRITELOG,
-	MSG_WriteCaliRes,
 	MSG_USB_OVC_EVENT,
 	MSG_SYS_SHUTDOWN,
-	MSG_FILETRANSMIT_UPLOAD,//文件上传
-	MSG_FILETRANSMIT_DOWNLOAD,//文件下载
+	MSG_UPDATE_FROM_UDISK,//u盘更新固件
 	MSG_COPY_LOGFILE,
 	MSG_COPY_PERFUSEFILE,
 	MSG_COPY_UPDATE_FW,
 	MSG_MESSAGE_DSIPLAY,
 	MSG_WARNING_DSIPLAY,
 	MSG_NONE_DSIPLAY,
+	MSG_FILETRANSMIT_DOWNLOAD,
+	MSG_JUMP_APP,
 } message_src_t;
 
 typedef struct _message_pkt {

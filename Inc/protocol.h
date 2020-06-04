@@ -58,6 +58,7 @@ typedef enum {
 	_CMD_READ_CalibrateRes = 0X09,//读取校准结果
 	_CMD_FILETRANSMIT_DOWNLOAD	= 0X0A,//下载文件
 	_CMD_FILETRANSMIT_UPLOAD	= 0X0B,	//读取文件
+	_CMD_UPDATE_FW	= 0X0C,	//固件升级
 	_CMD_LED_CTRL	= 0X0D,//LED on/off control
 	_CMD_RESET_MOTOR	= 0X0E,//电机复位
 	_CMD_DBG_MoveAnyPosAtReset = 0x0F,//移动电机

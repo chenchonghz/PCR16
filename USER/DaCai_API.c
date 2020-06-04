@@ -73,6 +73,26 @@ void DaCai_SwitchSubUI(_UI_t *pUI)
 	ptxbuf[len++] = pUI->sub_screen_id;
 	DaCai_SendData(ptxbuf, len);
 }
+//进度条
+void DaCai_UpdateProgressBar(_UI_t *pUI, u8 value)
+{
+	u8 len=0;
+	
+	mutex_lock(dacai.lock);
+	ptxbuf[len++] = DaCaiHEND;
+	ptxbuf[len++] = 0xb1;
+	ptxbuf[len++] = 0x10;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->screen_id;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = pUI->ctrl_id;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = 0;
+	ptxbuf[len++] = value;
+	DaCai_SendData(ptxbuf, len);
+}
+
 //dynamic controls flag 0-启动动画；1-停止
 void DaCai_DynamicCtrl(_UI_t *pUI,u8 flag)
 {

@@ -37,7 +37,7 @@
 #define	MenuResultDat_UIID						19
 #define	Flue_UIID							20
 #define	ResultDat_UIID							21
-
+#define	FWUpdate_UIID							22
 
 #define BUTTON_RELEASE	DEF_False
 #define BUTTON_PRESS		DEF_True

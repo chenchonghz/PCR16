@@ -52,7 +52,7 @@ static void TaskCreateOther(void)
 {	
 	AppDisplayInit();
 	AppUsartInit();
-	AppSpiFlashInit();
+//	AppSpiFlashInit();
 	AppUSBInit();	
 }
 

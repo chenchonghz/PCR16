@@ -4,8 +4,8 @@
 __align(4) OS_STK      AppUsartRxStk       [STK_SIZE_USART_RX];           // Usart接收任务堆栈
 __align(4) OS_STK      AppUsartTxStk       [STK_SIZE_USART_TX];           // Usart发送任务堆栈
 
-#define USART_TXBUFF_SIZE		1026
-#define USART_RXBUFF_SIZE		1026
+#define USART_TXBUFF_SIZE		1036
+#define USART_RXBUFF_SIZE		1036
 usart_t      usart;
 
 message_pkt_t    msg_pkt_usart[2];

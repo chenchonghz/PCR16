@@ -85,9 +85,10 @@ static void TaskDisplay(void * ppdata)
 				DaCai_CheckDevice();//check online
 			}else if(appdis.pDaCai->state==DEF_ONLINE)	{
 				if(appdis.pUI->screen_id == Invalid_UIID)	{
-					OSTimeDly(2000);
-					appdis.pUI->screen_id = Main_UIID;							
-					DaCai_SwitchUI(appdis.pUI);//显示主界面
+					OSTimeDly(1000);
+					appdis.pUI->screen_id = FWUpdate_UIID;
+					appdis.pUI->ctrl_id = 1;
+					DaCai_SwitchUI(appdis.pUI);//显示升级界面
 				}
 			}
 		}

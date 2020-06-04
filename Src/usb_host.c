@@ -113,19 +113,19 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   case HOST_USER_DISCONNECTION:
   Appli_state = APPLICATION_DISCONNECT;
 	msg_pkt_usbhost.Src = MSG_USB_DISCONNECT;
-	OSQPost(appudisk.MSG_Q, &msg_pkt_usbhost);
+	OSMboxPost(appudisk.mbox, &msg_pkt_usbhost);
   break;
 
   case HOST_USER_CLASS_ACTIVE:
   Appli_state = APPLICATION_READY;
 	msg_pkt_usbhost.Src = MSG_USB_READY;
-	OSQPost(appudisk.MSG_Q, &msg_pkt_usbhost);
+	OSMboxPost(appudisk.mbox, &msg_pkt_usbhost);
   break;
 
   case HOST_USER_CONNECTION:
   Appli_state = APPLICATION_START;
 	msg_pkt_usbhost.Src = MSG_USB_START;
-	OSQPost(appudisk.MSG_Q, &msg_pkt_usbhost);
+	OSMboxPost(appudisk.mbox, &msg_pkt_usbhost);
   break;
 
   default:
