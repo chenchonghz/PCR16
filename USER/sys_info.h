@@ -16,7 +16,7 @@
 #define CONFIG_SYSINFO_BoardSN                  		"********"
 #define CONFIG_SYSINFO_HW_Version   				   	"V0.1"
 #define CONFIG_SYSINFO_BOARD_Version                  	"V0.1"
-#define CONFIG_SYSINFO_FW_Version   				   	"V0.0.1M"
+#define CONFIG_SYSINFO_FW_Version   				   	"V0.0.3M"
 #define CONFIG_SYSINFO_BuildDate                      	__DATE__
 #define CONFIG_SYSINFO_BuildTime                     	__TIME__
 #define CONFIG_SYSINFO_Manufacturer                    "TechWay, Inc."

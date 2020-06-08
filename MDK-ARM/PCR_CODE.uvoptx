@@ -172,8 +172,8 @@
           <Number>0</Number>
           <Type>0</Type>
           <LineNumber>277</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134284914</Address>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134348378</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -189,7 +189,7 @@
           <Type>0</Type>
           <LineNumber>4541</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134295956</Address>
+          <Address>134359420</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -204,8 +204,8 @@
           <Number>2</Number>
           <Type>0</Type>
           <LineNumber>307</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134284664</Address>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134348128</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -220,8 +220,8 @@
           <Number>3</Number>
           <Type>0</Type>
           <LineNumber>113</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134284780</Address>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>134348244</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -237,7 +237,7 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>usart</ItemText>
+          <ItemText>Appli_state</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
@@ -282,7 +282,12 @@
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>filesize_total,0x0A</ItemText>
+          <ItemText>hUsbHostFS</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>userMSC_Handle-&gt;state</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

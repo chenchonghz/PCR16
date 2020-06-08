@@ -97,14 +97,14 @@ void SoftReset(void)
 }
 //固件升级 复位
 #define 	RunIAPKeyword               0xA5A55A5A
-#define		ApplicationUpgradeKeywordAddr		0x080FF800
+#define		ApplicationUpgradeKeywordAddr		0x0803F800 //最后一个page
 void FWUpdate_reboot(void)
 {
 	FLASH_EraseInitTypeDef f;
 	f.TypeErase = FLASH_TYPEERASE_PAGES;
-	f.Page = 511;
+	f.Page = 127;
 	f.NbPages = 1;
-	f.Banks = FLASH_BANK_2;
+	f.Banks = FLASH_BANK_1;
 	//设置PageError
 	uint32_t PageError = 0;
 	HAL_FLASH_Unlock();

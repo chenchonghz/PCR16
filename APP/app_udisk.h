@@ -4,7 +4,7 @@
 #include "includes.h"
 
 typedef struct _udisk	{
-	OS_EVENT           *MSG_Q;
+	OS_EVENT           *Mbox;
 	//FATFS fatfs;
 //	u8 state;
 }_appudisk_t;

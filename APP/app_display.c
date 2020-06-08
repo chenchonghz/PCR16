@@ -582,7 +582,7 @@ static void TaskDisplay(void * ppdata)
 				DisplayMessageUI((char *)msg->Data, 1);
 			}
 			else if(msg->Src == MSG_WARNING_DSIPLAY)	{
-				DisplayWarningUI((char *)appdis.pUI->pdata, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
+				DisplayWarningUI((char *)msg->Data, (char *)&Code_Choose[0][0], (char *)&Code_Choose[1][0]);
 			}
 			else if(msg->Src == MSG_NONE_DSIPLAY)	{
 				DaCai_SwitchUI(appdis.pUI);

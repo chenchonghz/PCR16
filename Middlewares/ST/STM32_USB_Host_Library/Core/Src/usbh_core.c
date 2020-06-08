@@ -1066,10 +1066,22 @@ uint8_t USBH_IsPortEnabled(USBH_HandleTypeDef *phost)
   */
 USBH_StatusTypeDef  USBH_LL_Connect(USBH_HandleTypeDef *phost)
 {
-  phost->device.is_connected = 1U;
-  phost->device.is_disconnected = 0U;
-  phost->device.is_ReEnumerated = 0U;
+  if(phost->gState == HOST_IDLE )
+  {
+    phost->device.is_connected = 1U;
 
+    if(phost->pUser != NULL)
+    {
+      phost->pUser(phost, HOST_USER_CONNECTION);
+    }
+  }
+  else
+  {
+    if (phost->device.PortEnabled == 1U)
+    {
+      phost->gState = HOST_DEV_ATTACHED;
+    }
+  }
 
 #if (USBH_USE_OS == 1U)
   phost->os_msg = (uint32_t)USBH_PORT_EVENT;
@@ -1103,6 +1115,19 @@ USBH_StatusTypeDef  USBH_LL_Disconnect(USBH_HandleTypeDef *phost)
   /* FRee Control Pipes */
   USBH_FreePipe(phost, phost->Control.pipe_in);
   USBH_FreePipe(phost, phost->Control.pipe_out);
+  phost->device.is_connected = 0U;
+
+  if(phost->pUser != NULL)
+  {
+    phost->pUser(phost, HOST_USER_DISCONNECTION);
+  }
+  USBH_UsrLog("USB Device disconnected");
+
+  /* Start the low level driver  */
+  USBH_LL_Start(phost);
+
+  phost->gState = HOST_DEV_DISCONNECTED;
+
 #if (USBH_USE_OS == 1U)
   phost->os_msg = (uint32_t)USBH_PORT_EVENT;
 #if (osCMSIS < 0x20000U)

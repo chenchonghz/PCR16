@@ -188,7 +188,7 @@ static void download_start(transmit_ctrl_t *ptfile)
 	FRESULT res;
 	char filepath[FILE_NAME_LEN];
 	char *buf[2];
-	u16 num,i;
+	u16 num;
 	
 	ptfile->state = DEF_Busy;
     ptfile->trans_is_ok = DEF_No;

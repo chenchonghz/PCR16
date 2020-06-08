@@ -2,12 +2,13 @@
 #include "rw_udisk.h"
 #include "bsp.h"
 #include "app_display.h"
+#include "sys_info.h"
 //堆栈
 __align(4) OS_STK  TASK_UDISK_STK[STK_SIZE_UDISK]; //任务堆栈声?
-#define N_MESSAGES		5
-static u8 data_buf[30];
+//#define N_MESSAGES		5
+static u8 data_buf[50];
 _appudisk_t appudisk;
-static void    *MyArrayOfMsg[N_MESSAGES];//消息队列数组
+//static void    *MyArrayOfMsg[N_MESSAGES];//消息队列数组
 static  message_pkt_t    msg_pkt_udisk;
 static void TaskUDISK(void * ppdata);
 extern USBH_HandleTypeDef  hUSB_Host;
@@ -23,7 +24,7 @@ void AppUSBInit(void)
 
 static void DataInit(void)
 {
-	appudisk.MSG_Q 			 = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
+	appudisk.Mbox 			 = OSMboxCreate((void *)0);
 }
 MSC_HandleTypeDef *userMSC_Handle;
 //UDISK任务
@@ -39,17 +40,18 @@ static void TaskUDISK(void * ppdata)
 	
 	for(;;)
 	{
-		msg = (message_pkt_t *)OSQPend(appudisk.MSG_Q, 0, &err);
+		msg = (message_pkt_t *)OSMboxPend(appudisk.Mbox, 0, &err);
 		if(err==OS_ERR_NONE)    {
 			if(msg->Src == MSG_USB_START || msg->Src == MSG_USB_READY || msg->Src == MSG_USB_DISCONNECT)	{
 				USBH_Process(&hUsbHostFS);
 				if(hUsbHostFS.gState != HOST_IDLE)	{
 					userMSC_Handle =  (MSC_HandleTypeDef *) hUsbHostFS.pActiveClass->pData;
-					if(userMSC_Handle->state != MSC_IDLE)	{
+					//if(userMSC_Handle->state != MSC_IDLE)	
+					{
 						OSTimeDly(10);
 						msg_pkt_udisk.Src = MSG_USB_START;
-						OSQPost(appudisk.MSG_Q, &msg_pkt_udisk);		
-					}						
+						OSMboxPost(appudisk.Mbox, &msg_pkt_udisk);		
+					}
 				}
 				if(msg->Src == MSG_USB_READY||msg->Src == MSG_USB_DISCONNECT)	{
 					MountUDISK(msg->Src);
@@ -94,7 +96,7 @@ void CheckUpdateFWName(void)
 					if(0==strcmp(FW_attr, "Mainboard"))        {//校验板名称：主板or传感器板	
 						if(0!=strcmp(FW_ver, CONFIG_SYSINFO_FW_Version))	{//版本号一致不升级
 							Sys.state |= SysState_UpdataFWTB;
-							rsize = sprintf((char *)data_buf, "检测到主板固件 Ver:%s\r\n是否升级？",FW_ver);					
+							sprintf((char *)data_buf, "检测到主板固件 Ver:%s\r\n是否升级？",FW_ver);					
 							OSQPost(appdis.MSG_Q,&msg_pkt_udisk);//通知app_display显示
 						}
 					}

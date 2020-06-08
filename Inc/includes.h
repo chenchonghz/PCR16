@@ -43,7 +43,7 @@
 #include "msg.h"
 #include "tlsf.h"
 #include "sys_data.h"
-#include "sys_info.h"
+
 #endif
 
 
