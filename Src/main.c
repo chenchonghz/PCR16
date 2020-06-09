@@ -107,6 +107,7 @@ __set_PRIMASK(1);//¹Ø±Õ×ÜÖÐ¶Ï
   MX_TIM2_Init();
   MX_TIM7_Init();
   MX_TIM8_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   SYS_PRINTF("SYS Startup.");
 LED_GREEN_ON();

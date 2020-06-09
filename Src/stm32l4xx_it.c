@@ -286,7 +286,8 @@ OSIntEnter();//上位机通讯
 		}
 	}
   /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);	
+  HAL_UART_IRQHandler(&huart2);
+  /* USER CODE BEGIN USART2_IRQn 1 */
 	if(__HAL_UART_GET_FLAG(usart.port, UART_FLAG_ORE)==SET)	{
 		__HAL_UART_CLEAR_OREFLAG(usart.port);
 	}
@@ -294,7 +295,6 @@ OSIntEnter();//上位机通讯
 		usart.port->gState = HAL_UART_STATE_READY;
 		__HAL_UART_CLEAR_FLAG(usart.port,UART_CLEAR_TCF);
 	}
-  /* USER CODE BEGIN USART2_IRQn 1 */
 OSIntExit();
   /* USER CODE END USART2_IRQn 1 */
 }
@@ -334,8 +334,8 @@ OSIntExit();
   */
 void TIM6_DAC_IRQHandler(void)
 {
-	static u32 time_cnt;
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
+	static u32 time_cnt;
 OSIntEnter();
 	if(__HAL_TIM_GET_FLAG(&htim6, TIM_IT_UPDATE)==SET)	{
 		__HAL_TIM_CLEAR_FLAG(&htim6, TIM_IT_UPDATE);

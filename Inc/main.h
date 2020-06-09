@@ -58,14 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MAX5401_CS1_Pin GPIO_PIN_13
-#define MAX5401_CS1_GPIO_Port GPIOC
-#define MAX5401_CS2_Pin GPIO_PIN_14
-#define MAX5401_CS2_GPIO_Port GPIOC
 #define EquipFanCtrl_Pin GPIO_PIN_0
 #define EquipFanCtrl_GPIO_Port GPIOC
-#define CoolFanCtrl_Pin GPIO_PIN_1
-#define CoolFanCtrl_GPIO_Port GPIOC
 #define LimitSwitchRgiht_Pin GPIO_PIN_2
 #define LimitSwitchRgiht_GPIO_Port GPIOC
 #define LimitSwitchRgiht_EXTI_IRQn EXTI2_IRQn
@@ -91,6 +85,8 @@ void Error_Handler(void);
 #define LED_GREEN_GPIO_Port GPIOB
 #define LED_BLUE_Pin GPIO_PIN_10
 #define LED_BLUE_GPIO_Port GPIOB
+#define HeatCover_PWM_Pin GPIO_PIN_11
+#define HeatCover_PWM_GPIO_Port GPIOB
 #define SPI2_CS_Pin GPIO_PIN_12
 #define SPI2_CS_GPIO_Port GPIOB
 #define TEC_PWM_Pin GPIO_PIN_6
@@ -99,8 +95,6 @@ void Error_Handler(void);
 #define Fluo_Green_GPIO_Port GPIOC
 #define Fluo_Blue_Pin GPIO_PIN_8
 #define Fluo_Blue_GPIO_Port GPIOC
-#define Fluo_OnOff_Pin GPIO_PIN_9
-#define Fluo_OnOff_GPIO_Port GPIOC
 #define BEEP_Pin GPIO_PIN_8
 #define BEEP_GPIO_Port GPIOA
 #define DEBUG_UART1_TX_Pin GPIO_PIN_9
@@ -116,10 +110,8 @@ void Error_Handler(void);
 #define LimitSwitchLeft_Pin GPIO_PIN_4
 #define LimitSwitchLeft_GPIO_Port GPIOB
 #define LimitSwitchLeft_EXTI_IRQn EXTI4_IRQn
-#define MAX5401_SCLK_Pin GPIO_PIN_8
-#define MAX5401_SCLK_GPIO_Port GPIOB
-#define MAX5401_DIN_Pin GPIO_PIN_9
-#define MAX5401_DIN_GPIO_Port GPIOB
+#define CoolFan_PWM_Pin GPIO_PIN_8
+#define CoolFan_PWM_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

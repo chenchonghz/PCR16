@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=F:/Personer/PCR/PCR_CODE/Inc
+HeaderPath=F:/Personer/PCR/PCR_CODE/PCR16/Inc
 HeaderFiles=gpio.h;ffconf.h;usbh_diskio.h;fatfs.h;user_diskio.h;sys.h;usb_host.h;usbh_conf.h;stm32l4xx_it.h;stm32l4xx_hal_conf.h;main.h;dma.h;spi.h;usart.h;tim.h;
-SourcePath=F:/Personer/PCR/PCR_CODE/Src
+SourcePath=F:/Personer/PCR/PCR_CODE/PCR16/Src
 SourceFiles=gpio.c;usbh_diskio.c;fatfs.c;user_diskio.c;sys.c;usb_host.c;usbh_conf.c;stm32l4xx_it.c;stm32l4xx_hal_msp.c;main.c;dma.c;spi.c;usart.c;tim.c;
 
 [PreviousLibFiles]
