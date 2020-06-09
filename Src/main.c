@@ -64,6 +64,7 @@ void MX_USB_HOST_Process(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 #include "task_manage.h"
+#include "sys_info.h"
 /* USER CODE END 0 */
 
 /**
@@ -109,7 +110,7 @@ __set_PRIMASK(1);//¹Ø±Õ×ÜÖÐ¶Ï
   MX_TIM8_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  SYS_PRINTF("SYS Startup.");
+  SYS_PRINTF("APP Startup. Ver:%s", CONFIG_SYSINFO_FW_Version);
 LED_GREEN_ON();
 CreatMainTask();
   /* USER CODE END 2 */

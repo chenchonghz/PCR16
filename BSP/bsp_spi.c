@@ -30,11 +30,11 @@
 //#define SPI1_PORT_MOSI	        AD_MOSI_GPIO_Port
 //#define SPI1_PIN_MOSI	        	AD_MOSI_Pin
 
-#define SPI1_PORT_SCK           MAX5401_SCLK_GPIO_Port
-#define SPI1_PIN_SCK            MAX5401_SCLK_Pin
+#define SPI1_PORT_SCK           TMC260_SCK_GPIO_Port
+#define SPI1_PIN_SCK            TMC260_SCK_Pin
 
-#define SPI1_PORT_DIO	        MAX5401_DIN_GPIO_Port
-#define SPI1_PIN_DIO	       	MAX5401_DIN_Pin
+#define SPI1_PORT_DIO	        TMC260_SDI_GPIO_Port
+#define SPI1_PIN_DIO	       	TMC260_SDI_Pin
 
 //#define SPI1_PORT_MOSI	        TMC260_SDI_GPIO_Port
 //#define SPI1_PIN_MOSI	        	TMC260_SDI_Pin

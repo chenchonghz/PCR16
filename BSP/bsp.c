@@ -14,7 +14,7 @@ void	bsp_init(void)
 	BSP_W25Qx_Init();
 	SoftTimerInit();
 //	BspAD7091Init();
-	MAX5401_init();
+//	MAX5401_init();
 }
 //io配置
 void ioconfig(const struct _io_map *pio, cpu_bool_t sw)
@@ -30,18 +30,20 @@ void ioconfig(const struct _io_map *pio, cpu_bool_t sw)
 
 void FluoLED_OnOff(u8 led_t, u8 onoff)
 {
-	Led_FluoGreen_Off();
-	Led_FluoBlue_Off();
+//	Led_FluoGreen_Off();
+//	Led_FluoBlue_Off();
 	if(led_t&LED_BLUE)	{
-		Led_FluoBlue_On();
+		if(onoff==DEF_ON)
+			Led_FluoBlue_On();
+		else if(onoff==DEF_OFF)
+			Led_FluoBlue_Off();
 	}
 	if(led_t&LED_GREEN)	{
-		Led_FluoGreen_On();
+		if(onoff==DEF_ON)
+			Led_FluoGreen_On();
+		else if(onoff==DEF_OFF)
+			Led_FluoGreen_Off();	
 	}
-	if(onoff==DEF_ON)
-		Led_Fluo_On();
-	else if(onoff==DEF_OFF)
-		Led_Fluo_Off();
 }
 ////修改串口波特率
 //void UartBaudrateSet(UART_HandleTypeDef *phuart, u32 baudrate)
@@ -97,12 +99,12 @@ void SoftReset(void)
 }
 //固件升级 复位
 #define 	RunIAPKeyword               0xA5A55A5A
-#define		ApplicationUpgradeKeywordAddr		0x0803F800 //最后一个page
+#define		ApplicationUpgradeKeywordAddr		0x0800E800 //一个page
 void FWUpdate_reboot(void)
 {
 	FLASH_EraseInitTypeDef f;
 	f.TypeErase = FLASH_TYPEERASE_PAGES;
-	f.Page = 127;
+	f.Page = 29;
 	f.NbPages = 1;
 	f.Banks = FLASH_BANK_1;
 	//设置PageError
