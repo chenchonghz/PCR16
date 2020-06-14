@@ -173,7 +173,7 @@
           <Type>0</Type>
           <LineNumber>277</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134348490</Address>
+          <Address>134348538</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -189,7 +189,7 @@
           <Type>0</Type>
           <LineNumber>4541</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134359508</Address>
+          <Address>134359560</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -205,7 +205,7 @@
           <Type>0</Type>
           <LineNumber>307</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134348240</Address>
+          <Address>134348288</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -221,7 +221,7 @@
           <Type>0</Type>
           <LineNumber>113</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134348356</Address>
+          <Address>134348404</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -279,12 +279,27 @@
           <WinNumber>1</WinNumber>
           <ItemText>ad7124,0x0A</ItemText>
         </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>TempPid,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>PID,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>app_temp,0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>0x20009b58</ItemText>
+          <ItemText>0x20009b6c</ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>

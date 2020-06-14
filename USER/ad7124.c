@@ -1,7 +1,7 @@
 #include "ad7124.h"
 #include "PD_DataProcess.h"
 
-#define	AD7124_REF_VOLTAGE		(2500) //参考电压 mV 3304
+#define	AD7124_REF_VOLTAGE		(3300) //参考电压 mV 3304
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
 

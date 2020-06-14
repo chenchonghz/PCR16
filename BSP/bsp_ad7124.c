@@ -330,7 +330,7 @@ void bsp_ad7124_control_set(ad7124_dev_t *pdev)
     r.bits.CONT_READ = 0;
     r.bits.DATA_STATUS = 1;
     r.bits.CS_EN = 1;//1-cs上升沿 DOUT引脚切换为RDY引脚
-    r.bits.REF_EN = 1;//此位置1时，内部基准电压源使能
+    r.bits.REF_EN = 0;//此位置1时，内部基准电压源使能
     r.bits.POWER_MODE  = 2;//01 = mid power 02 = full power
 	r.bits.Mode = AD7124_MODE_CONTINUOUS_CNV;//*/AD7124_MODE_SINGLE_CNV; //单次触发模式
 	r.bits.CLK_SEL = 0;//00 = internal 614.4 kHz clock. The internal clock is not available at the CLK pin
@@ -346,7 +346,7 @@ void bsp_ad7124_cfg_set(ad7124_dev_t *pdev, const ad7124_chcfg_t *pcfg)
 	r.bits.BURNOUT = pcfg->burnout;
 	r.bits.AINBUFP    = 1;
 	r.bits.AINBUFM    = 1;
-	r.bits.REFSEL = 2;//参考电压设置：0--外部;0x2--内部
+	r.bits.REFSEL = 0;//参考电压设置：0--外部;0x2--内部
     r.bits.GAIN   = pcfg->intgain;
 //	cfgwordset = r.uword;
     ad7124_reg_write(pdev, AD7124_REG_CONFIG + pcfg->config_idx, 2, r.uword);
