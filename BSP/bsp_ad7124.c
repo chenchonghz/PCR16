@@ -336,7 +336,7 @@ void bsp_ad7124_control_set(ad7124_dev_t *pdev)
 	r.bits.CLK_SEL = 0;//00 = internal 614.4 kHz clock. The internal clock is not available at the CLK pin
     ad7124_reg_write(pdev, AD7124_REG_CONTROL, 2, r.uword);
 }
-u32 cfgwordset;
+//u32 cfgwordset;
 void bsp_ad7124_cfg_set(ad7124_dev_t *pdev, const ad7124_chcfg_t *pcfg)
 {
     ad7124_reg_cfg_t r;
@@ -348,7 +348,7 @@ void bsp_ad7124_cfg_set(ad7124_dev_t *pdev, const ad7124_chcfg_t *pcfg)
 	r.bits.AINBUFM    = 1;
 	r.bits.REFSEL = 2;//参考电压设置：0--外部;0x2--内部
     r.bits.GAIN   = pcfg->intgain;
-	cfgwordset = r.uword;
+//	cfgwordset = r.uword;
     ad7124_reg_write(pdev, AD7124_REG_CONFIG + pcfg->config_idx, 2, r.uword);
 }
 

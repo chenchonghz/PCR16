@@ -27,7 +27,7 @@ static void TempDatInit(void)
 	TempPid[HOLE_TEMP].TimCH = TIM_CHANNEL_1;
 	TempPid[HOLE_TEMP].TimPluse = HOLE_TECPWM_PLUSE;
 	TempPid[HOLE_TEMP].DutyMax = HOLE_TECPWM_MAX;
-	TempPid[HOLE_TEMP].target_t = 3700;//0.01
+//	TempPid[HOLE_TEMP].target_t = 3700;//0.01
 	TempPid[HOLE_TEMP].PIDParam = 0.0;
 	
 	TempPid[COVER_TEMP].PIDid = PID_ID2;
@@ -35,7 +35,7 @@ static void TempDatInit(void)
 	TempPid[COVER_TEMP].TimCH = TIM_CHANNEL_4;
 	TempPid[COVER_TEMP].TimPluse = COVER_TECPWM_PLUSE;
 	TempPid[COVER_TEMP].DutyMax = COVER_TECPWM_MAX;
-	TempPid[COVER_TEMP].target_t = 0;	
+//	TempPid[COVER_TEMP].target_t = 0;	
 	TempPid[COVER_TEMP].PIDParam = 0.0;
 }
 //TEC pwm控制
@@ -46,7 +46,7 @@ void StartTECPWM(pid_ctrl_t *pTempPid, u8 duty)
 	
 	if(dutybk==duty)
 		return;
-	temp = (pTempPid->TimPluse/100)*duty;
+	temp = (pTempPid->TimPluse*duty)/100;
 	if(duty==100)	{
 		temp++;
 	}
@@ -144,6 +144,8 @@ void TempProgramLookOver(s16 c_temp)
 	s16 target;
 	static u8 ConstantTempCnt;
 	
+	if(Sys.devstate != DevState_Running)
+		return;
 	m = temp_data.CurStage;
 	n = temp_data.stage[m].CurStep;
 	target = temp_data.stage[m].step[n].temp;
@@ -166,6 +168,18 @@ void TempProgramLookOver(s16 c_temp)
 		}
 	}
 }
+//风扇控制：flag 开关，duty pwm占空比
+void StartCoolFan(u8 flag, u8 duty)
+{
+	u32 temp;
+	
+	if(flag==DEF_ON)	{
+		temp = (80*duty)/100;
+		StartPWM(&htim4, TIM_CHANNEL_3, temp);
+	}
+	else if(flag==DEF_OFF)
+		StopPWM(&htim4, TIM_CHANNEL_3);
+}
 
 #define	TEMPCTRL_ACCURACY		10//温控精度0.1
 #define	TEMPCOLLECT_ACCURACY		5//温度采集精度 0.05
@@ -177,9 +191,10 @@ static void AppTempTask (void *parg)
 	PIDParamInit();
 	StopTempCtrl(&TempPid[HOLE_TEMP]);
 	OSTimeDly(1000);
-//	COOLFAN_ON();
-//	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
-	SetPIDVal(PID_ID1, 0.0, 0.0, 0.0);
+//	EquipFAN_ON();//打开设备风扇
+	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
+//	SetPIDVal(PID_ID1, 0.0, 0.0, 0.0);
+	StartCoolFan(DEF_ON, 50);//打开制冷片风扇 默认50%占空比
 	
 	for(;;)
     {

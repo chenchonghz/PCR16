@@ -5,7 +5,7 @@
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
 
-#define	AVER_MAX		8
+#define	AVER_MAX		10
 #define	TEC_AVER_MAX		AVER_MAX
 #define	PD_AVER_MAX		4
 #define	TEC_DISCARD_NUM		2
@@ -195,13 +195,6 @@ static void CalcADCVolAverage(u8 ch, u32 adcode, u8 aver_max, u8 discard)
 			flag=0;
 			for (j=0;j<idx-i-1;j++)
 			{
-				if (AdcCodeAver[ch].buf[j] > AdcCodeAver[ch].buf[j+1])
-				{
-					temp = AdcCodeAver[ch].buf[j];
-					AdcCodeAver[ch].buf[j]   = AdcCodeAver[ch].buf[j+1];
-					AdcCodeAver[ch].buf[j+1] = temp;
-					flag = 1;
-				}
 				if (AdcCodeAver[ch].buf[j] > AdcCodeAver[ch].buf[j+1])
 				{
 					temp = AdcCodeAver[ch].buf[j];

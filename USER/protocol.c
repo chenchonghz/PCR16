@@ -213,7 +213,8 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			}else if(data==1)	{//启动
 				Sys.devstate = DevState_Debug;
 				Sys.devsubstate = DevSubState_DebugTemp;
-			}						
+			}
+			ack_state = ACK_OK;
 			break;
 		case _CMD_GetTemp://0x14,//读取模块温度
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);

@@ -173,7 +173,7 @@
           <Type>0</Type>
           <LineNumber>277</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134348378</Address>
+          <Address>134348490</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -189,7 +189,7 @@
           <Type>0</Type>
           <LineNumber>4541</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134359420</Address>
+          <Address>134359508</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -205,7 +205,7 @@
           <Type>0</Type>
           <LineNumber>307</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134348128</Address>
+          <Address>134348240</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -221,7 +221,7 @@
           <Type>0</Type>
           <LineNumber>113</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134348244</Address>
+          <Address>134348356</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -237,57 +237,47 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Appli_state</ItemText>
+          <ItemText>lab_data</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>lab_data</ItemText>
+          <ItemText>temp_data,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>temp_data,0x0A</ItemText>
+          <ItemText>Sys</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Sys</ItemText>
+          <ItemText>appdis.pUI</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>appdis.pUI</ItemText>
+          <ItemText>sample_data</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>sample_data</ItemText>
+          <ItemText>app_ad</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>app_ad</ItemText>
+          <ItemText>transmit_ctrl,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>transmit_ctrl,0x0A</ItemText>
+          <ItemText>transmit_buff</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>transmit_buff</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>hUsbHostFS</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>userMSC_Handle-&gt;state</ItemText>
+          <ItemText>ad7124,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

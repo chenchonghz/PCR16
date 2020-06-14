@@ -97,8 +97,8 @@ H*******************************************************************************
 #define	TEC_ON()				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET)
 #define	TEC_OFF()				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET)
 
-#define	COOLFAN_ON()				HAL_GPIO_WritePin(CoolFanCtrl_GPIO_Port, CoolFanCtrl_Pin, GPIO_PIN_SET)
-#define	COOLFAN_OFF()				HAL_GPIO_WritePin(CoolFanCtrl_GPIO_Port, CoolFanCtrl_Pin, GPIO_PIN_RESET)
+#define	EquipFAN_ON()				HAL_GPIO_WritePin(EquipFanCtrl_GPIO_Port, EquipFanCtrl_Pin, GPIO_PIN_SET)
+#define	EquipFAN_OFF()				HAL_GPIO_WritePin(EquipFanCtrl_GPIO_Port, EquipFanCtrl_Pin, GPIO_PIN_RESET)
 
 #define	LED_RED_ON()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_SET)
 #define	LED_RED_OFF()				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin,GPIO_PIN_RESET)
