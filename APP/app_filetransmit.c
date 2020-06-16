@@ -120,7 +120,7 @@ static void upload_end(transmit_ctrl_t *ptfile)
 void UploadFileOpt(transmit_ctrl_t *ptfile, message_pkt_t *pmsg)
 {
     INT8U  *pdata;
-    INT32U  len;
+//    INT32U  len;
     BIT32 tmp;
 
     pdata = (INT8U *)pmsg->Data;

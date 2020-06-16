@@ -26,7 +26,7 @@ extern _PID_t PID[PID_NUMS];
 void PIDParamInit(void);
 void SetPIDVal(u8 id, float P,float I,float D);
 void SetPIDTarget(u8 id, s32 data);
-float PID_control(u8 id, s32 set_dat,s32 actual_dat);
+float PID_control(u8 id, s32 actual_dat);
 s32 GetPIDDiff(u8 id);
 void ClearPIDDiff(u8 id);
 #endif

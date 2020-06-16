@@ -231,6 +231,22 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			msg[1].dLen = 2;
 			OSMboxPost(usart.mbox, &msg[1]);
 			break;
+////////////////////////////////////////////DEBUG 指令//////////////////////////////////////////////
+		case _CMD_SetPIDVal:	{//0xE0 PID参数设置
+			float P,I,D;
+			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			P = (float)UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
+			I = (float)UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
+			D = (float)UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
+			if(iPara==0)	{//设置模块PID
+				SetPIDVal(PID_ID1, P, I, D);
+			}
+			else if(iPara==1)	{//设置热盖PID
+				SetPIDVal(PID_ID2, P, I, D);
+			}
+			ack_state = ACK_OK;
+			break;
+		}
 		default:
 			break;
 	}

@@ -69,7 +69,7 @@ static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
 //	u16 setval;
 	
 	temp = pTempPid->PIDParam;
-	temp += PID_control(pTempPid->PIDid, dat, cur_t);
+	temp += PID_control(pTempPid->PIDid, cur_t);
 	pTempPid->PIDParam = temp;
 	dat = (s16)floatToInt(temp);
 	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温

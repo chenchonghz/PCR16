@@ -2,9 +2,9 @@
 #include "motor.h"
 
 #define BUFSIZE         64
-#define	HOLE_POSITION_MIN_OFFSET	(u32)(1.5*Motor_StepsPerum)	//
-#define	HOLE_POSITION_MAX_OFFSET	(u32)(1.3*Motor_StepsPerum)	//
-#define	HOLE_POSITION_DISTANCE	(u32)(4.5*Motor_StepsPerum)	//
+#define	HOLE_POSITION_MIN_OFFSET	(s16)(1.5f*Motor_StepsPerum)	//
+#define	HOLE_POSITION_MAX_OFFSET	(s16)(1.3f*Motor_StepsPerum)	//
+#define	HOLE_POSITION_DISTANCE		(s16)(4.5f*Motor_StepsPerum)	//
 
 _pd_data_t gPD_Data;
 u16 PD_max;

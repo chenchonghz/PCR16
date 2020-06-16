@@ -60,7 +60,7 @@ s32 PID_control(u8 id, s32 set_dat,s32 actual_dat)
 #endif
 float increment;
 //增量法计算公式：Pdlt=Kp*(e(t)-e(t-1))+Ki*e(t)+Kd*(e(t)-2*e(t-1)+e(t-2));
-float PID_control(u8 id, s32 set_dat,s32 actual_dat)
+float PID_control(u8 id, s32 actual_dat)
 {	
 //	float increment;
 //	s32 ret;
