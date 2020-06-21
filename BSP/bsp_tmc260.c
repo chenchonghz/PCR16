@@ -111,7 +111,7 @@ static tmc260_dev_t     g_tmc260_dev    [TMC260_ID_NUMS] = {
         .SmartEnergyControl = { // SMARTEN
             .SmartIMin              = 1,
             .SmartDownStep          = 2,
-            .SmartStallLevelMax     = 15,
+            .SmartStallLevelMax     = 12,
             .SmartUpStep            = 3,
             .SmartStallLevelMin     = 5
         },

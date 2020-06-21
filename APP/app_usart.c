@@ -148,7 +148,7 @@ void UsartSendAck(message_pkt_t *pMsg, INT8U ack)
 
 static void UsartSendData(message_pkt_t *pmsg)
 {
-	u8 idx,datlen;
+	u8 idx,datlen,retry_cnt;
 	u16 temp;
 	usart_t *pUsart = &usart;
 
@@ -170,6 +170,19 @@ static void UsartSendData(message_pkt_t *pmsg)
 	pUsart->tx_buf[idx++] = PROTOCOL_RX_END;
 	pUsart->tx_len = idx;
 	HAL_UART_Transmit_DMA(pUsart->port, pUsart->tx_buf, pUsart->tx_len);
+	retry_cnt = 0;
+	do	{
+		if(HAL_UART_Transmit_DMA(pUsart->port, pUsart->tx_buf, pUsart->tx_len)==HAL_OK)	{
+			break;
+		}else	{
+			OSTimeDly(1);
+		}
+		retry_cnt++;
+		if(retry_cnt>10)	{
+			mutex_unlock(usart.lock);
+			break;
+		}
+	}while(1);
 }
 
 extern u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[]);
