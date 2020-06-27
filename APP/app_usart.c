@@ -169,7 +169,6 @@ static void UsartSendData(message_pkt_t *pmsg)
 	pUsart->tx_buf[idx++] = temp>>8;
 	pUsart->tx_buf[idx++] = PROTOCOL_RX_END;
 	pUsart->tx_len = idx;
-	HAL_UART_Transmit_DMA(pUsart->port, pUsart->tx_buf, pUsart->tx_len);
 	retry_cnt = 0;
 	do	{
 		if(HAL_UART_Transmit_DMA(pUsart->port, pUsart->tx_buf, pUsart->tx_len)==HAL_OK)	{

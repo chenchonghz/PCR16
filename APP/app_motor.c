@@ -40,10 +40,12 @@ static void MotorReset(void)
 //	CalcAnyPosAtResetSteps(&tMotor[MOTOR_ID1], Motor_Move_MAX_STEP);
 	StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, Motor_Move_MAX_STEP, DEF_False);
 	if(tMotor[MOTOR_ID1].status.abort_type == MotorAbort_Min_LimitOpt)	{//复位过程碰到零点 成功
-		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetOK;		
+		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetOK;
+		SysError.Y1.bits.b1 = DEF_Active;//零点信号正常
 	}
 	else 	{
 		tMotor[MOTOR_ID1].status.action     = MotorAction_ResetFail;
+		SysError.Y1.bits.b1 = DEF_Inactive;//未找到电机零点
 	}
 	OSTimeDly(500);//等待一段时间清零位置 消除过充误差
 	tMotor[MOTOR_ID1].CurSteps = 0;
@@ -110,7 +112,7 @@ static void AppMotorTask (void *parg)
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, (u32)(25*Motor_StepsPerum), DEF_False);
 				StopCaliHolePosition();//停止孔位置校准
 				OSTimeDly(100);
-				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, (u32)(25*Motor_StepsPerum), DEF_True);
+				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, (u32)(25*Motor_StepsPerum), DEF_True);//回零点
 				CalcHolePositon();//计算孔位置
 				Sys.devstate = DevState_IDLE;
 			}
@@ -122,10 +124,9 @@ static void AppMotorTask (void *parg)
 				HolePos.idx = 0;
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MAX, Motor_Move_MAX_STEP, DEF_True);
 				CalcHolePDBase(LED_BLUE);//计算蓝光本底信号	
-				gPD_Data.ch = LED_GREEN;
+				gPD_Data.ch = LED_GREEN;//绿光扫描
 				FluoLED_OnOff(LED_GREEN, DEF_ON);
 				OSTimeDly(100);
-//				HolePos.idx = HOLE_NUM;
 				StartMotor(&tMotor[MOTOR_ID1], MOTOR_TO_MIN, tMotor[MOTOR_ID1].CurSteps, DEF_True);
 				StopCaliHolePDBase();//校准结束				
 				CalcHolePDBase(LED_GREEN);//计算绿光本底信号		

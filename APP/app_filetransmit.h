@@ -39,7 +39,6 @@ typedef struct _transmit_ctrl {
     INT16U  trans_cnt;                       // 一次收发计数器
     INT8U  *const buf_addr;                 // transmit缓存起始地址
     char  filepath[TransmitFilePathSize];                      // transmit 文件保存路径
-	FILE	*fp;
     INT32U const size_max;                  // 可存储最大量
     INT32U  size_total;                     // 文件总大小
     INT32U  size_cnt;                       // 单帧字节数

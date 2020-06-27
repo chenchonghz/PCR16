@@ -23,8 +23,8 @@ void SysDataInit(void)
 {
 	UserMem = tlsf_create_with_pool((void *)0x20012000, 0x6000);//内存0x12000 - 0x18000 区域24KB内存使用tlsf管理
 	jansson_init();
-	SysError.Y1.ubyte = 0x0;//来自传感器板的故障 
-	SysError.Y2.ubyte = 0;//主板故障
+	SysError.Y1.ubyte = 0x0;//主板故障
+	SysError.Y2.ubyte = 0x0;//
 	
 	Sys.state = SysState_None;
 	Sys.devstate = DevState_IDLE;

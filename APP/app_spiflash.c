@@ -29,10 +29,10 @@ void CheckSPIFlash(void)
 	BSP_W25Qx_Read_ID(devid);
 	if(devid[0] == W25QXX_MANUFACTURER_ID)	{//devid[1] -- DEVICE_ID; devid[0] -- MANUFACTURER_ID 
 		BSP_PRINTF("SPI FLASH OK.");
-		SysError.Y2.bits.b7 = DEF_Active;
+		SysError.Y1.bits.b7 = DEF_Active;
 	}else	{
 		BSP_PRINTF("SPI FLASH error.");
-		SysError.Y2.bits.b7 = DEF_Inactive;
+		SysError.Y1.bits.b7 = DEF_Inactive;
 	}
 }
 //通过任务写log
@@ -70,7 +70,7 @@ static void TaskSPIFLASH(void * ppdata)
 	
 	DataInit();
 	CheckSPIFlash();
-	if(SysError.Y2.bits.b7 == DEF_Active)	{
+	if(SysError.Y1.bits.b7 == DEF_Active)	{
 		if(FlashFSInit()==FR_OK)	{
 			BSP_PRINTF("filesys init ok");		
 			CreateSysFile();//创建系统文件
@@ -86,7 +86,7 @@ static void TaskSPIFLASH(void * ppdata)
 	{
 		msg = (message_pkt_t *)OSQPend(spiflash.MSG_Q, 0, &err);//
 		if(err==OS_ERR_NONE)    {
-			if(SysError.Y2.bits.b7 == DEF_Active)	{
+			if(SysError.Y1.bits.b7 == DEF_Active)	{
 				if(msg->Src == MSG_WRITELOG)	{//写日志
 					write_log();
 				}

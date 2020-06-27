@@ -20,7 +20,6 @@ transmit_ctrl_t   transmit_ctrl = {
     .trans_cnt      = 0,
     .buf_addr      = transmit_buff,
     .filepath     = {0},
-	.fp			  = NULL,
     .size_max      = TransmitBufMaxSize,
     .size_total    = 0,
     .size_cnt      = 0,
@@ -261,7 +260,7 @@ void DownloadFileOpt(transmit_ctrl_t *ptfile, message_pkt_t *pmsg)
     {
         case TransmitCmd_Start:
             if (ptfile->state == DEF_Idle) {
-//				ptfile->trans_type = pdata[1];//传输文件类型
+				ptfile->trans_type = pdata[1];//传输文件类型
 				tmp.ubyte[0] = pdata[1];
                 tmp.ubyte[1] = pdata[2];
                 tmp.ubyte[2] = pdata[3];

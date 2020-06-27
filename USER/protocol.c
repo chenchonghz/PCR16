@@ -233,17 +233,19 @@ u8 UsartCmdProcess(usart_t *pUsart, message_pkt_t msg[])
 			break;
 ////////////////////////////////////////////DEBUG 指令//////////////////////////////////////////////
 		case _CMD_SetPIDVal:	{//0xE0 PID参数设置
-			float P,I,D;
+			BIT32 P,I,D;
 			iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			P = (float)UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
-			I = (float)UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
-			D = (float)UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
+			P.uword = UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
+			I.uword = UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
+			D.uword = UsartRxGetINT32U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(iPara==0)	{//设置模块PID
-				SetPIDVal(PID_ID1, P, I, D);
+				SetPIDVal(PID_ID1, P.fp32, I.fp32, D.fp32);
 			}
 			else if(iPara==1)	{//设置热盖PID
-				SetPIDVal(PID_ID2, P, I, D);
+				SetPIDVal(PID_ID2, P.fp32, I.fp32, D.fp32);
 			}
+			else 
+				break;
 			ack_state = ACK_OK;
 			break;
 		}

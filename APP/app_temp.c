@@ -194,7 +194,7 @@ static void AppTempTask (void *parg)
 //	EquipFAN_ON();//打开设备风扇
 	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
 //	SetPIDVal(PID_ID1, 0.0, 0.0, 0.0);
-	StartCoolFan(DEF_ON, 50);//打开制冷片风扇 默认50%占空比
+	StartCoolFan(DEF_ON, 60);//打开制冷片风扇 默认50%占空比
 	
 	for(;;)
     {
@@ -205,20 +205,23 @@ static void AppTempTask (void *parg)
 				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
 //				SetPIDTarget(PID_ID1, TempPid[HOLE_TEMP].target_t);//设置控制目标
 				TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
+				SysError.Y1.bits.b3 = DEF_Active;
 			}else	{//温度传感器脱落
-			
+				SysError.Y1.bits.b3 = DEF_Inactive;//温度传感器异常
 			}
 			if(CalcTemperature(GetADCVol(TEMP_ID2), (s32 *)&cur_temp)==0)	{
-				app_temp.current_t[TEMP_ID2] = cur_temp;				
+				app_temp.current_t[TEMP_ID2] = cur_temp;
+				SysError.Y1.bits.b4 = DEF_Active;				
 			}else	{
-			
+				SysError.Y1.bits.b4 = DEF_Inactive;
 			}
 			if(CalcTemperature(GetADCVol(TEMP_ID3), (s32 *)&cur_temp)==0)	{
 				app_temp.current_t[TEMP_ID3] = cur_temp;
 //				SetPIDTarget(PID_ID2, TempPid[COVER_TEMP].target_t);//设置控制目标
 //				TempCtrl(&TempPid[COVER_TEMP], cur_temp);//热盖pid调节 增量法计算
+				SysError.Y1.bits.b5 = DEF_Active;
 			}else	{
-			
+				SysError.Y1.bits.b5 = DEF_Inactive;
 			}
 //			if(CalcTemperature(GetADCVol(TEMP_ID4), (s32 *)&cur_temp)==0)	{//散热器 预留
 //				app_temp.current_t[TEMP_ID4] = cur_temp;				

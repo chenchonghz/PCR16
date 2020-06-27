@@ -38,9 +38,9 @@ void AD7124Init(void)
 	ad7124.pdev = bsp_ad7124_init(AD7124_ID1);
 	ad7124_id = bsp_ad7124_id_get(ad7124.pdev);
 	if(ad7124_id == AD7124_ID)	{
-		SysError.Y2.bits.b2 = DEF_Active;
+		SysError.Y1.bits.b2 = DEF_Active;
 	}else	{
-		SysError.Y2.bits.b2 = DEF_Inactive;//AD7124异常
+		SysError.Y1.bits.b2 = DEF_Inactive;//AD7124异常
 	}
 	bsp_ad7124_filterreg_set(ad7124.pdev);
 	bsp_ad7124_control_set(ad7124.pdev);//连续采样模式
