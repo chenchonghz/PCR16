@@ -7,7 +7,7 @@
 __align(4) OS_STK  TASK_TEMP_STK[STK_SIZE_TEMP]; //任务堆栈声?
 
 _app_temp_t app_temp;
-pid_ctrl_t TempPid[PIDCTRL_NUM];
+temp_ctrl_t TempCtrl[TEMPCTRL_NUM];
 #define	HOLE_TECPWM_PLUSE		400
 #define	COVER_TECPWM_PLUSE		800
 #define	HOLE_TECPWM_MAX		62//TEC pwm占空比最大值
@@ -22,70 +22,74 @@ void AppTempInit (void)
 
 static void TempDatInit(void)
 {
-	TempPid[HOLE_TEMP].PIDid = PID_ID1;
-	TempPid[HOLE_TEMP].pTECPWM = &htim8;
-	TempPid[HOLE_TEMP].TimCH = TIM_CHANNEL_1;
-	TempPid[HOLE_TEMP].TimPluse = HOLE_TECPWM_PLUSE;
-	TempPid[HOLE_TEMP].DutyMax = HOLE_TECPWM_MAX;
-//	TempPid[HOLE_TEMP].target_t = 3700;//0.01
-	TempPid[HOLE_TEMP].PIDParam = 0.0;
+	TempCtrl[HOLE_TEMP].PIDid = PID_ID1;
+	TempCtrl[HOLE_TEMP].pTECPWM = &htim8;
+	TempCtrl[HOLE_TEMP].TimCH = TIM_CHANNEL_1;
+	TempCtrl[HOLE_TEMP].TimPluse = HOLE_TECPWM_PLUSE;
+	TempCtrl[HOLE_TEMP].DutyMax = HOLE_TECPWM_MAX;
+	SetPIDOutputLimits(PID_ID1, -HOLE_TECPWM_MAX, HOLE_TECPWM_MAX);
 	
-	TempPid[COVER_TEMP].PIDid = PID_ID2;
-	TempPid[COVER_TEMP].pTECPWM = &htim2;
-	TempPid[COVER_TEMP].TimCH = TIM_CHANNEL_4;
-	TempPid[COVER_TEMP].TimPluse = COVER_TECPWM_PLUSE;
-	TempPid[COVER_TEMP].DutyMax = COVER_TECPWM_MAX;
-//	TempPid[COVER_TEMP].target_t = 0;	
-	TempPid[COVER_TEMP].PIDParam = 0.0;
+	TempCtrl[COVER_TEMP].PIDid = PID_ID2;
+	TempCtrl[COVER_TEMP].pTECPWM = &htim2;
+	TempCtrl[COVER_TEMP].TimCH = TIM_CHANNEL_4;
+	TempCtrl[COVER_TEMP].TimPluse = COVER_TECPWM_PLUSE;
+	TempCtrl[COVER_TEMP].DutyMax = COVER_TECPWM_MAX;
+	SetPIDOutputLimits(PID_ID2, -COVER_TECPWM_MAX, COVER_TECPWM_MAX);
 }
 //TEC pwm控制
-void StartTECPWM(pid_ctrl_t *pTempPid, u8 duty)
+void StartTECPWM(temp_ctrl_t *pTempCtrl, u8 duty)
 {
-	static u8 dutybk;
 	u16 temp;
 	
-	if(dutybk==duty)
-		return;
-	temp = (pTempPid->TimPluse*duty)/100;
-	if(duty==100)	{
-		temp++;
+	temp = (pTempCtrl->TimPluse*duty)/100;
+	if(duty>=100)	{
+		temp = 101;
 	}
-	StartPWM(pTempPid->pTECPWM, pTempPid->TimCH, temp);
-	dutybk = duty;
+	StartPWM(pTempCtrl->pTECPWM, pTempCtrl->TimCH, temp);
 }
 
 //停止温度控制
-static void StopTempCtrl(pid_ctrl_t *pTempPid)
+static void StopTempCtrl(temp_ctrl_t *pTempPid)
 {
 	StopPWM(pTempPid->pTECPWM, pTempPid->TimCH);
-	pTempPid->PIDParam = 0.0;
+//	pTempPid->PIDParam = 0.0;
 }
 u16 setval;
 //pid调节半导体片温度 采样增量法计算 pwm占空比不能超过50%
-static void TempCtrl(pid_ctrl_t *pTempPid, u16 cur_t)
+static void TempControl(temp_ctrl_t *pTempPid, u16 cur_t)
 {
 	s16 dat;
 	float temp;
 //	u16 setval;
 	
-	temp = pTempPid->PIDParam;
-	temp += PID_control(pTempPid->PIDid, cur_t);
-	pTempPid->PIDParam = temp;
-	dat = (s16)floatToInt(temp);
+	temp = PID_control(pTempPid->PIDid, cur_t);
+	dat = (s16)temp;
 	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
-		if(dat < -pTempPid->DutyMax)
-			setval = pTempPid->DutyMax;
-		else
-			setval = -dat;
 		TEC_DIR_COLD();
 	}
-	else {//当前温度低于目标温度 将TEC切换到制热模式 快速升温
-		if(dat > pTempPid->DutyMax)
-			setval = pTempPid->DutyMax;
-		else
-			setval = dat;
+	else	{//当前温度低于目标温度 将TEC切换到制热模式 快速升温
 		TEC_DIR_HOT();
 	}
+	setval = abs(dat);
+	if(setval > pTempPid->DutyMax)
+		setval = pTempPid->DutyMax;
+//	temp = GetPIDIncrement(pTempPid->PIDid);//获取上次增量值
+//	temp += PID_control(pTempPid->PIDid, cur_t);//
+//	dat = (s16)floatToInt(temp);
+//	if(dat<0)	{//当前温度高于目标温度 将TEC切换到制冷模式 快速降温
+//		if(dat < -pTempPid->DutyMax)
+//			setval = pTempPid->DutyMax;
+//		else
+//			setval = -dat;
+//		TEC_DIR_COLD();
+//	}
+//	else {//当前温度低于目标温度 将TEC切换到制热模式 快速升温
+//		if(dat > pTempPid->DutyMax)
+//			setval = pTempPid->DutyMax;
+//		else
+//			setval = dat;
+//		TEC_DIR_HOT();
+//	}
 	StartTECPWM(pTempPid, setval);
 //	SYS_PRINTF("D:%d,T:%d ",dat,cur_t);
 }
@@ -95,7 +99,7 @@ u8 StartAPPTempCtrl(void)
 	msg_pkt_temp.Src = MSG_WriteLabTemplate;//保存实验模板, 路径./lab/Temp.json; ./lab/Lab.json
 	OSQPost(spiflash.MSG_Q, &msg_pkt_temp);	
 	OSTimeDly(500);
-	ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);	
+	ClearPIDDiff(TempCtrl[HOLE_TEMP].PIDid);	
 	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
 	return 1;
 }
@@ -187,15 +191,15 @@ static void AppTempTask (void *parg)
 {
 	s32 cur_temp;
 	
-	TempDatInit();
 	PIDParamInit();
-	StopTempCtrl(&TempPid[HOLE_TEMP]);
+	TempDatInit();
+	StopTempCtrl(&TempCtrl[HOLE_TEMP]);
 	OSTimeDly(1000);
 //	EquipFAN_ON();//打开设备风扇
 	SetPIDVal(PID_ID1, 0.65, 0.00025, 5.8);
 //	SetPIDVal(PID_ID1, 0.0, 0.0, 0.0);
-	StartCoolFan(DEF_ON, 60);//打开制冷片风扇 默认50%占空比
-	
+	StartCoolFan(DEF_ON, 100-70);//打开制冷片风扇 默认50%占空比
+	EquipFAN_OFF();
 	for(;;)
     {
 		if(Sys.devstate == DevState_Running||Sys.devsubstate == DevSubState_DebugTemp)	
@@ -204,7 +208,7 @@ static void AppTempTask (void *parg)
 				TempProgramLookOver(cur_temp);
 				app_temp.current_t[TEMP_ID1] = cur_temp;//0.01
 //				SetPIDTarget(PID_ID1, TempPid[HOLE_TEMP].target_t);//设置控制目标
-				TempCtrl(&TempPid[HOLE_TEMP], cur_temp);//pid调节 增量法计算
+				TempControl(&TempCtrl[HOLE_TEMP], cur_temp);//pid调节 增量法计算
 				SysError.Y1.bits.b3 = DEF_Active;
 			}else	{//温度传感器脱落
 				SysError.Y1.bits.b3 = DEF_Inactive;//温度传感器异常
@@ -231,10 +235,10 @@ static void AppTempTask (void *parg)
 		}
 		else	
 		{
-			ClearPIDDiff(TempPid[HOLE_TEMP].PIDid);
-			StopTempCtrl(&TempPid[HOLE_TEMP]);
-			ClearPIDDiff(TempPid[COVER_TEMP].PIDid);
-			StopTempCtrl(&TempPid[COVER_TEMP]);
+			ClearPIDDiff(TempCtrl[HOLE_TEMP].PIDid);
+			StopTempCtrl(&TempCtrl[HOLE_TEMP]);
+			ClearPIDDiff(TempCtrl[COVER_TEMP].PIDid);
+			StopTempCtrl(&TempCtrl[COVER_TEMP]);
 		}
 		OSTimeDly(80);
 	}

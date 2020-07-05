@@ -5,10 +5,10 @@
 #define	DEFAULT_VDD						(float)(3.3)
 _ad7124_t ad7124;
 
-#define	AVER_MAX		10
+#define	AVER_MAX		15
 #define	TEC_AVER_MAX		AVER_MAX
 #define	PD_AVER_MAX		4
-#define	TEC_DISCARD_NUM		2
+#define	TEC_DISCARD_NUM		4
 #define	PD_DISCARD_NUM		1
 #define	CH_AVERNUMS			6//需要算平均的通道个数
 struct _AdcCodeAver_t {

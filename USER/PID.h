@@ -14,11 +14,15 @@ typedef struct _PID{
     float    Kp,Ki,Kd;         // 比例系数,积分系数,微分系数
     s32      period;     // 控制周期
     s32    Target;         // 目标
-    s32    Actual;         // 实际
+    s32    LastInput;         // 实际
     s32    diff;      // 偏差值
     s32    diff_last;      // 上一个偏差值
     s32    diff_llast;      // 上上一个偏差值
-    s32 integral;
+	s32	OutputMin;
+	s32 OutputMax;
+    float integral;
+	float increment;
+	float PIterm;
     u8 issue_cnt;
 } _PID_t;
 
@@ -26,7 +30,9 @@ extern _PID_t PID[PID_NUMS];
 void PIDParamInit(void);
 void SetPIDVal(u8 id, float P,float I,float D);
 void SetPIDTarget(u8 id, s32 data);
-float PID_control(u8 id, s32 actual_dat);
+void SetPIDOutputLimits(u8 id, s32 min, s32 max);
+float PID_control(u8 id, s32 input_dat);
+float GetPIDIncrement(u8 id);
 s32 GetPIDDiff(u8 id);
 void ClearPIDDiff(u8 id);
 #endif

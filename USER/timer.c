@@ -91,10 +91,8 @@ void StopPWM(TIM_HandleTypeDef *pPWM, u8 ch)
 //ÐÞ¸ÄTEC pwmÕ¼¿Õ±È
 void UpdatePWM(TIM_HandleTypeDef *pPWM, u8 ch, INT16U val)
 {
-//	u16 temp;
-	
-//	temp = (HOLE_TECPWM_PLUSE/100)*duty;
-//    __HAL_TIM_SET_AUTORELOAD(pPWM, HOLE_TECPWM_PLUSE);
+	if(__HAL_TIM_GET_COMPARE(pPWM, ch) == val)
+		return;
     __HAL_TIM_SET_COMPARE(pPWM, ch, val);
 }
 
