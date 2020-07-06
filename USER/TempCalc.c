@@ -1222,11 +1222,13 @@ static u32 config_temp_calculate_decimal(uint32_t max, uint32_t mix, uint32_t re
     int i;
     uint32_t step, resistance_1;
 
-    step = (max - mix) / 10;
+	i = max - mix;
+    step = i / 10;
+	if(i%10>5)	step += 1;
     for(i = 0; i < 10 + 1; i++)
     {
         resistance_1 = max - i * step;
-        if(resistance_1 < resistance )
+        if(resistance_1 <= resistance )
             return i;
     }
 
